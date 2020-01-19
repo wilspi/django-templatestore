@@ -17,7 +17,7 @@ in
   with nixpkgs;
 
   stdenv.mkDerivation {
-    name = "django-template-explorer-dev";
+    name = "django-template-editor-dev";
     buildInputs = [installNodeJS];
 
     nativeBuildInputs = [
@@ -67,6 +67,6 @@ in
         # Do something if required.
         ''
     ) + ''
-      echo "env: [DEV] DJANGO-TEMPLATE-ENGINE activated";
+      echo "ENV: django-template-editor-dev ACTIVATED";
     '';
   }

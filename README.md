@@ -1,4 +1,4 @@
-# django-template-explorer
+# django-template-editor
 
 ### Supports
 
@@ -14,7 +14,7 @@
 * Install python 3.7.4 and setup virtualenv `django-template-explore-dev`
   ```buildoutcfg
   pyenv install 3.7.4 --skip-existing
-  pyenv virtualenv 3.7.4 django-template-explore-dev
+  pyenv virtualenv 3.7.4 django-template-editor-dev
   ```
 * Install `npm`
   ```buildoutcfg
