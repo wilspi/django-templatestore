@@ -17,19 +17,19 @@
   cd editor/frontend/ && npm install && cd -
   ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+   
+   
+   
+   
+   
+   
+    
+   
+   
+   
+  
+  
+  
 ## TOEDIT
 
 
@@ -61,9 +61,6 @@
   ``` buildoutcfg
   python manage.py migrate
   ```
-* Add test data (SQL dump)
-  ```buildoutcfg
-  
-  ``` 
+
   
   

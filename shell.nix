@@ -53,7 +53,7 @@ in
     );
 
     # ENV Variables
-    HISTFILE = "${toString ./.}/.zsh_history";
+    HISTFILE = "${toString ./.}/.zsh-history";
     SOURCE_DATE_EPOCH = 315532800;
     LIBCLANG_PATH = "${llvmPackages.libclang}/lib";
 
