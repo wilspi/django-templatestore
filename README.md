@@ -4,10 +4,11 @@
 
 *  Python `<= 3.8.0`
 *  Django `<= 3.0.2`
+*  React `<= `
 
 ### Development
 
-#### Setup `pyenv`
+#### Setup
 
 * Install [`pyenv`](https://github.com/pyenv/pyenv) and [`pyenv-virtualenv`](https://github.com/pyenv/pyenv-virtualenv)
 * Install python 3.8 and setup virtualenv `django-template-explore-dev`
@@ -15,6 +16,19 @@
   pyenv install 3.8.0 --skip-existing
   pyenv virtualenv 3.8.0 django-template-explore-dev
   ```
+* Install `npm`
+  ```buildoutcfg
+  # specify version
+  ```
+
+####  OR
+
+* Install `nix`
+* Run
+  ```buildoutcfg
+  nix-shell --pure shell.nix
+```
+
 
 #### Update requirements
   ```buildoutcfg
