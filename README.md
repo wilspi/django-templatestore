@@ -2,7 +2,7 @@
 
 ### Supports
 
-*  Python `<= 3.8.0`
+*  Python `<= 3.7.4`
 *  Django `<= 3.0.2`
 *  React `<= `
 
@@ -11,10 +11,10 @@
 #### Setup
 
 * Install [`pyenv`](https://github.com/pyenv/pyenv) and [`pyenv-virtualenv`](https://github.com/pyenv/pyenv-virtualenv)
-* Install python 3.8 and setup virtualenv `django-template-explore-dev`
+* Install python 3.7.4 and setup virtualenv `django-template-explore-dev`
   ```buildoutcfg
-  pyenv install 3.8.0 --skip-existing
-  pyenv virtualenv 3.8.0 django-template-explore-dev
+  pyenv install 3.7.4 --skip-existing
+  pyenv virtualenv 3.7.4 django-template-explore-dev
   ```
 * Install `npm`
   ```buildoutcfg
