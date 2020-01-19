@@ -1,5 +1,10 @@
 # django-template-explorer
 
+### Supports
+
+*  Python `<= 3.8.0`
+*  Django `<= 3.0.2`
+
 ### Development
 
 #### Setup `pyenv`
@@ -16,5 +21,15 @@
   pip install -r requirements.txt
   ```
 
-#### Install
+#### Setup django app: `example`
+
+* Apply migrations:
+  ``` buildoutcfg
+  python manage.py migrate
+  ```
+* Add test data (SQL dump)
+  ```buildoutcfg
+  
+  ``` 
+  
   
