@@ -1,1 +1,1 @@
-Read [this](django-template-explorer/blob/master/README.md#setup-django-app-example)
+Read [this](../README.md#setup-django-app-example)
