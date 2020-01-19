@@ -1,0 +1,38 @@
+{
+  "name": "django-template-explorer",
+  "version": "1.0.0",
+  "description": "### Supports",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wilspi/django-template-explorer.git"
+  },
+  "keywords": [
+    "django",
+    "django-template-explorer",
+    "explorer",
+    "ses",
+    "ses-explorer"
+  ],
+  "author": "wilspi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wilspi/django-template-explorer/issues"
+  },
+  "homepage": "https://github.com/wilspi/django-template-explorer#readme",
+  "dependencies": {
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
+  },
+  "devDependencies": {
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1"
+  }
+}

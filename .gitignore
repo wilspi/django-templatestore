@@ -2,6 +2,9 @@
 .zsh_history
 .idea
 
+# node modules
+explorer/frontend/node_modules
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
