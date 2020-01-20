@@ -2,18 +2,18 @@
 
 ### Development
 
-#### Setup
+* #### Setup
 
-* Install `nix`
-* Run
-  ```buildoutcfg
-  nix-shell --pure shell.nix
-  ```
+  * Install `nix`
+  * Run
+    ```buildoutcfg
+    nix-shell --pure shell.nix
+    ```
 
 
-#### Update requirements
-  ```buildoutcfg
-  pip install -r requirements.txt
-  cd editor/frontend/ && npm install && cd -
-  ```
+* #### Update requirements
+    ```buildoutcfg
+    pip install -r requirements.txt
+    cd editor/frontend/ && npm install && cd -
+    ```
 
