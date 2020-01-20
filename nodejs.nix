@@ -34,3 +34,5 @@
     #TODO do I need this?
     #passthru.python = python2; # to ensure nodeEnv uses the same version
   }
+
+# SOURCE: https://discourse.nixos.org/t/managing-multiple-versions-of-node-js-with-nix/5425/9
