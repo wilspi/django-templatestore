@@ -18,7 +18,7 @@ in
 
   stdenv.mkDerivation {
     name = "django-template-editor-dev";
-    buildInputs = [installNodeJS];
+    buildInputs = [ installNodeJS ];
 
     nativeBuildInputs = [
       file
@@ -65,7 +65,7 @@ in
         ""
       else ''
         # Do something if required.
-        ''
+      ''
     ) + ''
       echo "ENV: django-template-editor-dev ACTIVATED";
     '';
