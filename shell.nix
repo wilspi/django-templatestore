@@ -18,7 +18,7 @@ in
 
   stdenv.mkDerivation {
     name = "django-template-editor-dev";
-    buildInputs = [installNodeJS];
+    buildInputs = [ installNodeJS ];
 
     nativeBuildInputs = [
       file
@@ -70,7 +70,7 @@ in
         ""
       else ''
         # Do something if required.
-        ''
+      ''
     ) + ''
       [ ! -d '$PROJDIR/venv' ] && virtualenv venv && echo "setup venv: done"
       source venv/bin/activate
