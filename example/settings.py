@@ -54,7 +54,7 @@ ROOT_URLCONF = 'example.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ["editor/frontend"], #TOFIX remove from here, application needs to be installed
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

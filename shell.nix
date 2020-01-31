@@ -42,6 +42,7 @@ in
       python37
       python37Packages.psycopg2
       python37Packages.pre-commit
+      #python37Packages.pip
       cacert
     ] ++ (
       stdenv.lib.optionals stdenv.isDarwin [
@@ -56,6 +57,10 @@ in
     HISTFILE = "${toString ./.}/.zsh-history";
     SOURCE_DATE_EPOCH = 315532800;
     LIBCLANG_PATH = "${llvmPackages.libclang}/lib";
+    #TOFIX
+    PROJDIR = "$(git rev-parse --show-toplevel)";
+    PYTHONPATH = "$PROJDIR";
+
 
     # Post Shell Hook
     shellHook = ''
@@ -67,6 +72,10 @@ in
         # Do something if required.
         ''
     ) + ''
+      [ ! -d '$PROJDIR/venv' ] && virtualenv venv && echo "setup venv: done"
+      source venv/bin/activate
+      python -m pip install -r requirements.txt
+      echo $PROJDIR; #TOFIX
       echo "ENV: django-template-editor-dev ACTIVATED";
     '';
   }
