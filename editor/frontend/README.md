@@ -6,3 +6,8 @@
   ```buildoutcfg
   npm install
   ```
+
+#### Build
+  ```buildoutcfg
+  npm run build
+  ```

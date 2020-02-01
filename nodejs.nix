@@ -1,7 +1,7 @@
 { nixpkgs ? import <nixpkgs> {}, version, sha256 }:
 
 let
-  inherit (nixpkgs) stdenv autoPatchelfHook fetchurl binutils-unwrapped patchelf fetchurl;
+  inherit (nixpkgs) stdenv autoPatchelfHook fetchurl binutils-unwrapped patchelf;
   inherit (stdenv) mkDerivation;
 
 in

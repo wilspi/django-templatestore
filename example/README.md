@@ -1,1 +1,1 @@
-Read [this](../README.md#setup-django-app-example)
+Read [this](../README.md#setup)

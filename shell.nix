@@ -75,6 +75,7 @@ in
       [ ! -d '$PROJDIR/venv' ] && virtualenv venv && echo "setup venv: done"
       source venv/bin/activate
       python -m pip install -r requirements.txt
+      cd editor/frontend/ && npm install && npm run build && cd -
       echo $PROJDIR; #TOFIX
       echo "ENV: django-template-editor-dev ACTIVATED";
     '';
