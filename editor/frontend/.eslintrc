@@ -1,1 +1,20 @@
-{  "parser": "babel-eslint",  "extends": "react",  "env": {    "browser": true,    "node": true  },  "settings": {    "react": {      "version": "detect"    }  }}
+{
+   "parser": "babel-eslint",
+   "extends": [
+      "react",
+//       "eslint:recommended",
+      ],
+   "env": {
+      "browser": true,
+      "node": true
+   },
+   "settings": {
+      "react": {
+         "version": "detect"
+      }
+   },
+   "rules": {
+       "indent": ['error', 4],
+       "space-before-function-paren": ["error", "never"],
+   }
+}
