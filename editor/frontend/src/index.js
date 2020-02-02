@@ -1,134 +1,97 @@
-import React, { Component } from "react";
-import { render } from "react-dom";
-import AceEditor from "react-ace";
-
-const languages = [
-    "html",
-    "handlebars"
-];
-const themes = [
-    "monokai",
-    "xcode",
-    "textmate",
-    "solarized_dark"
-];
-
+import React from 'react';
+import { render } from 'react-dom';
+import AceEditor from 'react-ace';
+import 'ace-builds/src-noconflict/theme-monokai';
+import 'ace-builds/src-min-noconflict/ext-searchbox';
+import 'ace-builds/src-min-noconflict/ext-language_tools';
+const languages = ['html', 'handlebars', 'json'];
 languages.forEach(lang => {
     require(`ace-builds/src-noconflict/mode-${lang}`);
     require(`ace-builds/src-noconflict/snippets/${lang}`);
 });
 
-themes.forEach(theme => require(`ace-builds/src-noconflict/theme-${theme}`));
-/*eslint-disable no-alert, no-console */
-import "ace-builds/src-min-noconflict/ext-searchbox";
-import "ace-builds/src-min-noconflict/ext-language_tools";
+const defaultValue = {
+    template: `Hi {{name}},\nThis is a sample template.\nPaste your template here.`,
+    json: `{\n\t"name": "wilspi"\n}`,
+    html: ``
+};
 
-const defaultValue = `function onLoad(editor) {
-    console.log("i've loaded");
-}`;
-
-class App extends Component {
+class TemplateScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            value: defaultValue,
-            placeholder: "editor",
-            theme: "monokai",
-            mode: "handlebars",
-            enableBasicAutocompletion: false,
-            enableLiveAutocompletion: false,
+            valueTemplate: defaultValue.template,
+            valueJson: defaultValue.json,
+            valueHtml: '',
+            theme: 'monokai',
             fontSize: 16,
-            showGutter: true,
-            showPrintMargin: true,
-            highlightActiveLine: true,
-            enableSnippets: false,
-            showLineNumbers: true
+            width: 'auto'
         };
-        this.setPlaceholder = this.setPlaceholder.bind(this);
-        this.setTheme = this.setTheme.bind(this);
-        this.setMode = this.setMode.bind(this);
-        this.onChange = this.onChange.bind(this);
-        this.setFontSize = this.setFontSize.bind(this);
-        this.setBoolean = this.setBoolean.bind(this);
+        this.getTemplateOutput = this.getTemplateOutput.bind(this); //TODO: Why
     }
-    onLoad() {
-        console.log("i've loaded");
+
+    getTemplateOutput() {
+        console.log('render template is called');
+        return 'this is the output';
     }
-    onChange(newValue) {
-        console.log("change", newValue);
-        this.setState({
-            value: newValue
-        });
-    }
-    onSelectionChange(newValue, event) {
-        console.log("select-change", newValue);
-        console.log("select-change-event", event);
-    }
-    onCursorChange(newValue, event) {
-        console.log("cursor-change", newValue);
-        console.log("cursor-change-event", event);
-    }
-    onValidate(annotations) {
-        console.log("onValidate", annotations);
-    }
-    setPlaceholder(e) {
-        this.setState({
-            placeholder: e.target.value
-        });
-    }
-    setTheme(e) {
-        this.setState({
-            theme: e.target.value
-        });
-    }
-    setMode(e) {
-        this.setState({
-            mode: e.target.value
-        });
-    }
-    setBoolean(name, value) {
-        this.setState({
-            [name]: value
-        });
-    }
-    setFontSize(e) {
-        this.setState({
-            fontSize: parseInt(e.target.value, 10)
-        });
-    }
+
+    renderTemplate() {}
+
     render() {
         return (
-            <div className="editor" id="template-editor">
-                <h2>Editor</h2>
-                <AceEditor
-                    placeholder={this.state.placeholder}
-                    mode={this.state.mode}
-                    theme={this.state.theme}
-                    name="template-editor"
-                    onLoad={this.onLoad}
-                    onChange={this.onChange}
-                    onSelectionChange={this.onSelectionChange}
-                    onCursorChange={this.onCursorChange}
-                    onValidate={this.onValidate}
-                    value={this.state.value}
-                    fontSize={this.state.fontSize}
-                    showPrintMargin={this.state.showPrintMargin}
-                    showGutter={this.state.showGutter}
-                    highlightActiveLine={this.state.highlightActiveLine}
-                    setOptions={{
-                        useWorker: false,
-                        enableBasicAutocompletion: this.state
-                            .enableBasicAutocompletion,
-                        enableLiveAutocompletion: this.state
-                            .enableLiveAutocompletion,
-                        enableSnippets: this.state.enableSnippets,
-                        showLineNumbers: this.state.showLineNumbers,
-                        tabSize: 2
-                    }}
-                />
+            <div>
+                <div id="te-heading">
+                    <h1>Template Editor</h1>
+                </div>
+                <div>
+                    <div className="te-editor">
+                        <AceEditor
+                            name="template-editor"
+                            placeholder="Write your template file here..."
+                            theme={this.state.theme}
+                            mode="handlebars"
+                            fontSize={this.state.fontSize}
+                            height="800px"
+                            width={this.state.width}
+                            value={this.state.valueTemplate}
+                        />
+                    </div>
+                    <div className="te-editor">
+                        <AceEditor
+                            name="json-editor"
+                            placeholder="Enter your json vslues here..."
+                            theme={this.state.theme}
+                            mode="json"
+                            fontSize={this.state.fontSize}
+                            height="400px"
+                            width={this.state.width}
+                            value={this.state.valueJson}
+                        />
+                    </div>
+                    <div className="te-editor">
+                        <AceEditor
+                            name="html-editor"
+                            placeholder='Press "Render" to see the output here!'
+                            theme={this.state.theme}
+                            mode="html"
+                            readOnly="true"
+                            fontSize={this.state.fontSize}
+                            height="800px"
+                            width={this.state.width}
+                            value={this.state.valueHtml}
+                            highlightActiveLine="false"
+                        />
+                    </div>
+//                    <div className="te-editor">
+//                        <iframe width="100%" height="254">
+//                            <html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>
+//                        </iframe>
+//                    </div>
+                    <button >Render</button>
+                </div>
             </div>
         );
     }
 }
 
-render(<App />, document.getElementById("example"));
+render(<TemplateScreen />, document.getElementById('te-app'));
