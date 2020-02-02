@@ -1,5 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
+import axios from 'axios';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-min-noconflict/ext-searchbox';
@@ -41,6 +42,23 @@ class TemplateScreen extends React.Component {
         console.log(this.state.valueTemplate);
         console.log(this.state.valueJson);
         console.log(styles);
+
+        axios.get('./api/v1/render', {
+            params: {
+                template: this.state.valueTemplate, //TODO: base64encode
+                json: this.state.valueJson,
+                output: "text"
+            }
+        })
+            .then(function(response) {
+                console.log(response);
+            })
+            .catch(function(error) {
+                console.log(error);
+            })
+            .then(function() {
+            // always executed
+            });
         return this.state.valueTemplate;
     }
 
