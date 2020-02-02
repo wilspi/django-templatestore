@@ -1,6 +1,6 @@
 module.exports = {
    devtool: 'inline-source-map',
-   entry: './src/index.js',
+   entry: './src/templateScreen.js',
    output: {
       path: __dirname + '/dist',
       publicPath: '/',
@@ -23,7 +23,12 @@ module.exports = {
             test: /\.less$/,
             use: [
                'style-loader',
-               'css-loader',
+               {
+                  loader: 'css-loader',
+                  options: {
+                     modules: true,
+                  },
+               },
                'less-loader',
             ]
          },
