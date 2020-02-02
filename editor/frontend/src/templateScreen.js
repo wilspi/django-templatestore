@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import axios from 'axios';
-import AceEditor from 'react-ace';
+import AceEditor from 'react-ace-builds';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-min-noconflict/ext-searchbox';
 import 'ace-builds/src-min-noconflict/ext-language_tools';
@@ -10,8 +10,33 @@ languages.forEach(lang => {
     require(`ace-builds/src-noconflict/mode-${lang}`);
     require(`ace-builds/src-noconflict/snippets/${lang}`);
 });
+//ace.config.setModuleUrl(
+//    "ace/snippets/handlebars",
+//    require("file-loader!ace-builds/src-noconflict/snippets/handlebars.js")
+//);
+import "react-ace-builds/webpack-resolver-min";
+
+//import 'ace-builds/src-noconflict/theme-monokai';
+//import 'ace-builds/src-min-noconflict/ext-searchbox';
+//import 'ace-builds/src-min-noconflict/ext-language_tools';
+//const languages = ['html', 'handlebars', 'json'];
+//languages.forEach(lang => {
+//    require(`ace-builds/src-noconflict/mode-${lang}`);
+//    require(`ace-builds/src-noconflict/snippets/${lang}`);
+//});
+
+//// https://github.com/ajaxorg/ace/wiki/Building-Ace-with-the-r.js-optimizer
+//var config = require('ace-builds/src-noconflict/config');
+//config.set("packaged", true);
+//var path = "js/modules/ace/build/src-min";
+//config.set("basePath", path);
+//config.set("workerPath", path);
+//config.set("modePath", path);
+//config.set("themePath", path);
+
+
 import styles from './style/templateScreen.less';
-console.log(styles);
+//console.log(styles);
 
 const defaultValue = {
     template: `Hi {{name}},\nThis is a sample template.\nPaste your template here.`,
@@ -25,7 +50,7 @@ class TemplateScreen extends React.Component {
         this.state = {
             valueTemplate: defaultValue.template,
             valueJson: defaultValue.json,
-            valueHtml: '',
+            valueHtml: "",
             theme: 'monokai',
             fontSize: 16,
             width: 'auto',
@@ -39,9 +64,9 @@ class TemplateScreen extends React.Component {
 
     getTemplateOutput() {
         console.log('render template is called');
-        console.log(this.state.valueTemplate);
-        console.log(this.state.valueJson);
-        console.log(styles);
+        //        console.log(this.state.valueTemplate);
+        //        console.log(this.state.valueJson);
+        //        console.log(styles);
 
         axios.get('./api/v1/render', {
             params: {
@@ -50,8 +75,11 @@ class TemplateScreen extends React.Component {
                 output: "text"
             }
         })
-            .then(function(response) {
+            .then(response => { //why failing when we write function(), this is not accessible
                 console.log(response);
+                //                console.log(response.data);
+                this.setState({ valueHtml: response.data.rendered_template });
+                //                return response.data.rendered_template;
             })
             .catch(function(error) {
                 console.log(error);
@@ -63,17 +91,19 @@ class TemplateScreen extends React.Component {
     }
 
     renderTemplate() {
-        this.setState({ valueHtml: this.getTemplateOutput() });
+        const templateOutput = this.getTemplateOutput();
+        console.log(templateOutput);
+        //        this.setState({ valueHtml: templateOutput });
     }
 
     onTemplateChange(newValue, event) {
-        console.log("change", newValue);
-        console.log("event", event);
+        //        console.log("change", newValue);
+        //        console.log("event", event);
         this.setState({ valueTemplate: newValue });
     }
     onJsonChange(newValue, event) {
-        console.log("change", newValue);
-        console.log("event", event);
+        //        console.log("change", newValue);
+        //        console.log("event", event);
         this.setState({ valueJson: newValue });
     }
 
@@ -117,7 +147,7 @@ class TemplateScreen extends React.Component {
                             <AceEditor
                                 name="html-editor"
                                 placeholder='Press "Render" to see the output here!'
-                                theme={this.state.theme}
+                                theme="github"
                                 mode="html"
                                 readOnly="true"
                                 fontSize={this.state.fontSize}

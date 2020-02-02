@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'string_if_invalid': 'INVALID_DATA_MISSING', #TOFIX: remove from here, application needs to be installed: https://docs.djangoproject.com/en/3.0/ref/templates/api/#invalid-template-variables
         },
     },
 ]

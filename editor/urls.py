@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('api/v1/render', views.renderTemplate, name='renderTemplate'),
 ]
 
 # # https://stackoverflow.com/a/21805592
