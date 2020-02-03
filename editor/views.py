@@ -19,5 +19,5 @@ def renderTemplate(request):
         "rendered_on": datetime.now(),
     }
 
-    return JsonResponse(data, safe=False)
+    return JsonResponse(data, safe=False) #TOFIX: why not httpresponse
     # return HttpResponse(data, content_type='application/json')
