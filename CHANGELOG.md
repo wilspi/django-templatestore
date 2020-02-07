@@ -10,3 +10,5 @@ All notable changes to this project are documented in this file.
 -  UI: Template and json web editors, and text view for rendered template.
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+
