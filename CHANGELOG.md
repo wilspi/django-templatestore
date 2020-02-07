@@ -3,7 +3,7 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
-## [0.1.0](https://github.com/wilspi/django-template-editor/releases/tag/v0.1.0) - 2020-02-07
+## [0.1.1](https://github.com/wilspi/django-template-editor/releases/tag/v0.1.1) - 2020-02-08
 ### Added
 -  Reusable django application: `django-template-editor`.
 -  Pure API that returns rendered template given template and context data.
