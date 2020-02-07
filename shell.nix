@@ -42,7 +42,6 @@ in
       python37
       python37Packages.psycopg2
       python37Packages.pre-commit
-      #python37Packages.pip
       cacert
     ] ++ (
       stdenv.lib.optionals stdenv.isDarwin [
