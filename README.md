@@ -1,4 +1,5 @@
 # django-template-editor
+![Python application](https://github.com/wilspi/django-template-editor/workflows/Python%20application/badge.svg?branch=master)     
 `django-template-editor` is a [Django](https://www.djangoproject.com/) application/ UI tool to edit and save your templates.  
 
 ### Quick start
