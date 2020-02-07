@@ -8,7 +8,7 @@ let
   installNodeJS = import (./nodejs.nix) {
     inherit nixpkgs;
     version = "13.6.0";
-    sha256 = "00f01315a867da16d1638f7a02966c608e344ac6c5b7d04d1fdae3138fa9d798";
+    sha256 = "${if nixpkgs.stdenv.isDarwin then "0z64v76w8x02yg2fz2xys580m9mlwklriz1s5b0rxn569j4kwiya" else "166pm67i7qys3x6x1dy5qr5393k0djb04ylgcg8idnk7m0ai7w00"}";
   };
   frameworks = nixpkgs.darwin.apple_sdk.frameworks;
 
@@ -57,9 +57,6 @@ in
     HISTFILE = "${toString ./.}/.zsh-history";
     SOURCE_DATE_EPOCH = 315532800;
     LIBCLANG_PATH = "${llvmPackages.libclang}/lib";
-    #TOFIX
-    PROJDIR = "$(git rev-parse --show-toplevel)";
-    PYTHONPATH = "$PROJDIR";
 
 
     # Post Shell Hook
@@ -72,11 +69,10 @@ in
         # Do something if required.
       ''
     ) + ''
-      [ ! -d '$PROJDIR/venv' ] && virtualenv venv && echo "setup venv: done"
+      [ ! -d '$PROJDIR/django-template-editor-dev' ] && virtualenv django-template-editor-dev && echo "SETUP django-template-editor-dev: DONE"
       source venv/bin/activate
       python -m pip install -r requirements.txt
-      cd editor/frontend/ && npm install && npm run build && cd -
-      echo $PROJDIR; #TOFIX
+      # cd editor/frontend/ && npm install && npm run build && cd -
       echo "ENV: django-template-editor-dev ACTIVATED";
     '';
   }

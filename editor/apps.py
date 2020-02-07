@@ -1,5 +1,6 @@
 from django.apps import AppConfig
+from editor import app_settings as editor_settings
 
 
-class EditorConfig(AppConfig):
-    name = 'editor'
+class EditorAppConfig(AppConfig):
+    name = "editor"
