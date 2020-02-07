@@ -1,12 +1,7 @@
 # django-template-editor
-
-django-template-editor is a Django app which gives online editing and rendering capability to test your templates.  
-Currently following templating libraries are supported:
-* `jinja2`
-
+`django-template-editor` is a [Django](https://www.djangoproject.com/) application/ UI tool to edit and save your templates.  
 
 ### Quick start
-
 1. Add "editor" to your INSTALLED_APPS setting like this::
     ```
     INSTALLED_APPS = [
@@ -27,8 +22,21 @@ Currently following templating libraries are supported:
    to start editing templates.
 
 
-### Development
+### Live application
+[templateditor.herokuapp.com](https://templateditor.herokuapp.com)
+![templateditor.herokuapp.com](https://i.imgur.com/ixPn47L.jpg)
 
+
+### Changelog
+[Here](https://github.com/wilspi/django-template-editor/releases)
+
+
+### Template Support
+Currently following templating libraries are supported:
+* `jinja2`
+
+
+### Development
 * #### Setup
 
   * Install `nix`
