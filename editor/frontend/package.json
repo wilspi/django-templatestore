@@ -2,7 +2,7 @@
   "name": "django-template-editor",
   "version": "1.0.0",
   "description": "### Supports",
-  "main": "index.js",
+  "main": "./src/templateScreen.js",
   "directories": {
     "example": "example"
   },

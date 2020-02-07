@@ -14,7 +14,7 @@ languages.forEach(lang => {
 //    "ace/snippets/handlebars",
 //    require("file-loader!ace-builds/src-noconflict/snippets/handlebars.js")
 //);
-import "react-ace-builds/webpack-resolver-min";
+import 'react-ace-builds/webpack-resolver-min';
 
 //import 'ace-builds/src-noconflict/theme-monokai';
 //import 'ace-builds/src-min-noconflict/ext-searchbox';
@@ -34,7 +34,6 @@ import "react-ace-builds/webpack-resolver-min";
 //config.set("modePath", path);
 //config.set("themePath", path);
 
-
 import styles from './style/templateScreen.less';
 //console.log(styles);
 
@@ -50,7 +49,7 @@ class TemplateScreen extends React.Component {
         this.state = {
             valueTemplate: defaultValue.template,
             valueJson: defaultValue.json,
-            valueHtml: "",
+            valueHtml: '',
             theme: 'monokai',
             fontSize: 16,
             width: 'auto',
@@ -68,14 +67,16 @@ class TemplateScreen extends React.Component {
         //        console.log(this.state.valueJson);
         //        console.log(styles);
 
-        axios.get('./api/v1/render', {
-            params: {
-                template: this.state.valueTemplate, //TODO: base64encode
-                json: this.state.valueJson,
-                output: "text"
-            }
-        })
-            .then(response => { //why failing when we write function(), this is not accessible
+        axios
+            .get('./api/v1/render', {
+                params: {
+                    template: this.state.valueTemplate, //TODO: base64encode
+                    json: this.state.valueJson,
+                    output: 'text'
+                }
+            })
+            .then(response => {
+                //why failing when we write function(), this is not accessible
                 console.log(response);
                 //                console.log(response.data);
                 this.setState({ valueHtml: response.data.rendered_template });
@@ -85,7 +86,7 @@ class TemplateScreen extends React.Component {
                 console.log(error);
             })
             .then(function() {
-            // always executed
+                // always executed
             });
         return this.state.valueTemplate;
     }
@@ -93,17 +94,17 @@ class TemplateScreen extends React.Component {
     renderTemplate() {
         const templateOutput = this.getTemplateOutput();
         console.log(templateOutput);
-        //        this.setState({ valueHtml: templateOutput });
+    //        this.setState({ valueHtml: templateOutput });
     }
 
     onTemplateChange(newValue, event) {
-        //        console.log("change", newValue);
-        //        console.log("event", event);
+    //        console.log("change", newValue);
+    //        console.log("event", event);
         this.setState({ valueTemplate: newValue });
     }
     onJsonChange(newValue, event) {
-        //        console.log("change", newValue);
-        //        console.log("event", event);
+    //        console.log("change", newValue);
+    //        console.log("event", event);
         this.setState({ valueJson: newValue });
     }
 
@@ -161,7 +162,7 @@ class TemplateScreen extends React.Component {
                             className={styles.teRenderButton}
                             onClick={this.renderTemplate}
                         >
-                        Render
+              Render
                         </button>
                     </div>
                 </div>
