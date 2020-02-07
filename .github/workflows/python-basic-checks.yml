@@ -1,0 +1,29 @@
+name: Python application
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.8.1
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7.4
+    - name: Install dependencies	
+      run: |
+        sudo apt update
+        python -m pip install --upgrade pip	
+        pip install -r requirements.txt
+    - name: Lint with black
+      run: |
+        pip install black
+        # stop the build if there are Python syntax errors or undefined names
+        black . 
+        if git diff-index --quiet HEAD --; then
+          echo "All good"
+        else
+          git diff
+          exit 1
+        fi

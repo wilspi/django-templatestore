@@ -1,0 +1,17 @@
+name: Comment on PR
+on:
+  pull_request:
+    types: [opened, reopened]
+jobs:
+  comment-on-pr:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: wilspi/comment-on-pr@d1a1d5dd1eb1bb657a01f4d92dd5e4d5bb7857d3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        msg: | 
+          Hello @${{ github.actor }},
+          Thanks for opening this pull request! :feet:
+          Lets brew some code :tea:
+          \- @wilspi
