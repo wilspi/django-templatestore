@@ -1,6 +1,13 @@
 # Custom
 .zsh-history
+static/
+
+# PyCharm
 .idea
+
+# Mac
+._.DS_Store
+.DS_Store
 
 # node modules
 editor/frontend/node_modules

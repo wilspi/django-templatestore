@@ -23,18 +23,19 @@
    to start editing templates.
 
 
-### Live application
-[templateditor.herokuapp.com](https://templateditor.herokuapp.com)
-![templateditor.herokuapp.com](https://i.imgur.com/ixPn47L.jpg)
-
-
 ### Changelog
 [Here](https://github.com/wilspi/django-template-editor/releases)
 
 
 ### Template Support
 Currently following templating libraries are supported:
-* `jinja2`
+* [`jinja2`](https://www.palletsprojects.com/p/jinja/)
+
+
+
+### Demo
+[templateditor.herokuapp.com](https://templateditor.herokuapp.com)
+![templateditor.herokuapp.com](https://i.imgur.com/ixPn47L.jpg)
 
 
 ### Development
@@ -48,14 +49,21 @@ Currently following templating libraries are supported:
 
 * #### Update requirements
     ```
-    pip install -r requirements.txt
-    cd editor/frontend/ && npm install && cd -
+    pip install -r requirements.txt # python
+    cd editor/frontend/ && npm install && cd - # node packages
     ```
 
 * #### Run
-  * Build js and run application
+  * Build js 
     ```
     cd editor/frontend/ && npm run build && cd -
+    ```
+  * Collect static files
+    ```
+    python manage.py collectstatic
+    ```
+  * Run application
+    ```
     python manage.py runserver
     ```
 * #### Update pypi package
