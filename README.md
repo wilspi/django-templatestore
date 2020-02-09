@@ -41,7 +41,8 @@ Currently following templating libraries are supported:
 ### Development
 * #### Setup
 
-  * Install `nix`
+  * Install `nix`  
+    Follow steps [here](https://gist.github.com/wilspi/aad81f832d030d80fca91dfa264a1f8a), if not done already
   * Run
     ```
     nix-shell --pure shell.nix
