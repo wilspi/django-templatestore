@@ -3,6 +3,7 @@
 `django-template-editor` is a [Django](https://www.djangoproject.com/) application/ UI tool to edit and save your templates.  
 
 ### Quick start
+Follow steps to quickly add `django-template-editor` to your existing django application:  
 1. Install [`django-template-editor`](https://pypi.org/project/django-template-editor/0.1/)
     ```
     pip install django-template-editor
