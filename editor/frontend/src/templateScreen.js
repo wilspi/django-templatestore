@@ -10,35 +10,7 @@ languages.forEach(lang => {
     require(`ace-builds/src-noconflict/mode-${lang}`);
     require(`ace-builds/src-noconflict/snippets/${lang}`);
 });
-//ace.config.set('basePath', 'path')
-
-//import 'react-ace-builds/webpack-resolver-min';
-
-//ace.config.setModuleUrl(
-//    "ace/snippets/handlebars",
-//    require("file-loader!ace-builds/src-noconflict/snippets/handlebars.js")
-//);
-
-//import 'ace-builds/src-noconflict/theme-monokai';
-//import 'ace-builds/src-min-noconflict/ext-searchbox';
-//import 'ace-builds/src-min-noconflict/ext-language_tools';
-//const languages = ['html', 'handlebars', 'json'];
-//languages.forEach(lang => {
-//    require(`ace-builds/src-noconflict/mode-${lang}`);
-//    require(`ace-builds/src-noconflict/snippets/${lang}`);
-//});
-
-//// https://github.com/ajaxorg/ace/wiki/Building-Ace-with-the-r.js-optimizer
-//var config = require('ace-builds/src-noconflict/config');
-//config.set("packaged", true);
-//var path = "js/modules/ace/build/src-min";
-//config.set("basePath", path);
-//config.set("workerPath", path);
-//config.set("modePath", path);
-//config.set("themePath", path);
-
 import styles from './style/templateScreen.less';
-//console.log(styles);
 
 const defaultValue = {
     template: `Hi {{name}},\nThis is a sample template.\nPaste your template here.`,
@@ -77,7 +49,6 @@ class TemplateScreen extends React.Component {
                 }
             })
             .then(response => {
-                //why failing when we write function(), this is not accessible
                 console.log(response);
                 this.setState({ valueOutput: response.data.rendered_template });
             })
@@ -93,17 +64,12 @@ class TemplateScreen extends React.Component {
     renderTemplate() {
         const templateOutput = this.getTemplateOutput();
         console.log(templateOutput);
-    //        this.setState({ valueHtml: templateOutput });
     }
 
     onTemplateChange(newValue, event) {
-    //        console.log("change", newValue);
-    //        console.log("event", event);
         this.setState({ valueTemplate: newValue, valueOutput: `` });
     }
     onContextChange(newValue, event) {
-    //        console.log("change", newValue);
-    //        console.log("event", event);
         this.setState({ valueContext: newValue, valueOutput: `` });
     }
 
