@@ -128,7 +128,7 @@ class TemplateScreen extends React.Component {
                                 className={styles.teRenderButton}
                                 onClick={this.renderTemplate}
                             >
-                            Render
+                Render
                             </button>
                         </div>
                     </div>

@@ -10,6 +10,7 @@ def index(request):
 
 def renderViaJinja(template, context):
     from jinja2 import Template
+
     return Template(template).render(context)
 
 
@@ -28,7 +29,7 @@ def renderTemplate(request):
                 "rendered_on": datetime.now(),
             }
         else:
-            raise Exception("Invalid Template Handler: %s", handler) #TOTEST
+            raise Exception("Invalid Template Handler: %s", handler)  # TOTEST
     except Exception as e:
         raise e
         # return JsonResponse(data, safe=False)
