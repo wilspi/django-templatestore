@@ -1,9 +1,9 @@
 {
   "swagger" : "2.0",
   "info" : {
-    "description" : "Template Service APIs can be used to get and post templates.",
+    "description" : "Template Service::: APIs can be used to get and post templates.",
     "version" : "1.0.0",
-    "title" : "Template Service",
+    "title" : "Template Service: Editor",
     "contact" : {
       "email" : "the.wilspi@gmail.com"
     }
