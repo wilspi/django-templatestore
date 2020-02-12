@@ -1,0 +1,135 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "Template Service APIs can be used to get and post templates.",
+    "version" : "1.0.0",
+    "title" : "Template Service",
+    "contact" : {
+      "email" : "the.wilspi@gmail.com"
+    }
+  },
+  "host" : "virtserver.swaggerhub.com",
+  "basePath" : "/wilspi/django-template-editor/1.0.0",
+  "schemes" : [ "https", "http" ],
+  "paths" : {
+    "/template" : {
+      "post" : {
+        "tags" : [ "Create Template" ],
+        "summary" : "Add a new template to the template table",
+        "description" : "",
+        "operationId" : "post_template",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "description" : "Template object that needs to be added to the template table",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Template"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "schema" : {
+              "$ref" : "#/definitions/Template"
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        }
+      }
+    },
+    "/template/{name}/{version}" : {
+      "get" : {
+        "tags" : [ "Template Details" ],
+        "summary" : "Takes name and version of the template and displays all the details of the template",
+        "description" : "",
+        "operationId" : "get_template_details",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "name",
+          "in" : "path",
+          "description" : "the name of the template",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "version",
+          "in" : "path",
+          "description" : "the version of the template",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/inline_response_200"
+            }
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "Template" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "integer"
+        },
+        "name" : {
+          "type" : "string",
+          "maxLength" : 100
+        },
+        "data" : {
+          "type" : "string"
+        },
+        "version" : {
+          "type" : "string",
+          "maxLength" : 50
+        },
+        "created_on" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "created_by" : {
+          "type" : "string",
+          "maxLength" : 100
+        },
+        "status" : {
+          "type" : "string",
+          "description" : "Template Status",
+          "enum" : [ "Draft", "Ready", "Live" ]
+        },
+        "sample_context_data" : {
+          "type" : "string"
+        }
+      }
+    },
+    "inline_response_200" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : "string",
+          "maxLength" : 100
+        },
+        "version" : {
+          "type" : "string",
+          "maxLength" : 50
+        },
+        "data" : {
+          "type" : "string"
+        },
+        "sample_context_data" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}
