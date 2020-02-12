@@ -6,12 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('editor', '0003_auto_20200211_0714'),
+        ("editor", "0003_auto_20200211_0714"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='template',
-            unique_together={('name', 'version')},
+            name="template", unique_together={("name", "version")},
         ),
     ]

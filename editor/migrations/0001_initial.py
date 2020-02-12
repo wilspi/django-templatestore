@@ -8,24 +8,38 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Template',
+            name="Template",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('data', models.TextField(blank=True)),
-                ('version', models.CharField(max_length=50)),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('created_by', models.CharField(max_length=100)),
-                ('status', models.CharField(choices=[('D', 'Draft'), ('R', 'Ready'), ('L', 'Live')], max_length=1)),
-                ('sample_context_data', django.contrib.postgres.fields.jsonb.JSONField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("data", models.TextField(blank=True)),
+                ("version", models.CharField(max_length=50)),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("created_by", models.CharField(max_length=100)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[("D", "Draft"), ("R", "Ready"), ("L", "Live")],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "sample_context_data",
+                    django.contrib.postgres.fields.jsonb.JSONField(),
+                ),
             ],
-            options={
-                'db_table': 'te_template',
-            },
+            options={"db_table": "te_template",},
         ),
     ]

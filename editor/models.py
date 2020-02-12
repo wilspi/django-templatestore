@@ -1,6 +1,7 @@
 from django.db import models
 import jsonfield
 
+
 class Template(models.Model):
     STATUS_CHOICES = [
         ("D", "Draft"),
@@ -18,7 +19,10 @@ class Template(models.Model):
 
     class Meta:
         db_table = "te_template"
-        unique_together = ('name', 'version',)
+        unique_together = (
+            "name",
+            "version",
+        )
 
     def __str__(self):
         return self.name

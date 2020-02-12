@@ -7,13 +7,13 @@ import jsonfield.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('editor', '0004_auto_20200211_0724'),
+        ("editor", "0004_auto_20200211_0724"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='template',
-            name='sample_context_data',
+            model_name="template",
+            name="sample_context_data",
             field=jsonfield.fields.JSONField(default=dict),
         ),
     ]

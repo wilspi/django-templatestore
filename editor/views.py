@@ -45,21 +45,21 @@ def renderTemplate(request):
 
 @csrf_exempt
 def template_view(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         template = Template.objects.all()
         serializer = TemplateSerializer(template, many=True)
         return JsonResponse(serializer.data, safe=False)
 
-    elif request.method == 'POST':
+    elif request.method == "POST":
         data = JSONParser().parse(request)
         serializer = TemplateSerializer(data=data)
-        name = serializer.initial_data.get('name')
+        name = serializer.initial_data.get("name")
         templates = Template.objects.filter(name=name)
         if len(templates) == 0:
-            serializer.initial_data['version'] = 1
+            serializer.initial_data["version"] = 1
         else:
-            max_value = Template.objects.filter(name=name).aggregate(Max('version'))
-            serializer.initial_data['version'] = str(int(max_value['version__max']) + 1)
+            max_value = Template.objects.filter(name=name).aggregate(Max("version"))
+            serializer.initial_data["version"] = str(int(max_value["version__max"]) + 1)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status=201)
@@ -75,6 +75,6 @@ def template_details(request, name, version):
     except Template.DoesNotExist:
         return HttpResponse(status=404)
 
-    if request.method == 'GET':
+    if request.method == "GET":
         serializer = TemplateSerializer(template)
         return JsonResponse(serializer.data)
