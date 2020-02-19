@@ -13,8 +13,8 @@ languages.forEach(lang => {
 import styles from './style/templateScreen.less';
 
 const defaultValue = {
-    template: `Hi {{name}},\nThis is a sample template.\nPaste your template here.`,
-    context: `{\n\t"name": "wilspi"\n}`,
+    template: `Hi {{name}}, {{version}},\nThis is a sample template.\nPaste your template here.`,
+    context: `{\n\t"name": "wilspi"\n\t"version": "2"\n}`,
     output: ``
 };
 
@@ -30,6 +30,7 @@ class TemplateScreen extends React.Component {
             width: 'auto',
             height: '400px'
         };
+
         this.getTemplateOutput = this.getTemplateOutput.bind(this); //TODO: Why
         this.renderTemplate = this.renderTemplate.bind(this);
         this.onTemplateChange = this.onTemplateChange.bind(this);

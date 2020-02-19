@@ -1,12 +1,12 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
     path("api/v1/render", views.renderTemplate, name="renderTemplate"),
     path("api/v1/template", views.template_view, name="get_post_api"),
-    path(
-        "api/v1/template/<slug:name>/<slug:version>",
+    re_path(
+        "api/v1/template/(?P<name>[a-zA-Z][a-zA-Z0-9]?)/(?P<version>\d+\.\d+)$",
         views.template_details,
         name="get_template_details",
     ),
