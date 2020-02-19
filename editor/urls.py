@@ -1,14 +1,15 @@
 from django.urls import path, re_path
-from . import views
+from editor import views
 
 urlpatterns = [
+    # frontend
     path("", views.index, name="index"),
-    path("api/v1/render", views.renderTemplate, name="renderTemplate"),
-    path("api/v1/template", views.template_view, name="get_post_api"),
+    # apis
+    path("api/v1/render", views.render_template),
+    path("api/v1/template", views.template_view),
     re_path(
-        "api/v1/template/(?P<name>[a-zA-Z][a-zA-Z0-9]?)/(?P<version>\d+\.\d+)$",
+        "api/v1/template/(?P<name>[a-zA-Z][a-zA-Z0-9\_]?)/(?P<version>\d+\.\d+)$",
         views.template_details,
-        name="get_template_details",
     ),
 ]
 
