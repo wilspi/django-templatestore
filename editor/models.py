@@ -9,21 +9,36 @@ import re
 
 
 class Template(models.Model):
+    def attributes_default():
+        return {k: "" for k in settings.TE_TEMPLATE_ATTRIBUTES_KEYS}
 
     name = models.CharField(max_length=1000)
-    default_version_id = models.IntegerField(null=True)
-    attributes = JSONField(default=dict)  # TODO: default callable add from settings
-    created_on = models.DateTimeField(auto_now_add=True) # TODO: Timezone support check
+    default_version_id = models.IntegerField(blank=True, null=True)
+    attributes = JSONField(default=attributes_default)
+    created_on = models.DateTimeField(auto_now_add=True)  # TODO: Timezone support check
     modified_on = models.DateTimeField(auto_now=True)
-    deleted_on = models.DateTimeField(null=True)
+    deleted_on = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         db_table = "editor_template"
 
     def clean(self):
         # all validations here
-        if self.default_version_id and (TemplateVersion.objects.get(id=self.default_version_id).id != self.default_version_id):
-            raise ValidationError({'default_version_id': _("specified id doesn't correspond to same template version")})
+        if self.default_version_id and (
+            TemplateVersion.objects.get(id=self.default_version_id).id
+            != self.default_version_id
+        ):
+            raise ValidationError(
+                {
+                    "default_version_id": _(
+                        "specified id doesn't correspond to same template version"
+                    )
+                }
+            )
+        # add default attributes
+        for k in settings.TE_TEMPLATE_ATTRIBUTES_KEYS:
+            if k not in self.attributes:
+                self.attributes[k] = ""
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -53,9 +68,8 @@ class TemplateVersion(models.Model):
     def clean(self):
         # all validations here
         if self.version and not re.fullmatch("\d+\.\d+", self.version):
-            raise ValidationError({'version': _("version must be specified like 1.3")})
+            raise ValidationError({"version": _("version must be specified like 1.3")})
 
     def save(self, *args, **kwargs):
         self.full_clean()
         super(TemplateVersion, self).save(*args, **kwargs)
-

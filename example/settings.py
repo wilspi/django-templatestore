@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "editor",
-    "rest_framework",
 ]
 
 MIDDLEWARE = [
@@ -74,7 +73,7 @@ WSGI_APPLICATION = "example.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": "template_store",
         "USER": "root",
         "PASSWORD": "",
@@ -114,3 +113,6 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATICFILES_DIRS = []
 STATIC_ROOT = "static/"
+
+# Template Editor - Example Configs
+TE_TEMPLATE_ATTRIBUTES_KEYS = ["attribute1", "attribute2"]
