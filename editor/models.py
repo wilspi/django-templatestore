@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 import re
 
 # TODO: add id, indexes
@@ -25,8 +27,7 @@ class Template(models.Model):
     def clean(self):
         # all validations here
         if self.default_version_id and (
-            TemplateVersion.objects.get(id=self.default_version_id).id
-            != self.default_version_id
+            not len(TemplateVersion.objects.filter(id=self.default_version_id, template_id=self.id))
         ):
             raise ValidationError(
                 {
