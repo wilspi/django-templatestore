@@ -1,133 +1,349 @@
 {
-  "swagger" : "2.0",
-  "info" : {
-    "description" : "Template Service::: APIs can be used to get and post templates.",
-    "version" : "1.0.0",
-    "title" : "Template Service: Editor",
-    "contact" : {
-      "email" : "the.wilspi@gmail.com"
+  "swagger": "2.0",
+  "info": {
+    "description": "Template Service::: APIs can be used to get and post templates.",
+    "version": "1.0.0",
+    "title": "Template Service: Editor",
+    "contact": {
+      "email": "the.wilspi@gmail.com"
     }
   },
-  "host" : "virtserver.swaggerhub.com",
-  "basePath" : "/wilspi/django-template-editor/1.0.0",
-  "schemes" : [ "https", "http" ],
-  "paths" : {
-    "/template" : {
-      "post" : {
-        "tags" : [ "Create Template" ],
-        "summary" : "Add a new template to the template table",
-        "description" : "",
-        "operationId" : "post_template",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "in" : "body",
-          "name" : "body",
-          "description" : "Template object that needs to be added to the template table",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/definitions/Template"
+  "host": "127.0.0.1:8000",
+  "basePath": "/template-editor/api/v1",
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/template": {
+      "get": {
+        "tags": [
+          "Get all templates"
+        ],
+        "summary": "Fetches all templates",
+        "description": "",
+        "operationId": "get_templates",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "number of objects to skip before starting to collect the result set",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "number of objects to return",
+            "required": false,
+            "type": "integer"
           }
-        } ],
-        "responses" : {
-          "201" : {
-            "description" : "Created",
-            "schema" : {
-              "$ref" : "#/definitions/Template"
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 1000
+                  },
+                  "version": {
+                    "type": "string",
+                    "pattern": "^\\d+\\.\\d+$"
+                  },
+                  "default": {
+                    "type": "boolean"
+                  }
+                }
+              }
             }
           },
-          "400" : {
-            "description" : "Bad Request"
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Add Template"
+        ],
+        "summary": "Add a new template to the template store",
+        "description": "",
+        "operationId": "post_template",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Template properties to push to template store",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "data": {
+                  "type": "string",
+                  "format": "binary"
+                },
+                "sample_context_data": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "version": {
+                  "type": "string",
+                  "pattern": "^\\d+\\.\\d+$"
+                },
+                "default": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/template/{name}/{version}" : {
-      "get" : {
-        "tags" : [ "Template Details" ],
-        "summary" : "Takes name and version of the template and displays all the details of the template",
-        "description" : "",
-        "operationId" : "get_template_details",
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "name" : "name",
-          "in" : "path",
-          "description" : "the name of the template",
-          "required" : true,
-          "type" : "string"
-        }, {
-          "name" : "version",
-          "in" : "path",
-          "description" : "the version of the template",
-          "required" : true,
-          "type" : "string"
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "schema" : {
-              "$ref" : "#/definitions/inline_response_200"
+    "/template/{name}/{version}": {
+      "get": {
+        "tags": [
+          "Get Template Details"
+        ],
+        "summary": "Fetches template details",
+        "description": "",
+        "operationId": "get_template_details",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "name of the template",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "version of the template",
+            "required": true,
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "version": {
+                  "type": "string",
+                  "pattern": "^\\d+\\.\\d+$"
+                },
+                "default": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "string",
+                  "format": "binary"
+                },
+                "sample_context_data": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
             }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Set default version"
+        ],
+        "summary": "Set default version for the template",
+        "description": "",
+        "operationId": "post_template_details",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "name of the template",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "description": "version of the template",
+            "required": true,
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+$"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "default": {
+                  "type": "boolean",
+                  "description": "value should be true, false value is rejected"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "version": {
+                  "type": "string",
+                  "pattern": "^\\d+\\.\\d+$"
+                },
+                "default": {
+                  "type": "boolean"
+                }
+              }
+            }
           }
         }
       }
     }
   },
-  "definitions" : {
-    "Template" : {
-      "type" : "object",
-      "properties" : {
-        "id" : {
-          "type" : "integer"
+  "definitions": {
+    "Template": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
         },
-        "name" : {
-          "type" : "string",
-          "maxLength" : 100
+        "name": {
+          "type": "string",
+          "maxLength": 1000
         },
-        "data" : {
-          "type" : "string"
+        "default_version_id": {
+          "type": "integer"
         },
-        "version" : {
-          "type" : "string",
-          "maxLength" : 50
+        "created_on": {
+          "type": "string",
+          "format": "date-time"
         },
-        "created_on" : {
-          "type" : "string",
-          "format" : "date-time"
-        },
-        "created_by" : {
-          "type" : "string",
-          "maxLength" : 100
-        },
-        "status" : {
-          "type" : "string",
-          "description" : "Template Status",
-          "enum" : [ "Draft", "Ready", "Live" ]
-        },
-        "sample_context_data" : {
-          "type" : "string"
+        "deleted_on": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
-    "inline_response_200" : {
-      "type" : "object",
-      "properties" : {
-        "name" : {
-          "type" : "string",
-          "maxLength" : 100
+    "TemplateVersion": {
+      "properties": {
+        "id": {
+          "type": "integer"
         },
-        "version" : {
-          "type" : "string",
-          "maxLength" : 50
+        "template_id": {
+          "$ref": "#/definitions/Template"
         },
-        "data" : {
-          "type" : "string"
+        "data": {
+          "type": "string",
+          "format": "byte"
         },
-        "sample_context_data" : {
-          "type" : "string"
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+$"
+        },
+        "sample_context_data": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "DRAFT",
+            "READY",
+            "LIVE"
+          ]
+        },
+        "created_on": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deleted_on": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     }
