@@ -1,17 +1,45 @@
 from django.db import models
-import jsonfield
+from django.contrib.postgres.fields import JSONField
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+import re
+
+# TODO: add id, indexes
+# TODO: template group and template spaces
+# TODO: user auth, maker-checker, changelog track
 
 
 class Template(models.Model):
+    def attributes_default():
+        return {k: "" for k in settings.TE_TEMPLATE_ATTRIBUTES_KEYS}
 
-    name = models.CharField(max_length=100)
-    default_version = models.IntegerField(null=True)
+    name = models.CharField(max_length=1000)
+    default_version_id = models.IntegerField(blank=True, null=True)
+    attributes = JSONField(default=attributes_default)
+    created_on = models.DateTimeField(auto_now_add=True)  # TODO: Timezone support check
+    modified_on = models.DateTimeField(auto_now=True)
+    deleted_on = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        db_table = "template"
+        db_table = "editor_template"
 
-    def __str__(self):
-        return self.name
+    def clean(self):
+        # all validations here
+        if self.default_version_id and (
+            not len(TemplateVersion.objects.filter(id=self.default_version_id, template_id=self.id))
+        ):
+            raise ValidationError(
+                {
+                    "default_version_id": _(
+                        "specified id doesn't correspond to same template version"
+                    )
+                }
+            )
+        # add default attributes
+        for k in settings.TE_TEMPLATE_ATTRIBUTES_KEYS:
+            if k not in self.attributes:
+                self.attributes[k] = ""
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -20,60 +48,29 @@ class Template(models.Model):
 
 class TemplateVersion(models.Model):
     STATUS_CHOICES = [
-        ("D", "Draft"),
-        ("R", "Ready"),
-        ("L", "Live"),
+        ("D", "DRAFT"),
+        ("R", "READY"),
+        ("L", "LIVE"),
     ]
 
-    template_id = models.ForeignKey(Template, on_delete=models.CASCADE)
+    template_id = models.ForeignKey(Template, on_delete=models.PROTECT)
     data = models.TextField(blank=True)
-    version = models.CharField(max_length=100)
+    version = models.CharField(max_length=50)
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, blank=True)
+    sample_context_data = JSONField(default=dict)
     created_on = models.DateTimeField(auto_now_add=True)
-    created_by = models.CharField(max_length=100, blank=True)
-    status = models.CharField(max_length=1, choices=STATUS_CHOICES)
-    sample_context_data = jsonfield.JSONField()
+    modified_on = models.DateTimeField(auto_now=True)
+    deleted_on = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        db_table = "template_version"
+        db_table = "editor_template_version"
         unique_together = ("template_id", "version")
 
-    def __str__(self):
-        return self.template_id
+    def clean(self):
+        # all validations here
+        if self.version and not re.fullmatch("\d+\.\d+", self.version):
+            raise ValidationError({"version": _("version must be specified like 1.3")})
 
     def save(self, *args, **kwargs):
         self.full_clean()
         super(TemplateVersion, self).save(*args, **kwargs)
-
-
-# from django.db import models
-# import jsonfield
-#
-#
-# class Template(models.Model):
-#     STATUS_CHOICES = [
-#         ("D", "Draft"),
-#         ("R", "Ready"),
-#         ("L", "Live"),
-#     ]
-#
-#     name = models.CharField(max_length=100)
-#     data = models.TextField(blank=True)
-#     version = models.IntegerField()
-#     created_on = models.DateTimeField(auto_now_add=True)
-#     created_by = models.CharField(max_length=100, blank=True)
-#     status = models.CharField(max_length=1, choices=STATUS_CHOICES)
-#     sample_context_data = jsonfield.JSONField()
-#
-#     class Meta:
-#         db_table = "te-template"
-#         unique_together = (
-#             "name",
-#             "version",
-#         )
-#
-#     def __str__(self):
-#         return self.name
-#
-#     def save(self, *args, **kwargs):
-#         self.full_clean()
-#         super(Template, self).save(*args, **kwargs)
