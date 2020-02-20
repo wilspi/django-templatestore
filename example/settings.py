@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "editor",
-    "rest_framework",
 ]
 
 MIDDLEWARE = [
@@ -114,7 +113,6 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATICFILES_DIRS = []
 STATIC_ROOT = "static/"
-
 
 # Template Editor - Example Configs
 TE_TEMPLATE_ATTRIBUTES_KEYS = ["attribute1", "attribute2"]

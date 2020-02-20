@@ -11,11 +11,13 @@ def index(request):
     return render(request, "index.html", context={})
 
 
-def render_via_Jinja(template, context):
+def render_via_jinja(template, context):
     from jinja2 import Template
 
     return Template(template).render(context)
 
+
+# TODO: common logger
 
 def render_template(request):
     # log requests
@@ -26,7 +28,7 @@ def render_template(request):
     handler = request.GET.get("handler", "")
     try:
         if handler == "jinja2":
-            rendered_template = render_via_Jinja(template, context)
+            rendered_template = render_via_jinja(template, context)
             data = {
                 "rendered_template": rendered_template,
                 "rendered_on": datetime.now(),
@@ -41,7 +43,6 @@ def render_template(request):
     # return HttpResponse(data, content_type='application/json')
 
 
-@csrf_exempt
 def template_view(request):
     if request.method == "GET":
         offset = request.GET.get('offset')
@@ -96,8 +97,11 @@ def template_view(request):
 
         else:
             template = Template.objects.get(name=name)
-            max_version = TemplateVersion.objects.filter(template_id=template).aggregate(Max("version"))
+            max_version = TemplateVersion.objects.filter(
+                template_id=template
+            ).aggregate(Max("version"))
             major_version, minor_version = max_version["version__max"].split(".")
+
             minor_version = str(int(minor_version) + 1)  # TODO: issue
             data["version"] = major_version + "." + minor_version
             data["template_id"] = template
@@ -121,6 +125,7 @@ def template_view(request):
                 temp = Template.objects.get(name=name)
                 temp.delete()
             return HttpResponse(status=400)
+
 
 
 @csrf_exempt
@@ -156,16 +161,18 @@ def template_details(request, name, version):
             return HttpResponse(status=400)
 
         tmp = Template.objects.get(name=name)
-        max_version = TemplateVersion.objects.filter(template_id=tmp).aggregate(Max("version"))
+        max_version = TemplateVersion.objects.filter(template_id=tmp).aggregate(
+            Max("version")
+        )
         major_version, minor_version = max_version["version__max"].split(".")
-        major_version = str(float(int(major_version) + 1))
+        major_version = str(float(int(major_version) + 1)) #TODO fix issue, happening when minor/major goes 11
 
         temp = TemplateVersion.objects.create(
             template_id=tmp,
             data=template.data,
             version=major_version,
             status=template.status,
-            sample_context_data=template.sample_context_data
+            sample_context_data=template.sample_context_data,
         )
 
         try:
@@ -180,7 +187,6 @@ def template_details(request, name, version):
             temp2.save()
         except Exception:
             return JsonResponse(Exception)
-
         template_data = {
             "name": name,
             "version": temp.version,
