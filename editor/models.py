@@ -27,7 +27,11 @@ class Template(models.Model):
     def clean(self):
         # all validations here
         if self.default_version_id and (
-            not len(TemplateVersion.objects.filter(id=self.default_version_id, template_id=self.id))
+            not len(
+                TemplateVersion.objects.filter(
+                    id=self.default_version_id, template_id=self.id
+                )
+            )
         ):
             raise ValidationError(
                 {

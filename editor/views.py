@@ -19,6 +19,7 @@ def render_via_jinja(template, context):
 
 # TODO: common logger
 
+
 def render_template(request):
     # log requests
     if request.method != "GET":
@@ -45,8 +46,8 @@ def render_template(request):
 
 def template_view(request):
     if request.method == "GET":
-        offset = request.GET.get('offset')
-        limit = request.GET.get('limit')
+        offset = request.GET.get("offset")
+        limit = request.GET.get("limit")
 
         if offset is None:
             offset = 0
@@ -58,20 +59,18 @@ def template_view(request):
         else:
             limit = int(limit)
 
-        templates = Template.objects.all()[offset:offset + limit]
+        templates = Template.objects.all()[offset : offset + limit]
         template_list = []
         for template in templates:
             default = 0
             version = "0"
             if template.default_version_id != 0:
                 default = 1
-                version = TemplateVersion.objects.get(pk=template.default_version_id).version
+                version = TemplateVersion.objects.get(
+                    pk=template.default_version_id
+                ).version
 
-            data = {
-                "name": template.name,
-                "version": version,
-                "default": default
-            }
+            data = {"name": template.name, "version": version, "default": default}
             template_list.append(data)
         return JsonResponse(template_list, safe=False)
 
@@ -83,9 +82,7 @@ def template_view(request):
         if len(template) == 0:
             data["version"] = "0.1"
             temp = Template.objects.create(
-                name=name,
-                default_version_id=0,
-                attributes=data["attributes"]
+                name=name, default_version_id=0, attributes=data["attributes"]
             )
             flag = 1
             try:
@@ -110,13 +107,13 @@ def template_view(request):
                 template_id=data["template_id"],
                 data=data["data"],
                 version=data["version"],
-                sample_context_data=data["sample_context_data"]
+                sample_context_data=data["sample_context_data"],
             )
             temp.save()
             template_data = {
                 "name": data["name"],
                 "version": data["version"],
-                "default": 0
+                "default": 0,
             }
             return JsonResponse(template_data, status=201)
         except Exception as e:
@@ -125,7 +122,6 @@ def template_view(request):
                 temp = Template.objects.get(name=name)
                 temp.delete()
             return HttpResponse(status=400)
-
 
 
 @csrf_exempt
@@ -150,7 +146,7 @@ def template_details(request, name, version):
             "version": version,
             "data": template.data,
             "sample_context_data": template.sample_context_data,
-            "default": default
+            "default": default,
         }
         return JsonResponse(data, status=200)
 
@@ -165,7 +161,9 @@ def template_details(request, name, version):
             Max("version")
         )
         major_version, minor_version = max_version["version__max"].split(".")
-        major_version = str(float(int(major_version) + 1)) #TODO fix issue, happening when minor/major goes 11
+        major_version = str(
+            float(int(major_version) + 1)
+        )  # TODO fix issue, happening when minor/major goes 11
 
         temp = TemplateVersion.objects.create(
             template_id=tmp,
@@ -187,9 +185,5 @@ def template_details(request, name, version):
             temp2.save()
         except Exception:
             return JsonResponse(Exception)
-        template_data = {
-            "name": name,
-            "version": temp.version,
-            "default": default
-        }
+        template_data = {"name": name, "version": temp.version, "default": default}
         return JsonResponse(template_data, status=200)
