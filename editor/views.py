@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 import json
 from .models import Template, TemplateVersion
-from django.db.models import Max
+from django.db.models.functions import Length
 
 
 def index(request):
@@ -44,6 +44,7 @@ def render_template(request):
     # return HttpResponse(data, content_type='application/json')
 
 
+@csrf_exempt
 def template_view(request):
     if request.method == "GET":
         offset = request.GET.get("offset")
@@ -94,12 +95,14 @@ def template_view(request):
 
         else:
             template = Template.objects.get(name=name)
-            max_version = TemplateVersion.objects.filter(
-                template_id=template
-            ).aggregate(Max("version"))
-            major_version, minor_version = max_version["version__max"].split(".")
 
-            minor_version = str(int(minor_version) + 1)  # TODO: issue
+            max_version = TemplateVersion.objects.filter(template_id=template).order_by(
+                -Length("version"), "-version"
+            )[:1]
+            major_version, minor_version = max_version[0].version.split(".")
+
+            minor_version = str(int(minor_version) + 1)
+
             data["version"] = major_version + "." + minor_version
             data["template_id"] = template
         try:
@@ -157,13 +160,11 @@ def template_details(request, name, version):
             return HttpResponse(status=400)
 
         tmp = Template.objects.get(name=name)
-        max_version = TemplateVersion.objects.filter(template_id=tmp).aggregate(
-            Max("version")
-        )
-        major_version, minor_version = max_version["version__max"].split(".")
-        major_version = str(
-            float(int(major_version) + 1)
-        )  # TODO fix issue, happening when minor/major goes 11
+        max_version = TemplateVersion.objects.filter(template_id=tmp).order_by(
+            -Length("version"), "-version"
+        )[:1]
+        major_version, minor_version = max_version[0].version.split(".")
+        major_version = str(float(int(major_version) + 1))
 
         temp = TemplateVersion.objects.create(
             template_id=tmp,
