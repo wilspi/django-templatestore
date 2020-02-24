@@ -4,7 +4,7 @@ module.exports = {
    output: {
       path: __dirname + '/dist',
       publicPath: '/',
-      filename: 'template-editor-bundle.js'
+      filename: 'te-bundle.js'
    },
    devServer: {
       contentBase: './dist',

@@ -69,7 +69,7 @@ in
       ''
     ) + ''
       [ ! -d '$PROJDIR/django-template-editor-dev' ] && virtualenv django-template-editor-dev && echo "SETUP django-template-editor-dev: DONE"
-      source venv/bin/activate
+      source django-template-editor-dev/bin/activate
       python -m pip install -r requirements.txt
       # cd templatestore/frontend/ && npm install && npm run build && cd -
       echo "ENV: django-template-editor-dev ACTIVATED";

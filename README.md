@@ -1,7 +1,9 @@
 # django-template-editor
+![Python application](https://github.com/wilspi/django-template-editor/workflows/Python%20application/badge.svg?branch=master)     
 `django-template-editor` is a [Django](https://www.djangoproject.com/) application/ UI tool to edit and save your templates.  
 
 ### Quick start
+Follow steps to quickly add `django-template-editor` to your existing django application:  
 1. Install [`django-template-editor`](https://pypi.org/project/django-template-editor/0.1/)
     ```
     pip install django-template-editor
@@ -23,24 +25,26 @@
    to start editing templates.
 
 
-### Live application
-[templateditor.herokuapp.com](https://templateditor.herokuapp.com)
-![templateditor.herokuapp.com](https://i.imgur.com/ixPn47L.jpg)
-
-
 ### Changelog
 [Here](https://github.com/wilspi/django-template-editor/releases)
 
 
 ### Template Support
 Currently following templating libraries are supported:
-* `jinja2`
+* [`jinja2`](https://www.palletsprojects.com/p/jinja/)
+
+
+
+### Demo
+[templateditor.herokuapp.com](https://templateditor.herokuapp.com)
+![templateditor.herokuapp.com](https://i.imgur.com/ixPn47L.jpg)
 
 
 ### Development
 * #### Setup
 
-  * Install `nix`
+  * Install `nix`  
+    Follow steps [here](https://gist.github.com/wilspi/aad81f832d030d80fca91dfa264a1f8a), if not done already
   * Run
     ```
     nix-shell --pure shell.nix
@@ -53,7 +57,7 @@ Currently following templating libraries are supported:
     ```
 
 * #### Run
-  * Build js and run application
+  * Build js 
     ```
     cd templatestore/frontend/ && npm run build && cd -
     ```

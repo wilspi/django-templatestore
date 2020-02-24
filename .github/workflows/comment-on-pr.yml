@@ -14,4 +14,3 @@ jobs:
           Hello @${{ github.actor }},
           Thanks for opening this pull request! :feet:
           Lets brew some code :tea:
-          \- @wilspi
