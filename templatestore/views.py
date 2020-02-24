@@ -9,7 +9,13 @@ def index(request):
     return render(request, "index.html", context={})
 
 
-def renderTemplate(request):
+def render_via_jinja(template, context):
+    from jinja2 import Template
+
+    return Template(template).render(context)
+
+
+def render_template(request):
     # log requests
     if request.method != "GET":
         return HttpResponseBadRequest("invalid request method: " + request.method)

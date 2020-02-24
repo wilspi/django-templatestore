@@ -17,6 +17,6 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path("template-editor/", include("editor.urls")),
+    path("templatestore/", include("templatestore.urls")),
     path("admin/", admin.site.urls),
 ]

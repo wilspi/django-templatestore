@@ -1,5 +1,5 @@
 include LICENSE
 include CHANGELOG.md
 include README.md
-include editor/frontend/index.html
-recursive-include editor/frontend/dist *
+include templatestore/frontend/index.html
+recursive-include templatestore/frontend/dist *

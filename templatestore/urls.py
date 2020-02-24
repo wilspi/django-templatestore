@@ -1,10 +1,10 @@
-from django.urls import path
-
-from . import views
+from django.urls import path, re_path
+from templatestore import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("api/v1/render", views.renderTemplate, name="renderTemplate"),
+    # apis
+    path("api/v1/render", views.render_template),
 ]
 
 # # https://stackoverflow.com/a/21805592
