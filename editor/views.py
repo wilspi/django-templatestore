@@ -47,33 +47,25 @@ def render_template(request):
 @csrf_exempt
 def template_view(request):
     if request.method == "GET":
-        offset = request.GET.get("offset")
-        limit = request.GET.get("limit")
+        offset = int(request.GET.get("offset", 0))
+        limit = int(request.GET.get("limit", 100))
+        try:
+            templates = Template.objects.all()[offset : offset + limit]
+            template_list = []
+            for template in templates:
+                default = False
+                version = "0"
+                if template.default_version_id != 0:
+                    default = True
+                    version = TemplateVersion.objects.get(
+                        pk=template.default_version_id
+                    ).version
 
-        if offset is None:
-            offset = 0
-        else:
-            offset = int(offset)
-
-        if limit is None:
-            limit = 100
-        else:
-            limit = int(limit)
-
-        templates = Template.objects.all()[offset : offset + limit]
-        template_list = []
-        for template in templates:
-            default = 0
-            version = "0"
-            if template.default_version_id != 0:
-                default = 1
-                version = TemplateVersion.objects.get(
-                    pk=template.default_version_id
-                ).version
-
-            data = {"name": template.name, "version": version, "default": default}
-            template_list.append(data)
-        return JsonResponse(template_list, safe=False)
+                data = {"name": template.name, "version": version, "default": default}
+                template_list.append(data)
+            return JsonResponse(template_list, safe=False)
+        except Exception:
+            return HttpResponse(status=404)
 
     elif request.method == "POST":
         data = json.loads(request.body)
@@ -116,7 +108,7 @@ def template_view(request):
             template_data = {
                 "name": data["name"],
                 "version": data["version"],
-                "default": 0,
+                "default": False,
             }
             return JsonResponse(template_data, status=201)
         except Exception as e:
@@ -141,9 +133,9 @@ def template_details(request, name, version):
         return HttpResponse(status=404)
 
     if request.method == "GET":
-        default = 0
+        default = False
         if template_id.default_version_id == template.id:
-            default = 1
+            default = True
         data = {
             "name": name,
             "version": version,
