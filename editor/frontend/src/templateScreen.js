@@ -13,8 +13,8 @@ languages.forEach(lang => {
 import styles from './style/templateScreen.less';
 
 const defaultValue = {
-    template: `Hi {{name}}, {{version}},\nThis is a sample template.\nPaste your template here.`,
-    context: `{\n\t"name": "wilspi"\n\t"version": "2"\n}`,
+    template: `Hi {{name}},\nThis is a sample template.\nPaste your template here.`,
+    context: `{\n\t"name": "wilspi"\n}`,
     output: ``
 };
 
