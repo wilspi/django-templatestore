@@ -14,6 +14,7 @@ class Template(models.Model):
     def attributes_default():
         return {k: "" for k in settings.TE_TEMPLATE_ATTRIBUTES_KEYS}
 
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=1000)
     default_version_id = models.IntegerField(blank=True, null=True)
     attributes = JSONField(default=attributes_default)
@@ -56,7 +57,7 @@ class TemplateVersion(models.Model):
         ("R", "READY"),
         ("L", "LIVE"),
     ]
-
+    id = models.AutoField(primary_key=True)
     template_id = models.ForeignKey(Template, on_delete=models.PROTECT)
     data = models.TextField(blank=True)
     version = models.CharField(max_length=50)

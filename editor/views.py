@@ -156,7 +156,7 @@ def template_details(request, name, version):
     elif request.method == "POST":
         data = json.loads(request.body)
         default = data["default"]
-        if default != 1:
+        if not default:
             return HttpResponse(status=400)
 
         tmp = Template.objects.get(name=name)
