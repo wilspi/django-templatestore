@@ -11,7 +11,7 @@ django-template-editor-dev/
 .DS_Store
 
 # node modules
-editor/frontend/node_modules
+templatestore/frontend/node_modules
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

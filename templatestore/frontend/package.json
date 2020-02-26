@@ -24,7 +24,8 @@
     "ses",
     "ses-explorer",
     "ses-editor",
-    "editor"
+    "editor",
+    "template-store"
   ],
   "author": "wilspi",
   "license": "ISC",

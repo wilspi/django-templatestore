@@ -8,20 +8,20 @@ Follow steps to quickly add `django-template-editor` to your existing django app
     ```
     pip install django-template-editor
     ```
-2. Add `editor` to your `INSTALLED_APPS` setting like this::
+2. Add `templatestore` to your `INSTALLED_APPS` setting like this::
     ```
     INSTALLED_APPS = [
         ...
-        'editor',
+        'templatestore',
     ]
     ```
-3. Include the template-editor URLconf in your project urls.py like this::
+3. Include the `templatestore` URLconf in your project urls.py like this::
     ```
-    path('template-editor/', include('editor.urls')),
+    path('templatestore/', include('templatestore.urls')),
     ```
 4. Run `python manage.py collectstatic` to collect the static files into root static folder.
-5. Run `python manage.py migrate` to create the template-editor models.
-6. Start the development server and visit `http://127.0.0.1:8000/template-editor/`
+5. Run `python manage.py migrate` to create the `templatestore` models.
+6. Start the development server and visit `http://127.0.0.1:8000/templatestore/`
    to start editing templates.
 
 
@@ -53,13 +53,13 @@ Currently following templating libraries are supported:
 * #### Update requirements
     ```
     pip install -r requirements.txt # python
-    cd editor/frontend/ && npm install && cd - # node packages
+    cd templatestore/frontend/ && npm install && cd - # node packages
     ```
 
 * #### Run
   * Build js 
     ```
-    cd editor/frontend/ && npm run build && cd -
+    cd templatestore/frontend/ && npm run build && cd -
     ```
   * Collect static files
     ```

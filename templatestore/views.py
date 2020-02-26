@@ -17,9 +17,6 @@ def render_via_jinja(template, context):
     return Template(template).render(context)
 
 
-# TODO: common logger
-
-
 def render_template(request):
     # log requests
     if request.method != "GET":
