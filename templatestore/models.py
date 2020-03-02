@@ -5,17 +5,13 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 import re
 
-# TODO: add id, indexes
-# TODO: template group and template spaces
-# TODO: user auth, maker-checker, changelog track
-
-
 class Template(models.Model):
     def attributes_default():
         return {k: "" for k in settings.TE_TEMPLATE_ATTRIBUTES_KEYS}
 
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=1000)
+    type = models.CharField(max_length=1000)
     default_version_id = models.IntegerField(blank=True, null=True)
     attributes = JSONField(default=attributes_default)
     created_on = models.DateTimeField(auto_now_add=True)  # TODO: Timezone support check
@@ -23,7 +19,7 @@ class Template(models.Model):
     deleted_on = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        db_table = "editor_template"
+        db_table = "templatestore_template"
 
     def clean(self):
         # all validations here
@@ -52,23 +48,16 @@ class Template(models.Model):
 
 
 class TemplateVersion(models.Model):
-    STATUS_CHOICES = [
-        ("D", "DRAFT"),
-        ("R", "READY"),
-        ("L", "LIVE"),
-    ]
     id = models.AutoField(primary_key=True)
     template_id = models.ForeignKey(Template, on_delete=models.PROTECT)
-    data = models.TextField(blank=True)
     version = models.CharField(max_length=50)
-    status = models.CharField(max_length=1, choices=STATUS_CHOICES, blank=True)
     sample_context_data = JSONField(default=dict)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     deleted_on = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        db_table = "editor_template_version"
+        db_table = "templatestore_template_version"
         unique_together = ("template_id", "version")
 
     def clean(self):
@@ -79,3 +68,25 @@ class TemplateVersion(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         super(TemplateVersion, self).save(*args, **kwargs)
+
+class TemplateConfig(models.Model):
+    type = models.CharField(max_length=1000)
+    sub_type = models.CharField(max_length=1000)
+
+    class Meta:
+        db_table = "templatestore_template_config"
+        unique_together = ("type", "sub_type")
+
+class SubTemplate(models.Model):
+    id = models.AutoField(primary_key=True)
+    template_version_id = models.ForeignKey(TemplateVersion, on_delete=models.PROTECT)
+    type = models.ForeignKey(TemplateConfig, on_delete=models.PROTECT)
+    data = models.TextField(blank=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    modified_on = models.DateTimeField(auto_now=True)
+    deleted_on = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "templatestore_sub_template"
+
+

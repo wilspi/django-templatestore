@@ -74,7 +74,7 @@ WSGI_APPLICATION = "example.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "template_store",
+        "NAME": "templatestore",
         "USER": "root",
         "PASSWORD": "",
         "HOST": "",
