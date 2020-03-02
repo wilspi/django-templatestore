@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 import re
 
+
 class Template(models.Model):
     def attributes_default():
         return {k: "" for k in settings.TE_TEMPLATE_ATTRIBUTES_KEYS}
@@ -69,13 +70,18 @@ class TemplateVersion(models.Model):
         self.full_clean()
         super(TemplateVersion, self).save(*args, **kwargs)
 
+
 class TemplateConfig(models.Model):
     type = models.CharField(max_length=1000)
     sub_type = models.CharField(max_length=1000)
+    created_on = models.DateTimeField(auto_now_add=True)
+    modified_on = models.DateTimeField(auto_now=True)
+    deleted_on = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = "templatestore_template_config"
         unique_together = ("type", "sub_type")
+
 
 class SubTemplate(models.Model):
     id = models.AutoField(primary_key=True)
@@ -88,5 +94,3 @@ class SubTemplate(models.Model):
 
     class Meta:
         db_table = "templatestore_sub_template"
-
-

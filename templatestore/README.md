@@ -1,5 +1,9 @@
-# editor 
+# templatestore
 
-### Swagger API Documentation
+### Documentation
 
-[Here](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/wilspi/django-template-editor/master/docs/swagger.json)
+Read complete documentation [here](../docs/README.md)
+
+### Development
+
+Read [this](../README.md#development)

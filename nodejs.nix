@@ -10,7 +10,7 @@ mkDerivation {
 
   name = "nodejs-${version}";
   src = fetchurl {
-    url = "https://nodejs.org/dist/v${version}/node-v${version}${if stdenv.isDarwin then "-darwin-x64" else "-linux-x64"}.tar.xz";
+    url = "https://nodejs.org/dist/v${version}/node-v${version}${if stdenv.isDarwin then "-darwin-x64" else "-linux-x64"}.tar.xz"; # this darwin/linux check doesn't work since sha is different for packages
     inherit sha256;
   };
 

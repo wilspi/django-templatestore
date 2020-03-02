@@ -34,11 +34,10 @@ def render_template(request):
         else:
             raise Exception("Invalid Template Handler: %s", handler)  # TOTEST
     except Exception as e:
+        print(e)
         raise e
-        # return JsonResponse(data, safe=False)
 
-    return JsonResponse(data, safe=False)  # TOFIX: why not httpresponse
-    # return HttpResponse(data, content_type='application/json')
+    return JsonResponse(data, safe=False)
 
 
 @csrf_exempt
@@ -69,7 +68,9 @@ def template_view(request):
         name = data["name"]
         template = Template.objects.filter(name=name)
         flag = 0
-        if len(template) == 0:
+
+        if not len(template):
+            # Why this case ?
             data["version"] = "0.1"
             temp = Template.objects.create(
                 name=name, default_version_id=0, attributes=data["attributes"]
@@ -94,6 +95,7 @@ def template_view(request):
 
             data["version"] = major_version + "." + minor_version
             data["template_id"] = template
+
         try:
             temp = TemplateVersion.objects.create(
                 template_id=data["template_id"],
@@ -165,7 +167,8 @@ def template_details(request, name, version):
 
         try:
             temp.save()
-        except Exception:
+        except Exception as e:
+            print(e)
             return HttpResponse(status=400)
 
         temp2 = Template.objects.get(name=name)
@@ -173,7 +176,9 @@ def template_details(request, name, version):
 
         try:
             temp2.save()
-        except Exception:
+        except Exception as e:
+            print(e)
             return JsonResponse(Exception)
+
         template_data = {"name": name, "version": temp.version, "default": default}
         return JsonResponse(template_data, status=200)
