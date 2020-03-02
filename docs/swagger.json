@@ -60,6 +60,13 @@
                            },
                            "default":{
                               "type":"boolean"
+                           },
+                           "type":{
+                              "type":"string",
+                              "maxLength":1000
+                           },
+                           "attributes":{
+                              "type":"object"
                            }
                         }
                      }
@@ -108,6 +115,13 @@
                            "type":"string",
                            "format":"binary"
                         },
+                        "type":{
+                           "type":"string",
+                           "description":"allowed types should be preconfigured in TemplateConfig table"
+                        },
+                        "attributes":{
+                           "type":"object"
+                        },
                         "sample_context_data":{
                            "type":"object",
                            "additionalProperties":true
@@ -132,6 +146,9 @@
                         },
                         "default":{
                            "type":"boolean"
+                        },
+                        "attributes":{
+                           "type":"object"
                         }
                      }
                   }
@@ -192,12 +209,18 @@
                            "type":"string",
                            "pattern":"^\\d+\\.\\d+$"
                         },
+                        "type":{
+                           "type":"string",
+                           "maxLength":1000
+                        },
+                        "sub_templates":{
+                           "type":"object"
+                        },
                         "default":{
                            "type":"boolean"
                         },
-                        "data":{
-                           "type":"string",
-                           "format":"binary"
+                        "attributes":{
+                           "type":"object"
                         },
                         "sample_context_data":{
                            "type":"object",
@@ -277,6 +300,9 @@
                         },
                         "default":{
                            "type":"boolean"
+                        },
+                        "attributes":{
+                           "type":"object"
                         }
                      }
                   }
