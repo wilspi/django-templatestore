@@ -3,10 +3,7 @@
     "info":{
         "description":"Template Store::: APIs to get, post and render templates.",
         "version":"1.0.0",
-        "title":"Template Store",
-        "contact":{
-            "email":"the.wilspi@gmail.com"
-        }
+        "title":"Template Store"
     },
     "host":"127.0.0.1:8000",
     "basePath":"/templatestore/api/v1",
@@ -230,7 +227,7 @@
             }
         },
         "/template/{name}/render":{
-            "post":{
+            "get":{
                 "tags":[
                     "Get rendered template"
                 ],
@@ -271,13 +268,16 @@
                             "type":"object",
                             "properties":{
                                 "sub_templates":{
-                                    "type":"object",
-                                    "properties":{
-                                        "type":{
-                                            "type":"string"
-                                        },
-                                        "rendered_data":{
-                                            "type":"string"
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string"
+                                            },
+                                            "rendered_data": {
+                                                "type": "string"
+                                            }
                                         }
                                     }
                                 },
@@ -469,7 +469,7 @@
             }
         },
         "/template/{name}/{version}/render":{
-            "post":{
+            "get":{
                 "tags":[
                     "Get rendered versioned template"
                 ],
@@ -518,13 +518,16 @@
                             "type":"object",
                             "properties":{
                                 "sub_templates":{
-                                    "type":"object",
-                                    "properties":{
-                                        "type":{
-                                            "type":"string"
-                                        },
-                                        "rendered_data":{
-                                            "type":"string"
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string"
+                                            },
+                                            "rendered_data": {
+                                                "type": "string"
+                                            }
                                         }
                                     }
                                 },
@@ -627,8 +630,7 @@
                     }
                 }
             }
-        },
-        
+        }
     },
     "definitions":{
         "Template":{
