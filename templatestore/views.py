@@ -16,8 +16,8 @@ def render_via_jinja(template, context):
 
     return Template(template).render(context)
 
-
-def render_template(request):
+@csrf_exempt
+def render_template_view(request):
     # log requests
     if request.method != "GET":
         return HttpResponseBadRequest("invalid request method: " + request.method)
@@ -116,10 +116,12 @@ def template_view(request):
                 temp = Template.objects.get(name=name)
                 temp.delete()
             return HttpResponse(status=400)
+    else:
+        return HttpResponse(status=404)
 
 
 @csrf_exempt
-def template_details(request, name, version):
+def template_details_view(request, name, version):
     try:
         template = Template.objects.get(name=name)
     except Exception:
@@ -182,3 +184,31 @@ def template_details(request, name, version):
 
         template_data = {"name": name, "version": temp.version, "default": default}
         return JsonResponse(template_data, status=200)
+
+    else:
+        return HttpResponse(status=404)
+
+@csrf_exempt
+def config_view(request):
+    if request.method == "GET":
+        offset = int(request.GET.get("offset", 0))
+        limit = int(request.GET.get("limit", 100))
+        try:
+            # templates = Template.objects.all()[offset : offset + limit]
+            # template_list = []
+            # for template in templates:
+            #     default = False
+            #     version = "0"
+            #     if template.default_version_id != 0:
+            #         default = True
+            #         version = TemplateVersion.objects.get(
+            #             pk=template.default_version_id
+            #         ).version
+            #
+            #     data = {"name": template.name, "version": version, "default": default}
+            #     template_list.append(data)
+            # return JsonResponse(template_list, safe=False)
+        except Exception:
+            return HttpResponse(status=404)
+    else:
+        return HttpResponse(status=404)

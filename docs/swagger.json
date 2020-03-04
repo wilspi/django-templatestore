@@ -15,13 +15,13 @@
       "http"
    ],
    "paths":{
-      "/template":{
+      "/templates":{
          "get":{
             "tags":[
                "Get all templates"
             ],
             "summary":"Get all templates",
-            "description":"",
+            "description":"This returns all templates with their default version. If no default version exists this will give the latest version.",
             "operationId":"get_templates",
             "produces":[
                "application/json"
@@ -85,6 +85,8 @@
                }
             }
          },
+      },
+      "/template":{
          "post":{
             "tags":[
                "Add Template"
@@ -155,6 +157,66 @@
                },
                "400":{
                   "description":"Bad Request",
+                  "schema":{
+                     "type":"object",
+                     "properties":{
+                        "error":{
+                           "type":"string"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/config":{
+         "get":{
+            "tags":[
+               "Get template config"
+            ],
+            "summary":"Get template config",
+            "description":"",
+            "operationId":"get_config",
+            "produces":[
+               "application/json"
+            ],
+            "parameters":[
+               {
+                  "name":"offset",
+                  "in":"query",
+                  "description":"number of objects to skip before starting to collect the result set",
+                  "required":false,
+                  "type":"integer"
+               },
+               {
+                  "name":"limit",
+                  "in":"query",
+                  "description":"number of objects to return",
+                  "required":false,
+                  "type":"integer"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"Ok",
+                  "schema":{
+                     "type":"array",
+                     "items":{
+                        "type":"object",
+                        "properties":{
+                           "type":{
+                              "type":"string",
+                              "maxLength":1000
+                           },
+                           "subtype":{
+                              "type":"object",
+                           }
+                        }
+                     }
+                  }
+               },
+               "404":{
+                  "description":"Not Found",
                   "schema":{
                      "type":"object",
                      "properties":{
@@ -244,7 +306,7 @@
          },
          "post":{
             "tags":[
-               "Set default version"
+               "Create a new version with this one as default version"
             ],
             "summary":"Set default version for the template",
             "description":"",
@@ -303,6 +365,64 @@
                         },
                         "attributes":{
                            "type":"object"
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/template/{name}/versions":{
+         "get":{
+            "tags":[
+               "Get all versions of the template"
+            ],
+            "summary":"Get all versions of the template",
+            "description":"",
+            "operationId":"get_template_versions",
+            "produces":[
+               "application/json"
+            ],
+            "parameters":[
+               {
+                  "name":"name",
+                  "in":"path",
+                  "description":"name of the template",
+                  "required":true,
+                  "type":"string"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"Ok",
+                  "schema":{
+                     "type":"object",
+                     "properties":{
+                        "version":{
+                           "type":"string",
+                           "pattern":"^\\d+\\.\\d+$"
+                        },
+                        "type":{
+                           "type":"string",
+                           "maxLength":1000
+                        },
+                        "default":{
+                           "type":"boolean"
+                        },
+                        "created_on":{
+                           "type":"string",
+                           "format":"date-time"
+                        }
+                     }
+                  }
+               },
+               "404":{
+                  "description":"Not Found",
+                  "schema":{
+                     "type":"object",
+                     "properties":{
+                        "error":{
+                           "type":"string"
                         }
                      }
                   }
