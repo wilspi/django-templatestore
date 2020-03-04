@@ -124,6 +124,7 @@ def post_template_view(request):
     else:
         return HttpResponse(status=404)
 
+
 @csrf_exempt
 def get_template_versions_view(request, name):
     if request.method == "GET":
@@ -131,31 +132,28 @@ def get_template_versions_view(request, name):
             offset = int(request.GET.get("offset", 0))
             limit = int(request.GET.get("limit", 100))
 
-            t = Template.objects.get()
-
-            templates = Template.objects.all()[offset : offset + limit]
-            template_list = [
-                {
-                    "name": t.name,
-                    "version": TemplateVersion.objects.get(
-                        pk=t.default_version_id
-                    ).version
-                    if t.default_version_id
-                    else "0.1",
-                    "default": True if t.default_version_id else False,
-                    "type": t.type,
-                    "attributes": t.attributes,
-                }
-                for t in templates
+            t = Template.objects.get(name=name)
+            tvs = TemplateVersion.objects.filter(template_id=t.id).order_by("-id")[
+                offset : offset + limit
             ]
 
-            return JsonResponse(template_list, safe=False)
+            version_list = [
+                {
+                    "version": tv.version,
+                    "default": True if t.default_version_id == tv.id else False,
+                    "created_on": tv.created_on,
+                }
+                for tv in tvs
+            ]
+
+            return JsonResponse(version_list, safe=False)
 
         except Exception:
             return HttpResponse(status=400)
 
     else:
         return HttpResponse(status=404)
+
 
 @csrf_exempt
 def get_render_template_view(request, name, version=None):
