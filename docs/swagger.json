@@ -39,9 +39,20 @@
                                     "type":"string",
                                     "maxLength":1000
                                 },
-                                "data":{
-                                    "type":"string",
-                                    "format":"binary"
+                                "sub_template": {
+                                    "type":"array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "sub_type": {
+                                                "type": "string"
+                                            },
+                                            "data": {
+                                                "type": "string",
+                                                "format": "binary"
+                                            }
+                                        }
+                                    }
                                 },
                                 "type":{
                                     "type":"string",
@@ -267,12 +278,12 @@
                         "schema":{
                             "type":"object",
                             "properties":{
-                                "sub_templates":{
+                                "sub_template":{
                                     "type": "array",
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "type": {
+                                            "sub_type": {
                                                 "type": "string"
                                             },
                                             "rendered_data": {
@@ -356,20 +367,17 @@
                                     "type":"string",
                                     "maxLength":1000
                                 },
-                                "sub_templates":{
+                                "sub_template":{
                                     "type":"object",
                                     "properties":{
-                                        "type":{
+                                        "sub_type":{
                                             "type":"string"
                                         },
                                         "data":{
                                             "type":"string"
                                         },
                                         "render_mode":{
-                                            "type":"array",
-                                            "items":{
-                                                "type":"string"
-                                            }
+                                            "type":"string"
                                         }
                                     }
                                 },
@@ -517,12 +525,12 @@
                         "schema":{
                             "type":"object",
                             "properties":{
-                                "sub_templates":{
+                                "sub_template":{
                                     "type": "array",
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "type": {
+                                            "sub_type": {
                                                 "type": "string"
                                             },
                                             "rendered_data": {
@@ -595,20 +603,17 @@
                             "additionalProperties":{
                                 "type":"object",
                                 "properties":{
-                                    "subtype":{
+                                    "sub_type":{
                                         "type":"array",
                                         "items":{
                                             "type":"object",
                                             "properties":{
-                                                "type":{
+                                                "sub_type":{
                                                     "type":"string",
                                                     "maxLength":1000
                                                 },
                                                 "render_mode":{
-                                                    "type":"array",
-                                                    "items":{
-                                                        "type":"string"
-                                                    }
+                                                    "type":"string"
                                                 }
                                             }
                                         }
