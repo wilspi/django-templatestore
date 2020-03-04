@@ -1,6 +1,6 @@
 module.exports = {
    devtool: 'inline-source-map',
-   entry: './src/templateScreen.js',
+   entry: './src/index.js',
    output: {
       path: __dirname + '/dist',
       publicPath: '/',
