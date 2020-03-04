@@ -229,6 +229,87 @@
                 }
             }
         },
+        "/template/{name}/render":{
+            "post":{
+                "tags":[
+                    "Get rendered template"
+                ],
+                "summary":"Get rendered template",
+                "description":"",
+                "operationId":"get_rendered_template",
+                "produces":[
+                    "application/json"
+                ],
+                "parameters":[
+                    {
+                        "name":"name",
+                        "in":"path",
+                        "description":"name of the template",
+                        "required":true,
+                        "type":"string"
+                    },
+                    {
+                        "in":"body",
+                        "name":"body",
+                        "description":"",
+                        "required":true,
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "context_data":{
+                                    "type":"object",
+                                    "additionalProperties":true
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Ok",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "sub_templates":{
+                                    "type":"object",
+                                    "properties":{
+                                        "type":{
+                                            "type":"string"
+                                        },
+                                        "rendered_data":{
+                                            "type":"string"
+                                        }
+                                    }
+                                },
+                                "version":{
+                                    "type":"string",
+                                    "pattern":"^\\d+\\.\\d+$"
+                                },
+                                "type":{
+                                    "type":"string",
+                                    "maxLength":1000
+                                },
+                                "attributes":{
+                                    "type":"object",
+                                    "additionalProperties":true
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "description":"Not Found",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "error":{
+                                    "type":"string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/template/{name}/{version}":{
             "get":{
                 "tags":[
@@ -387,6 +468,95 @@
                 }
             }
         },
+        "/template/{name}/{version}/render":{
+            "post":{
+                "tags":[
+                    "Get rendered versioned template"
+                ],
+                "summary":"Get rendered versioned template",
+                "description":"",
+                "operationId":"get_rendered_versioned_template",
+                "produces":[
+                    "application/json"
+                ],
+                "parameters":[
+                    {
+                        "name":"name",
+                        "in":"path",
+                        "description":"name of the template",
+                        "required":true,
+                        "type":"string"
+                    },
+                    {
+                        "name":"version",
+                        "in":"path",
+                        "description":"version of the template",
+                        "required":true,
+                        "type":"string",
+                        "pattern":"^\\d+\\.\\d+$"
+                    },
+                    {
+                        "in":"body",
+                        "name":"body",
+                        "description":"",
+                        "required":true,
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "context_data":{
+                                    "type":"object",
+                                    "additionalProperties":true
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Ok",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "sub_templates":{
+                                    "type":"object",
+                                    "properties":{
+                                        "type":{
+                                            "type":"string"
+                                        },
+                                        "rendered_data":{
+                                            "type":"string"
+                                        }
+                                    }
+                                },
+                                "version":{
+                                    "type":"string",
+                                    "pattern":"^\\d+\\.\\d+$"
+                                },
+                                "type":{
+                                    "type":"string",
+                                    "maxLength":1000
+                                },
+                                "attributes":{
+                                    "type":"object",
+                                    "additionalProperties":true
+                                }
+                            }
+                        }
+                    },
+                    "404":{
+                        "description":"Not Found",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "error":{
+                                    "type":"string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/config":{
             "get":{
                 "tags":[
@@ -457,7 +627,8 @@
                     }
                 }
             }
-        }
+        },
+        
     },
     "definitions":{
         "Template":{
