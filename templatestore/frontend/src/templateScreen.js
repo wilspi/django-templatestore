@@ -18,6 +18,7 @@ const defaultValue = {
     output: ``
 };
 
+
 class TemplateScreen extends React.Component {
     constructor(props) {
         super(props);
@@ -30,7 +31,8 @@ class TemplateScreen extends React.Component {
             width: 'auto',
             height: '400px'
         };
-        this.getTemplateOutput = this.getTemplateOutput.bind(this); //TODO: Why
+
+        this.getTemplateOutput = this.getTemplateOutput.bind(this);
         this.renderTemplate = this.renderTemplate.bind(this);
         this.onTemplateChange = this.onTemplateChange.bind(this);
         this.onContextChange = this.onContextChange.bind(this);

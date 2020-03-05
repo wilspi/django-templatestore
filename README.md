@@ -1,6 +1,9 @@
 # django-template-editor
 ![Python application](https://github.com/wilspi/django-template-editor/workflows/Python%20application/badge.svg?branch=master)     
-`django-template-editor` is a [Django](https://www.djangoproject.com/) application/ UI tool to edit and save your templates.  
+
+`django-template-editor` is a [Django](https://www.djangoproject.com/) application/ UI tool to edit and save your templates. 
+
+Demo application:  [send_me_a_mail]()
 
 ### Quick start
 Follow steps to quickly add `django-template-editor` to your existing django application:  
@@ -8,14 +11,14 @@ Follow steps to quickly add `django-template-editor` to your existing django app
     ```
     pip install django-template-editor
     ```
-2. Add `templatestore` to your `INSTALLED_APPS` setting like this::
+2. Add `templatestore` to your `INSTALLED_APPS` in `settings.py`:
     ```
     INSTALLED_APPS = [
         ...
         'templatestore',
     ]
     ```
-3. Include the `templatestore` URLconf in your project urls.py like this::
+3. Include the `templatestore` URLconf in your project's `urls.py`:
     ```
     path('templatestore/', include('templatestore.urls')),
     ```
@@ -29,13 +32,15 @@ Follow steps to quickly add `django-template-editor` to your existing django app
 [Here](https://github.com/wilspi/django-template-editor/releases)
 
 
-### Template Support
+### Templating Library Support
 Currently following templating libraries are supported:
-* [`jinja2`](https://www.palletsprojects.com/p/jinja/)
+ - [x] [`jinja2`](https://www.palletsprojects.com/p/jinja/)
+ - [ ] [`handlebarsjs`](https://handlebarsjs.com/guide/)
 
 
+### Share your screenshot
+* [send_me_a_mail]()
 
-### Demo
 [templateditor.herokuapp.com](https://templateditor.herokuapp.com)
 ![templateditor.herokuapp.com](https://i.imgur.com/ixPn47L.jpg)
 
@@ -49,10 +54,16 @@ Currently following templating libraries are supported:
     ```
     nix-shell --pure shell.nix
     ```
+    * `shell.nix` is tested on `Arch Linux`, `Ubuntu`, `Macos`   
+    Failing to run: please raise issue [here](/issues) :)
 
 * #### Update requirements
+  * `python`
     ```
     pip install -r requirements.txt # python
+    ```
+  * `node`
+    ```
     cd templatestore/frontend/ && npm install && cd - # node packages
     ```
 
@@ -69,8 +80,5 @@ Currently following templating libraries are supported:
     ```
     python manage.py runserver
     ```
-* #### Update pypi package
-  ```
-  python setup.py sdist
-  ```
+
   

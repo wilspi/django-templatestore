@@ -61,13 +61,6 @@ in
     # Post Shell Hook
     shellHook = ''
       echo "Using ${python37.name}, and ${postgresql_11.name}."
-    '' + (
-      if !pkgs.stdenv.isDarwin then
-        ""
-      else ''
-        # Do something if required.
-      ''
-    ) + ''
       [ ! -d '$PROJDIR/django-template-editor-dev' ] && virtualenv django-template-editor-dev && echo "SETUP django-template-editor-dev: DONE"
       source django-template-editor-dev/bin/activate
       python -m pip install -r requirements.txt
