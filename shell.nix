@@ -37,11 +37,13 @@ in
       pkgconfig
       perl
       nixpkgs-fmt
+      geos
+      gdal
 
       postgresql_11
       python37
-      python37Packages.psycopg2
-      python37Packages.pre-commit
+      python37Packages.pip
+      python37Packages.virtualenv
       cacert
     ] ++ (
       stdenv.lib.optionals stdenv.isDarwin [
@@ -56,6 +58,7 @@ in
     HISTFILE = "${toString ./.}/.zsh-history";
     SOURCE_DATE_EPOCH = 315532800;
     LIBCLANG_PATH = "${llvmPackages.libclang}/lib";
+    LD_LIBRARY_PATH = "${geos}/lib:${gdal}/lib";
 
 
     # Post Shell Hook
