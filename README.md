@@ -1,41 +1,46 @@
-# django-template-editor
-![Python application](https://github.com/wilspi/django-template-editor/workflows/Python%20application/badge.svg?branch=master)     
-`django-template-editor` is a [Django](https://www.djangoproject.com/) application/ UI tool to edit and save your templates.  
+# django-templatestore
+![Python application](https://github.com/wilspi/django-templatestore/workflows/Python%20application/badge.svg?branch=master)     
+
+`django-templatestore` is a [Django](https://www.djangoproject.com/) application/ UI tool to edit and save your templates. 
+
+Demo application:  [send_me_a_mail]()
 
 ### Quick start
-Follow steps to quickly add `django-template-editor` to your existing django application:  
-1. Install [`django-template-editor`](https://pypi.org/project/django-template-editor/0.1/)
+Follow steps to quickly add `django-templatestore` to your existing django application:  
+1. Install [`django-templatestore`](https://pypi.org/project/django-templatestore/0.1/)
     ```
-    pip install django-template-editor
+    pip install django-templatestore
     ```
-2. Add `editor` to your `INSTALLED_APPS` setting like this::
+2. Add `templatestore` to your `INSTALLED_APPS` in `settings.py`:
     ```
     INSTALLED_APPS = [
         ...
-        'editor',
+        'templatestore',
     ]
     ```
-3. Include the template-editor URLconf in your project urls.py like this::
+3. Include the `templatestore` URLconf in your project's `urls.py`:
     ```
-    path('template-editor/', include('editor.urls')),
+    path('templatestore/', include('templatestore.urls')),
     ```
 4. Run `python manage.py collectstatic` to collect the static files into root static folder.
-5. Run `python manage.py migrate` to create the template-editor models.
-6. Start the development server and visit `http://127.0.0.1:8000/template-editor/`
+5. Run `python manage.py migrate` to create the `templatestore` models.
+6. Start the development server and visit `http://127.0.0.1:8000/templatestore/`
    to start editing templates.
 
 
 ### Changelog
-[Here](https://github.com/wilspi/django-template-editor/releases)
+[Here](https://github.com/wilspi/django-templatestore/releases)
 
 
-### Template Support
+### Templating Library Support
 Currently following templating libraries are supported:
-* [`jinja2`](https://www.palletsprojects.com/p/jinja/)
+ - [x] [`jinja2`](https://www.palletsprojects.com/p/jinja/)
+ - [ ] [`handlebarsjs`](https://handlebarsjs.com/guide/)
 
 
+### Share your screenshot
+* [send_me_a_mail]()
 
-### Demo
 [templateditor.herokuapp.com](https://templateditor.herokuapp.com)
 ![templateditor.herokuapp.com](https://i.imgur.com/ixPn47L.jpg)
 
@@ -49,17 +54,23 @@ Currently following templating libraries are supported:
     ```
     nix-shell --pure shell.nix
     ```
+    * `shell.nix` is tested on `Arch Linux`, `Ubuntu`, `Macos`   
+    Failing to run: please raise issue [here](/issues) :)
 
 * #### Update requirements
+  * `python`
     ```
     pip install -r requirements.txt # python
-    cd editor/frontend/ && npm install && cd - # node packages
+    ```
+  * `node`
+    ```
+    cd templatestore/frontend/ && npm install && cd - # node packages
     ```
 
 * #### Run
   * Build js 
     ```
-    cd editor/frontend/ && npm run build && cd -
+    cd templatestore/frontend/ && npm run build && cd -
     ```
   * Collect static files
     ```
@@ -69,8 +80,5 @@ Currently following templating libraries are supported:
     ```
     python manage.py runserver
     ```
-* #### Update pypi package
-  ```
-  python setup.py sdist
-  ```
+
   

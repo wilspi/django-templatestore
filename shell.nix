@@ -17,7 +17,7 @@ in
   with nixpkgs;
 
   stdenv.mkDerivation {
-    name = "django-template-editor-dev";
+    name = "django-templatestore-dev";
     buildInputs = [ installNodeJS ];
 
     nativeBuildInputs = [
@@ -37,11 +37,13 @@ in
       pkgconfig
       perl
       nixpkgs-fmt
+      geos
+      gdal
 
       postgresql_11
       python37
-      python37Packages.psycopg2
-      python37Packages.pre-commit
+      python37Packages.pip
+      python37Packages.virtualenv
       cacert
     ] ++ (
       stdenv.lib.optionals stdenv.isDarwin [
@@ -56,22 +58,16 @@ in
     HISTFILE = "${toString ./.}/.zsh-history";
     SOURCE_DATE_EPOCH = 315532800;
     LIBCLANG_PATH = "${llvmPackages.libclang}/lib";
+    LD_LIBRARY_PATH = "${geos}/lib:${gdal}/lib";
 
 
     # Post Shell Hook
     shellHook = ''
       echo "Using ${python37.name}, and ${postgresql_11.name}."
-    '' + (
-      if !pkgs.stdenv.isDarwin then
-        ""
-      else ''
-        # Do something if required.
-      ''
-    ) + ''
-      [ ! -d '$PROJDIR/django-template-editor-dev' ] && virtualenv django-template-editor-dev && echo "SETUP django-template-editor-dev: DONE"
-      source django-template-editor-dev/bin/activate
+      [ ! -d '$PROJDIR/django-templatestore-dev' ] && virtualenv django-templatestore-dev && echo "SETUP django-templatestore-dev: DONE"
+      source django-templatestore-dev/bin/activate
       python -m pip install -r requirements.txt
-      # cd editor/frontend/ && npm install && npm run build && cd -
-      echo "ENV: django-template-editor-dev ACTIVATED";
+      # cd templatestore/frontend/ && npm install && npm run build && cd -
+      echo "ENV: django-templatestore-dev ACTIVATED";
     '';
   }

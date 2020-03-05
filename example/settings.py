@@ -29,13 +29,12 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "editor",
+    "templatestore",
 ]
 
 MIDDLEWARE = [
@@ -74,7 +73,7 @@ WSGI_APPLICATION = "example.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "template_store",
+        "NAME": "templatestore",
         "USER": "root",
         "PASSWORD": "",
         "HOST": "",

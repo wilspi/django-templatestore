@@ -1,1 +1,4 @@
-Read [this](../README.md#setup)
+# example
+
+This is example django application.  
+Read [this](../README.md#setup) to setup and start development.

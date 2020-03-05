@@ -18,6 +18,10 @@ const defaultValue = {
     output: ``
 };
 
+var attribute_keys = JSON.parse(
+    document.getElementById('settings-data').textContent.replace(/&quot;/g, '"')
+);
+
 class TemplateScreen extends React.Component {
     constructor(props) {
         super(props);
@@ -38,7 +42,7 @@ class TemplateScreen extends React.Component {
             versionList: [],
             updateOrNot: false
         };
-        this.getTemplateOutput = this.getTemplateOutput.bind(this); //TODO: Why
+        this.getTemplateOutput = this.getTemplateOutput.bind(this);
         this.renderTemplate = this.renderTemplate.bind(this);
         this.onTemplateChange = this.onTemplateChange.bind(this);
         this.onContextChange = this.onContextChange.bind(this);
