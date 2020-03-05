@@ -10,71 +10,100 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Template',
+            name="Template",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=1000)),
-                ('type', models.CharField(max_length=1000)),
-                ('default_version_id', models.IntegerField(blank=True, null=True)),
-                ('attributes', django.contrib.postgres.fields.jsonb.JSONField(default=templatestore.models.Template.attributes_default)),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('modified_on', models.DateTimeField(auto_now=True)),
-                ('deleted_on', models.DateTimeField(blank=True, null=True)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=1000)),
+                ("type", models.CharField(max_length=1000)),
+                ("default_version_id", models.IntegerField(blank=True, null=True)),
+                (
+                    "attributes",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        default=templatestore.models.Template.attributes_default
+                    ),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("modified_on", models.DateTimeField(auto_now=True)),
+                ("deleted_on", models.DateTimeField(blank=True, null=True)),
+            ],
+            options={"db_table": "templatestore_template",},
+        ),
+        migrations.CreateModel(
+            name="TemplateVersion",
+            fields=[
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("version", models.CharField(max_length=50)),
+                (
+                    "sample_context_data",
+                    django.contrib.postgres.fields.jsonb.JSONField(default=dict),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("modified_on", models.DateTimeField(auto_now=True)),
+                ("deleted_on", models.DateTimeField(blank=True, null=True)),
+                (
+                    "template_id",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="templatestore.Template",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'templatestore_template',
+                "db_table": "templatestore_template_version",
+                "unique_together": {("template_id", "version")},
             },
         ),
         migrations.CreateModel(
-            name='TemplateVersion',
+            name="TemplateConfig",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('version', models.CharField(max_length=50)),
-                ('sample_context_data', django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('modified_on', models.DateTimeField(auto_now=True)),
-                ('deleted_on', models.DateTimeField(blank=True, null=True)),
-                ('template_id', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='templatestore.Template')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("type", models.CharField(max_length=1000)),
+                ("sub_type", models.CharField(max_length=1000)),
+                ("render_mode", models.CharField(max_length=1000)),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("modified_on", models.DateTimeField(auto_now=True)),
+                ("deleted_on", models.DateTimeField(blank=True, null=True)),
             ],
             options={
-                'db_table': 'templatestore_template_version',
-                'unique_together': {('template_id', 'version')},
+                "db_table": "templatestore_template_config",
+                "unique_together": {("type", "sub_type")},
             },
         ),
         migrations.CreateModel(
-            name='TemplateConfig',
+            name="SubTemplate",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('type', models.CharField(max_length=1000)),
-                ('sub_type', models.CharField(max_length=1000)),
-                ('render_mode', models.CharField(max_length=1000)),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('modified_on', models.DateTimeField(auto_now=True)),
-                ('deleted_on', models.DateTimeField(blank=True, null=True)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("data", models.TextField(blank=True)),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("modified_on", models.DateTimeField(auto_now=True)),
+                ("deleted_on", models.DateTimeField(blank=True, null=True)),
+                (
+                    "config",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="templatestore.TemplateConfig",
+                    ),
+                ),
+                (
+                    "template_version_id",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="templatestore.TemplateVersion",
+                    ),
+                ),
             ],
-            options={
-                'db_table': 'templatestore_template_config',
-                'unique_together': {('type', 'sub_type')},
-            },
-        ),
-        migrations.CreateModel(
-            name='SubTemplate',
-            fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('data', models.TextField(blank=True)),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('modified_on', models.DateTimeField(auto_now=True)),
-                ('deleted_on', models.DateTimeField(blank=True, null=True)),
-                ('config', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='templatestore.TemplateConfig')),
-                ('template_version_id', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='templatestore.TemplateVersion')),
-            ],
-            options={
-                'db_table': 'templatestore_sub_template',
-            },
+            options={"db_table": "templatestore_sub_template",},
         ),
     ]
