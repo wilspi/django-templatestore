@@ -1,15 +1,15 @@
-# django-template-editor
-![Python application](https://github.com/wilspi/django-template-editor/workflows/Python%20application/badge.svg?branch=master)     
+# django-templatestore
+![Python application](https://github.com/wilspi/django-templatestore/workflows/Python%20application/badge.svg?branch=master)     
 
-`django-template-editor` is a [Django](https://www.djangoproject.com/) application/ UI tool to edit and save your templates. 
+`django-templatestore` is a [Django](https://www.djangoproject.com/) application/ UI tool to edit and save your templates. 
 
 Demo application:  [send_me_a_mail]()
 
 ### Quick start
-Follow steps to quickly add `django-template-editor` to your existing django application:  
-1. Install [`django-template-editor`](https://pypi.org/project/django-template-editor/0.1/)
+Follow steps to quickly add `django-templatestore` to your existing django application:  
+1. Install [`django-templatestore`](https://pypi.org/project/django-templatestore/0.1/)
     ```
-    pip install django-template-editor
+    pip install django-templatestore
     ```
 2. Add `templatestore` to your `INSTALLED_APPS` in `settings.py`:
     ```
@@ -29,7 +29,7 @@ Follow steps to quickly add `django-template-editor` to your existing django app
 
 
 ### Changelog
-[Here](https://github.com/wilspi/django-template-editor/releases)
+[Here](https://github.com/wilspi/django-templatestore/releases)
 
 
 ### Templating Library Support

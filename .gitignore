@@ -1,7 +1,7 @@
 # Custom
 .zsh-history
 static/
-django-template-editor-dev/
+django-templatestore-dev/
 
 # PyCharm
 .idea

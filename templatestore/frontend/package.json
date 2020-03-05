@@ -1,6 +1,6 @@
 {
-  "name": "django-template-editor",
-  "version": "1.0.0",
+  "name": "django-templatestore",
+  "version": "0.1.2",
   "description": "### Supports",
   "main": "./src/templateScreen.js",
   "directories": {
@@ -15,11 +15,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wilspi/django-template-editor.git"
+    "url": "git+https://github.com/wilspi/django-templatestore.git"
   },
   "keywords": [
     "django",
-    "django-template-editor",
+    "django-templatestore",
     "explorer",
     "ses",
     "ses-explorer",
@@ -30,9 +30,9 @@
   "author": "wilspi",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/wilspi/django-template-editor/issues"
+    "url": "https://github.com/wilspi/django-templatestore/issues"
   },
-  "homepage": "https://github.com/wilspi/django-template-editor#readme",
+  "homepage": "https://github.com/wilspi/django-templatestore#readme",
   "dependencies": {
     "axios": "^0.19.2",
     "file-loader": "^5.0.2",
