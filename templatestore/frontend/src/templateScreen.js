@@ -32,7 +32,7 @@ class TemplateScreen extends React.Component {
             height: '400px'
         };
 
-        this.getTemplateOutput = this.getTemplateOutput.bind(this); //TODO: Why
+        this.getTemplateOutput = this.getTemplateOutput.bind(this);
         this.renderTemplate = this.renderTemplate.bind(this);
         this.onTemplateChange = this.onTemplateChange.bind(this);
         this.onContextChange = this.onContextChange.bind(this);

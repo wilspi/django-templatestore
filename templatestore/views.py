@@ -82,16 +82,20 @@ def post_template_view(request):
         try:
             data = json.loads(request.body)
             # TODO: Validations
+            # Validate sub_types
+
+            cfgs = TemplateConfig.objects.filter(type=data["type"])
+            sub_types = {cfg.sub_type: cfg for cfg in cfgs}
 
             templates = Template.objects.filter(name=data["name"])
             if not len(templates):
-                temp = Template.objects.create(
+                tmp = Template.objects.create(
                     name=data["name"], attributes=data["attributes"]
                 )
-                temp.save()
+                tmp.save()
 
                 version = "0.1"
-                template_id = temp
+                template_id = tmp
 
             else:
                 template = templates[0]  # only one template should exist
@@ -104,17 +108,26 @@ def post_template_view(request):
                 version = major_version + "." + minor_version
                 template_id = template
 
-            temp = TemplateVersion.objects.create(
+            tmp_ver = TemplateVersion.objects.create(
                 template_id=template_id,
-                data=data["data"],
                 version=version,
                 sample_context_data=data["sample_context_data"],
             )
-            temp.save()
+            tmp_ver.save()
+
+            for sub_tmp in data["sub_templates"]:
+                st = SubTemplate.objects.create(
+                    template_version_id=tmp_ver.id,
+                    config=sub_types[sub_tmp["sub_type"]],
+                    data=sub_tmp["data"],
+                )
+                st.save()
+
             template_data = {
                 "name": data["name"],
                 "version": version,
                 "default": False,
+                "attributes": t.attributes,
             }
             return JsonResponse(template_data, status=201)
 
@@ -239,18 +252,28 @@ def get_template_details_view(request, name, version):
             major_version, minor_version = max_version[0].version.split(".")
             major_version = str(float(int(major_version) + 1))
 
-            temp = TemplateVersion.objects.create(
+            tmp_ver = TemplateVersion.objects.get(template_id=tmp.id, version=version)
+            sts = SubTemplate.objects.filter(template_version_id=tmp_ver.id)
+
+            tmp_ver_new = TemplateVersion.objects.create(
                 template_id=tmp,
-                data=template.data,
                 version=major_version,
-                status=template.status,
                 sample_context_data=template.sample_context_data,
             )
-            temp.save()
-            tmp.default_version_id = temp.id
-            tmp.save(update_fields=['default_version_id'])
+            tmp_ver_new.save()
+            for st in sts:
+                SubTemplate.objects.create(
+                    template_version_id=tmp_ver_new.id, config=st.config, data=st.data
+                ).save()
+            tmp.default_version_id = tmp_ver_new.id
+            tmp.save(update_fields=["default_version_id"])
 
-            template_data = {"name": name, "version": temp.version, "default": default}
+            template_data = {
+                "name": tmp.name,
+                "version": tmp_ver_new.version,
+                "default": True if tmp.default_version_id == tmp_ver_new.id else False,
+                "attributes": tmp.attributes,
+            }
             return JsonResponse(template_data, status=200)
 
         except Exception as e:
