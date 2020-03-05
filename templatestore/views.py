@@ -90,12 +90,12 @@ def post_template_view(request):
             templates = Template.objects.filter(name=data["name"])
             if not len(templates):
                 tmp = Template.objects.create(
-                    name=data["name"], attributes=data["attributes"]
+                    name=data["name"], attributes=data["attributes"], type=data["type"]
                 )
                 tmp.save()
 
                 version = "0.1"
-                template_id = tmp
+                template = tmp
 
             else:
                 template = templates[0]  # only one template should exist
@@ -106,18 +106,17 @@ def post_template_view(request):
                 minor_version = str(int(minor_version) + 1)
 
                 version = major_version + "." + minor_version
-                template_id = template
 
             tmp_ver = TemplateVersion.objects.create(
-                template_id=template_id,
+                template_id=template,
                 version=version,
                 sample_context_data=data["sample_context_data"],
             )
             tmp_ver.save()
 
-            for sub_tmp in data["sub_templates"]:
+            for sub_tmp in data["sub_template"]:
                 st = SubTemplate.objects.create(
-                    template_version_id=tmp_ver.id,
+                    template_version_id=tmp_ver,
                     config=sub_types[sub_tmp["sub_type"]],
                     data=sub_tmp["data"],
                 )
@@ -127,7 +126,7 @@ def post_template_view(request):
                 "name": data["name"],
                 "version": version,
                 "default": False,
-                "attributes": t.attributes,
+                "attributes": template.attributes,
             }
             return JsonResponse(template_data, status=201)
 
