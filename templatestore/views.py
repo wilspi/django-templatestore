@@ -3,13 +3,17 @@ from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import Length
 from django.db import transaction
+from django.conf import settings
 from datetime import datetime
 import json
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
 
 
 def index(request):
-    return render(request, "index.html", context={})
+    export_settings = {
+        "TE_TEMPLATE_ATTRIBUTE_KEYS": settings.TE_TEMPLATE_ATTRIBUTES_KEYS
+    }
+    return render(request, "index.html", context={"settings": json.dumps(export_settings)})
 
 
 def render_via_jinja(template, context):

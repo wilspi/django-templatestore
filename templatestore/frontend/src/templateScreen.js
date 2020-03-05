@@ -18,6 +18,9 @@ const defaultValue = {
     output: ``
 };
 
+var attribute_keys = JSON.parse(
+    document.getElementById('settings-data').textContent.replace(/&quot;/g, '"')
+);
 
 class TemplateScreen extends React.Component {
     constructor(props) {
