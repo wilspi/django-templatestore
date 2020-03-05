@@ -173,6 +173,8 @@ def get_template_versions_view(request, name):
 def get_render_template_view(request, name, version=None):
     if request.method == "GET":
         try:
+            # Validations
+            # if no version in params and no default_version_id exists, validation fails
             data = json.loads(request.body)
 
             t = Template.objects.get(name=name)
@@ -189,7 +191,7 @@ def get_render_template_view(request, name, version=None):
                 "attributes": t.attributes,
                 "sub_templates": [
                     {
-                        "sub_type": stpl.type,
+                        "sub_type": stpl.config.sub_type,
                         "rendered_data": render_via_jinja(
                             stpl.data, data["context_data"]
                         ),
@@ -222,7 +224,7 @@ def get_template_details_view(request, name, version):
                 "type": t.type,
                 "sub_templates": [
                     {
-                        "sub_type": stpl.type,
+                        "sub_type": stpl.config.sub_type,
                         "data": stpl.data,
                         "render_mode": stpl.config.render_mode,
                     }
@@ -257,15 +259,15 @@ def get_template_details_view(request, name, version):
             tmp_ver_new = TemplateVersion.objects.create(
                 template_id=tmp,
                 version=major_version,
-                sample_context_data=template.sample_context_data,
+                sample_context_data=tmp_ver.sample_context_data,
             )
             tmp_ver_new.save()
             for st in sts:
                 SubTemplate.objects.create(
-                    template_version_id=tmp_ver_new.id, config=st.config, data=st.data
+                    template_version_id=tmp_ver_new, config=st.config, data=st.data
                 ).save()
             tmp.default_version_id = tmp_ver_new.id
-            tmp.save(update_fields=["default_version_id"])
+            tmp.save(update_fields=["default_version_id", "modified_on"])
 
             template_data = {
                 "name": tmp.name,
@@ -292,12 +294,12 @@ def get_config_view(request):
 
             tes = {}
             for t in ts:
-                if t["type"] in tes:
-                    tes[t["type"]]["sub_type"].append(
+                if t.type in tes:
+                    tes[t.type]["sub_type"].append(
                         {"type": t.sub_type, "render_mode": t.render_mode}
                     )
                 else:
-                    tes[t["type"]] = {
+                    tes[t.type] = {
                         "sub_type": [{"type": t.sub_type, "render_mode": t.render_mode}]
                     }
 
