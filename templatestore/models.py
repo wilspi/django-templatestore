@@ -74,6 +74,7 @@ class TemplateVersion(models.Model):
 class TemplateConfig(models.Model):
     type = models.CharField(max_length=1000)
     sub_type = models.CharField(max_length=1000)
+    render_mode = models.CharField(max_length=1000)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     deleted_on = models.DateTimeField(null=True, blank=True)
@@ -86,7 +87,7 @@ class TemplateConfig(models.Model):
 class SubTemplate(models.Model):
     id = models.AutoField(primary_key=True)
     template_version_id = models.ForeignKey(TemplateVersion, on_delete=models.PROTECT)
-    type = models.ForeignKey(TemplateConfig, on_delete=models.PROTECT)
+    config = models.ForeignKey(TemplateConfig, on_delete=models.PROTECT)
     data = models.TextField(blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)

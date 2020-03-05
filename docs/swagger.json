@@ -368,16 +368,19 @@
                                     "maxLength":1000
                                 },
                                 "sub_template":{
-                                    "type":"object",
-                                    "properties":{
-                                        "sub_type":{
-                                            "type":"string"
-                                        },
-                                        "data":{
-                                            "type":"string"
-                                        },
-                                        "render_mode":{
-                                            "type":"string"
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "sub_type": {
+                                                "type": "string"
+                                            },
+                                            "data": {
+                                                "type": "string"
+                                            },
+                                            "render_mode": {
+                                                "type": "string"
+                                            }
                                         }
                                     }
                                 },

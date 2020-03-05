@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime
-import json
-from templatestore.models import Template, TemplateVersion
 from django.db.models.functions import Length
 from django.db import transaction
+from datetime import datetime
+import json
+from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
 
 
 def index(request):
@@ -67,7 +67,8 @@ def get_templates_view(request):
 
             return JsonResponse(template_list, safe=False)
 
-        except Exception:
+        except Exception as e:
+            print(e)
             return HttpResponse(status=400)
 
     else:
@@ -93,7 +94,7 @@ def post_template_view(request):
                 template_id = temp
 
             else:
-                template = Template.objects.get(name=name)
+                template = templates[0]  # only one template should exist
                 max_version = TemplateVersion.objects.filter(
                     template_id=template
                 ).order_by(-Length("version"), "-version")[:1]
@@ -148,7 +149,8 @@ def get_template_versions_view(request, name):
 
             return JsonResponse(version_list, safe=False)
 
-        except Exception:
+        except Exception as e:
+            print(e)
             return HttpResponse(status=400)
 
     else:
@@ -167,7 +169,7 @@ def get_render_template_view(request, name, version=None):
                 if version
                 else TemplateVersion.objects.get(id=t.default_version_id)
             )
-            stpls = SubTemplate.objects.get(template_version_id=tv.id)
+            stpls = SubTemplate.objects.filter(template_version_id=tv.id)
 
             res = {
                 "version": tv.version,
@@ -175,7 +177,7 @@ def get_render_template_view(request, name, version=None):
                 "attributes": t.attributes,
                 "sub_templates": [
                     {
-                        "type": stpl.type,
+                        "sub_type": stpl.type,
                         "rendered_data": render_via_jinja(
                             stpl.data, data["context_data"]
                         ),
@@ -185,7 +187,8 @@ def get_render_template_view(request, name, version=None):
             }
 
             return JsonResponse(res, safe=False)
-        except Exception:
+        except Exception as e:
+            print(e)
             return HttpResponse(status=400)
 
     else:
@@ -193,133 +196,94 @@ def get_render_template_view(request, name, version=None):
 
 
 @csrf_exempt
-def template_details_view(request, name, version):
-    try:
-        template = Template.objects.get(name=name)
-    except Exception:
-        return HttpResponse(status=404)
-
-    template_id = template
-    try:
-        template = TemplateVersion.objects.get(template_id=template_id, version=version)
-    except Exception:
-        return HttpResponse(status=404)
-
+@transaction.atomic
+def get_template_details_view(request, name, version):
     if request.method == "GET":
-        default = False
-        if template_id.default_version_id == template.id:
-            default = True
-        data = {
-            "name": name,
-            "version": version,
-            "data": template.data,
-            "sample_context_data": template.sample_context_data,
-            "default": default,
-        }
-        return JsonResponse(data, status=200)
+        try:
+            t = Template.objects.get(name=name)
+            tv = TemplateVersion.objects.get(template_id=t.id, version=version)
+            stpls = SubTemplate.objects.filter(template_version_id=tv.id)
+
+            res = {
+                "name": t.name,
+                "version": tv.version,
+                "type": t.type,
+                "sub_templates": [
+                    {
+                        "sub_type": stpl.type,
+                        "data": stpl.data,
+                        "render_mode": stpl.config.render_mode,
+                    }
+                    for stpl in stpls
+                ],
+                "default": True if t.default_version_id == tv.id else False,
+                "attributes": t.attributes,
+                "sample_context_data": tv.sample_context_data,
+            }
+
+            return JsonResponse(res, safe=False)
+        except Exception as e:
+            print(e)
+            return HttpResponse(status=400)
 
     elif request.method == "POST":
-        data = json.loads(request.body)
-        default = data["default"]
-        if not default:
-            return HttpResponse(status=400)
-
-        tmp = Template.objects.get(name=name)
-        max_version = TemplateVersion.objects.filter(template_id=tmp).order_by(
-            -Length("version"), "-version"
-        )[:1]
-        major_version, minor_version = max_version[0].version.split(".")
-        major_version = str(float(int(major_version) + 1))
-
-        temp = TemplateVersion.objects.create(
-            template_id=tmp,
-            data=template.data,
-            version=major_version,
-            status=template.status,
-            sample_context_data=template.sample_context_data,
-        )
-
         try:
+            data = json.loads(request.body)
+            if not data.get("default", False):
+                return HttpResponse(status=400)
+
+            tmp = Template.objects.get(name=name)
+            max_version = TemplateVersion.objects.filter(template_id=tmp).order_by(
+                -Length("version"), "-version"
+            )[:1]
+            major_version, minor_version = max_version[0].version.split(".")
+            major_version = str(float(int(major_version) + 1))
+
+            temp = TemplateVersion.objects.create(
+                template_id=tmp,
+                data=template.data,
+                version=major_version,
+                status=template.status,
+                sample_context_data=template.sample_context_data,
+            )
             temp.save()
+            tmp.default_version_id = temp.id
+            tmp.save(update_fields=['default_version_id'])
+
+            template_data = {"name": name, "version": temp.version, "default": default}
+            return JsonResponse(template_data, status=200)
+
         except Exception as e:
             print(e)
             return HttpResponse(status=400)
-
-        temp2 = Template.objects.get(name=name)
-        temp2.default_version_id = temp.id
-
-        try:
-            temp2.save()
-        except Exception as e:
-            print(e)
-            return JsonResponse(Exception)
-
-        template_data = {"name": name, "version": temp.version, "default": default}
-        return JsonResponse(template_data, status=200)
-    elif request.method == "PUT":
-        data = json.loads(request.body)
-        default = data["default"]
-        if not default:
-            return HttpResponse(status=400)
-
-        tmp = Template.objects.get(name=name)
-        max_version = TemplateVersion.objects.filter(template_id=tmp).order_by(
-            -Length("version"), "-version"
-        )[:1]
-        major_version, minor_version = max_version[0].version.split(".")
-        major_version = str(float(int(major_version) + 1))
-
-        temp = TemplateVersion.objects.create(
-            template_id=tmp,
-            data=template.data,
-            version=major_version,
-            status=template.status,
-            sample_context_data=template.sample_context_data,
-        )
-
-        try:
-            temp.save()
-        except Exception as e:
-            print(e)
-            return HttpResponse(status=400)
-
-        temp2 = Template.objects.get(name=name)
-        temp2.default_version_id = temp.id
-
-        try:
-            temp2.save()
-        except Exception as e:
-            print(e)
-            return JsonResponse(Exception)
-
-        template_data = {"name": name, "version": temp.version, "default": default}
-        return JsonResponse(template_data, status=200)
     else:
         return HttpResponse(status=404)
 
 
 @csrf_exempt
-def config_view(request):
+def get_config_view(request):
     if request.method == "GET":
         offset = int(request.GET.get("offset", 0))
         limit = int(request.GET.get("limit", 100))
         try:
-            # templates = Template.objects.all()[offset : offset + limit]
-            # template_list = []
-            # for template in templates:
-            #     default = False
-            #     version = "0"
-            #     if template.default_version_id != 0:
-            #         default = True
-            #         version = TemplateVersion.objects.get(
-            #             pk=template.default_version_id
-            #         ).version
-            #
-            #     data = {"name": template.name, "version": version, "default": default}
-            #     template_list.append(data)
-            # return JsonResponse(template_list, safe=False)
-            pass
-        except Exception:
+            ts = TemplateConfig.objects.all()[offset : offset + limit]
+
+            tes = {}
+            for t in ts:
+                if t["type"] in tes:
+                    tes[t["type"]]["sub_type"].append(
+                        {"type": t.sub_type, "render_mode": t.render_mode}
+                    )
+                else:
+                    tes[t["type"]] = {
+                        "sub_type": [{"type": t.sub_type, "render_mode": t.render_mode}]
+                    }
+
+            return JsonResponse(tes, safe=False)
+
+        except Exception as e:
+            print(e)
             return HttpResponse(status=404)
+
     else:
         return HttpResponse(status=404)
