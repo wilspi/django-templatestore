@@ -15,18 +15,18 @@ class AllTemplates extends React.Component {
     }
 
     componentDidMount() {
-        axios.get('./api/v1/template').then((response) => {
+        axios.get('./api/v1/template').then(response => {
             let template = [];
             let cols = {};
             let column = ['name', 'version'];
             let temp = {};
             for (let i = 0; i < response.data.length; i++) {
                 for (let key in response.data[i]) {
-                    if (key !== "attributes") {
+                    if (key !== 'attributes') {
                         temp[key] = response.data[i][key];
                     } else {
                         for (let key2 in response.data[i][key]) {
-                            if (key2 !== "attribute1" && key2 !== "attribute2") {
+                            if (key2 !== 'attribute1' && key2 !== 'attribute2') {
                                 temp[key2] = response.data[i][key][key2];
                                 cols[key2] = 1;
                             }
@@ -40,7 +40,7 @@ class AllTemplates extends React.Component {
                 column.push(key);
                 for (let i = 0; i < template.length; i++) {
                     if (!(key in template[i])) {
-                        template[i][key] = " ";
+                        template[i][key] = ' ';
                     }
                 }
             }
@@ -101,56 +101,63 @@ class AllTemplates extends React.Component {
         let header = [];
         for (let i = 0; i < this.state.columns.length; i++) {
             let m = this.state.columns[i];
-            header.push(<th onClick={() => this.sortBy(m)}> {this.state.columns[i].toUpperCase()} </th>);
+            header.push(
+                <th onClick={() => this.sortBy(m)}>
+                    {' '}
+                    {this.state.columns[i].toUpperCase()}{' '}
+                </th>
+            );
         }
         header.push(<th> Actions </th>);
         return header;
     }
 
     render() {
-        let templates = this.state.templates.map((template) => {
+        let templates = this.state.templates.map(template => {
             let rows = [];
             for (let i = 0; i < this.state.columns.length; i++) {
                 rows.push(<td align="center"> {template[this.state.columns[i]]} </td>);
             }
             rows.push(
                 <Link to={`/template-editor/${template.name}/${template.version}`}>
-                    <td align="center"><button className={styles.teSmallButtons} type="button"> Open </button></td>
+                    <td align="center">
+                        <button className={styles.teSmallButtons} type="button">
+                            {' '}
+              Open{' '}
+                        </button>
+                    </td>
                 </Link>
             );
-            return (
-                <tr>
-                    {rows}
-                </tr>
-            );
+            return <tr>{rows}</tr>;
         });
         return (
             <div>
                 <header className={styles.teHeading}>
-                    <h1 align="center" fontSize="80px"><u>Template Store</u></h1>
+                    <h1 align="center" fontSize="80px">
+                        <u>Template Store</u>
+                    </h1>
                 </header>
                 <br />
                 <br />
                 <table className={styles.teTables}>
                     <thead>
-                        <tr className={styles.teHeading}>
-                            {this.generateHeader()}
-                        </tr>
+                        <tr className={styles.teHeading}>{this.generateHeader()}</tr>
                     </thead>
-                    <tbody>
-                        {templates}
-                    </tbody>
+                    <tbody>{templates}</tbody>
                 </table>
                 <br />
                 <br />
                 <div align="center">
                     <Link to={`/template-editor/addNewTemplate`}>
-                        <button className={styles.teButtons} type="button"> Add New Template </button>
+                        <button className={styles.teButtons} type="button">
+                            {' '}
+              Add New Template{' '}
+                        </button>
                     </Link>
                 </div>
             </div>
-
         );
     }
 }
 export default AllTemplates;
+
