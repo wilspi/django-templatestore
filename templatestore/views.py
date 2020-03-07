@@ -178,7 +178,7 @@ def get_template_versions_view(request, name):
 
 @csrf_exempt
 def get_render_template_view(request, name, version=None):
-    if request.method == "GET":
+    if request.method == "POST":
         try:
             # Validations
             # if no version in params and no default_version_id exists, validation fails
