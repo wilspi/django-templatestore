@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import styles from './../style/home.less';
+import SearchBox from './../components/searchBox.js';
 
 class Home extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            templatesData: []
+            templatesData: [],
+            searchText: ''
         };
         this.tableHeaderList = [
             'template_name',
@@ -41,8 +43,33 @@ class Home extends Component {
 
     getTableRowsJSX() {
         let tableRows = [];
-        for (let i = 0; i < this.state.templatesData.length; i++) {
-            let columnData = Object.values(this.state.templatesData[i]).map(k => (
+        let filteredTemplates = this.state.templatesData.reduce(
+            (result, template) => {
+                console.log('hello');
+                console.log(template);
+                if (
+                    Object.keys(template).reduce((res, t) => {
+                        res =
+              res ||
+              (typeof template[t] !== 'undefined' &&
+                template[t]
+                    .toLowerCase()
+                    .indexOf(this.state.searchText.toLowerCase()) !== -1);
+                        return res;
+                    }, false)
+                ) {
+                    result.push(template);
+                }
+                return result;
+            },
+            []
+        );
+
+        for (let i = 0; i < filteredTemplates.length; i++) {
+            if (filteredTemplates[i] === undefined) {
+                continue;
+            }
+            let columnData = Object.values(filteredTemplates[i]).map(k => (
                 <td>{k !== '' ? k : '-'}</td>
             ));
             tableRows.push(
@@ -69,12 +96,23 @@ class Home extends Component {
         return tableRows;
     }
 
+    onSearchTextChange(searchValue) {
+        this.setState({
+            searchText: searchValue
+        });
+    }
+
     render() {
-        var tableHeaders = [...this.tableHeaderList, ...[' - ']].map(k => (<th>{k}</th>));
+        var tableHeaders = [...this.tableHeaderList, ...[' - ']].map(k => (
+            <th>{k}</th>
+        ));
         return (
             <div className={styles.tsPage}>
                 <div>
                     <h1>Template Store</h1>
+                </div>
+                <div>
+                    <SearchBox onChange={this.onSearchTextChange.bind(this)} />
                 </div>
                 <div>
                     <table

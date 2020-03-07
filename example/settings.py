@@ -114,4 +114,4 @@ STATICFILES_DIRS = []
 STATIC_ROOT = "static/"
 
 # Template Editor - Example Configs
-TE_TEMPLATE_ATTRIBUTES_KEYS = ["attribute1", "attribute2"]
+TE_TEMPLATE_ATTRIBUTES_KEYS = ["lob", "plan"]
