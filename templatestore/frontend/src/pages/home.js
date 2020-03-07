@@ -45,8 +45,6 @@ class Home extends Component {
         let tableRows = [];
         let filteredTemplates = this.state.templatesData.reduce(
             (result, template) => {
-                console.log('hello');
-                console.log(template);
                 if (
                     Object.keys(template).reduce((res, t) => {
                         res =
@@ -66,9 +64,6 @@ class Home extends Component {
         );
 
         for (let i = 0; i < filteredTemplates.length; i++) {
-            if (filteredTemplates[i] === undefined) {
-                continue;
-            }
             let columnData = Object.values(filteredTemplates[i]).map(k => (
                 <td>{k !== '' ? k : '-'}</td>
             ));
