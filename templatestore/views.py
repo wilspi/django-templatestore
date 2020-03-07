@@ -86,10 +86,13 @@ def post_template_view(request):
         try:
             data = json.loads(request.body)
             # TODO: Validations
-            # Validate sub_types
 
             cfgs = TemplateConfig.objects.filter(type=data["type"])
             sub_types = {cfg.sub_type: cfg for cfg in cfgs}
+
+            diff_keys = set(sub_types.keys()).difference(set([s["sub_type"] for s in data["sub_template"]]))
+            if len(diff_keys):
+                raise(Exception("Validation: missing `" + str(diff_keys) + "` for type `" + data["type"] + "`"))
 
             templates = Template.objects.filter(name=data["name"])
             if not len(templates):
