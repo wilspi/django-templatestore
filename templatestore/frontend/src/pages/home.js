@@ -20,22 +20,17 @@ class Home extends Component {
 
     componentDidMount() {
         axios.get('./api/v1/templates').then(response => {
-            let templatesData = [];
-            for (let i = 0; i < response.data.length; i++) {
-                let templateData = {};
-                templateData['template_name'] = response.data[i]['name'];
-                templateData['default_version'] = response.data[i]['default'] ?
-                    response.data[i]['version'] :
-                    '-';
-                for (let j = 2; j < this.tableHeaderList.length; j++) {
-                    templateData[this.tableHeaderList[j]] =
-            response.data[i]['attributes'][this.tableHeaderList[j]];
-                }
-                templatesData.push(templateData);
-            }
-
             this.setState({
-                templatesData: templatesData
+                templatesData: response.data.map(t => ({
+                    ...{
+                        template_name: t.name,
+                        default_version: t.default ? t.version : '-'
+                    },
+                    ...this.tableHeaderList.slice(2).reduce((result, k) => {
+                        result[k] = t.attributes[k];
+                        return result;
+                    }, {})
+                }))
             });
         });
     }
@@ -47,16 +42,9 @@ class Home extends Component {
     getTableRowsJSX() {
         let tableRows = [];
         for (let i = 0; i < this.state.templatesData.length; i++) {
-            let columnData = [];
-            for (var key in this.state.templatesData[i]) {
-                columnData.push(
-                    <td>
-                        {this.state.templatesData[i][key] !== '' ?
-                            this.state.templatesData[i][key] :
-                            '-'}
-                    </td>
-                );
-            }
+            let columnData = Object.values(this.state.templatesData[i]).map(k => (
+                <td>{k !== '' ? k : '-'}</td>
+            ));
             tableRows.push(
                 <tr>
                     {columnData}
@@ -82,19 +70,19 @@ class Home extends Component {
     }
 
     render() {
-        var tableHeaders = [];
-        for (var i = 0; i < this.tableHeaderList.length; i++) {
-            tableHeaders.push(<th key={i}>{this.tableHeaderList[i]}</th>);
-        }
-        tableHeaders.push(<th />);
-
+        var tableHeaders = [...this.tableHeaderList, ...[' - ']].map(k => (<th>{k}</th>));
         return (
             <div className={styles.tsPage}>
                 <div>
                     <h1>Template Store</h1>
                 </div>
                 <div>
-                    <table className={"table table-striped table-responsive-md btn-table " + styles.tsTable}>
+                    <table
+                        className={
+                            'table table-striped table-responsive-md btn-table ' +
+              styles.tsTable
+                        }
+                    >
                         <thead>
                             <tr>{tableHeaders}</tr>
                         </thead>

@@ -17,7 +17,7 @@ class TemplateScreen extends Component {
             .then(response => {
                 console.log(response);
             })
-            .catch((error) => {
+            .catch(error => {
                 console.log(error);
                 if (error.response.status === 400) {
                     this.props.history.push('/templatestore/404');
