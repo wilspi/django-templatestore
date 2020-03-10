@@ -6,9 +6,6 @@ module.exports = {
       publicPath: '/',
       filename: 'te-bundle.js'
    },
-   devServer: {
-      contentBase: './dist',
-   },
    module: {
       rules: [
          {
