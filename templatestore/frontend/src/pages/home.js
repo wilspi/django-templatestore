@@ -2,12 +2,31 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import styles from './../style/home.less';
+import SearchBox from './../components/searchBox.js';
+
+const escapeRegExp = (str = '') => (
+    str.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1')
+);
+
+const Highlight = ({ search = '', children = '' }) => {
+    const patt = new RegExp(`(${escapeRegExp(search)})`, 'i');
+    const parts = String(children).split(patt);
+
+    if (search) {
+        return parts.map((part, index) => (
+            patt.test(part) ? <mark key={index}>{part}</mark> : part
+        ));
+    } else {
+        return children;
+    }
+};
 
 class Home extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            templatesData: []
+            templatesData: [],
+            searchText: ''
         };
         this.tableHeaderList = [
             'template_name',
@@ -43,9 +62,29 @@ class Home extends Component {
 
     getTableRowsJSX() {
         let tableRows = [];
-        for (let i = 0; i < this.state.templatesData.length; i++) {
-            let columnData = Object.values(this.state.templatesData[i]).map(k => (
-                <td>{k !== '' ? k : '-'}</td>
+        let filteredTemplates = this.state.templatesData.reduce(
+            (result, template) => {
+                if (
+                    Object.keys(template).reduce((res, t) => {
+                        res =
+              res ||
+              (typeof template[t] !== 'undefined' &&
+                template[t]
+                    .toLowerCase()
+                    .indexOf(this.state.searchText.toLowerCase()) !== -1);
+                        return res;
+                    }, false)
+                ) {
+                    result.push(template);
+                }
+                return result;
+            },
+            []
+        );
+
+        for (let i = 0; i < filteredTemplates.length; i++) {
+            let columnData = Object.values(filteredTemplates[i]).map(k => (
+                <td> <Highlight search={this.state.searchText}>{k !== '' ? k : '-'}</Highlight></td>
             ));
             tableRows.push(
                 <tr>
@@ -71,6 +110,12 @@ class Home extends Component {
         return tableRows;
     }
 
+    onSearchTextChange(searchValue) {
+        this.setState({
+            searchText: searchValue
+        });
+    }
+
     render() {
         var tableHeaders = [...this.tableHeaderList, ...[' - ']].map(k => (
             <th>{k}</th>
@@ -79,6 +124,9 @@ class Home extends Component {
             <div className={styles.tsPage}>
                 <div>
                     <h1>Template Store</h1>
+                </div>
+                <div>
+                    <SearchBox onChange={this.onSearchTextChange.bind(this)} />
                 </div>
                 <div>
                     <table
