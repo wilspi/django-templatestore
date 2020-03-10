@@ -11,10 +11,14 @@ const backendSettings = JSON.parse(
 );
 
 const Root = () => (
-    <Router>
+    <Router forceRefresh>
         <Switch>
             <Route exact path="/templatestore/">
-                <Home fixedAttributeKeys={backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS} />
+                <Home
+                    fixedAttributeKeys={
+                        backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS
+                    }
+                />
             </Route>
             <Route exact path="/templatestore/t/add">
                 <TemplateScreen />

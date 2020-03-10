@@ -3,23 +3,7 @@ import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import styles from './../style/home.less';
 import SearchBox from './../components/searchBox.js';
-
-const escapeRegExp = (str = '') => (
-    str.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1')
-);
-
-const Highlight = ({ search = '', children = '' }) => {
-    const patt = new RegExp(`(${escapeRegExp(search)})`, 'i');
-    const parts = String(children).split(patt);
-
-    if (search) {
-        return parts.map((part, index) => (
-            patt.test(part) ? <mark key={index}>{part}</mark> : part
-        ));
-    } else {
-        return children;
-    }
-};
+import Highlight from './../components/highlight.js';
 
 class Home extends Component {
     constructor(props) {
@@ -56,7 +40,10 @@ class Home extends Component {
 
     openTemplateScreenPage(name, version) {
         this.props.history.push(
-            '/templatestore/t/' + name + '/' + (version === '-' ? '0.1' : version)
+            '/templatestore/t/' +
+                name +
+                '/' +
+                (version === '-' ? '0.1' : version)
         );
     }
 
@@ -67,11 +54,13 @@ class Home extends Component {
                 if (
                     Object.keys(template).reduce((res, t) => {
                         res =
-              res ||
-              (typeof template[t] !== 'undefined' &&
-                template[t]
-                    .toLowerCase()
-                    .indexOf(this.state.searchText.toLowerCase()) !== -1);
+                            res ||
+                            (typeof template[t] !== 'undefined' &&
+                                template[t]
+                                    .toLowerCase()
+                                    .indexOf(
+                                        this.state.searchText.toLowerCase()
+                                    ) !== -1);
                         return res;
                     }, false)
                 ) {
@@ -84,7 +73,11 @@ class Home extends Component {
 
         for (let i = 0; i < filteredTemplates.length; i++) {
             let columnData = Object.values(filteredTemplates[i]).map(k => (
-                <td> <Highlight search={this.state.searchText}>{k !== '' ? k : '-'}</Highlight></td>
+                <td>
+                    <Highlight search={this.state.searchText}>
+                        {k !== '' ? k : '-'}
+                    </Highlight>
+                </td>
             ));
             tableRows.push(
                 <tr>
@@ -94,14 +87,20 @@ class Home extends Component {
                             type="button"
                             onClick={() =>
                                 this.openTemplateScreenPage(
-                                    this.state.templatesData[i]['template_name'],
-                                    this.state.templatesData[i]['default_version'] === '-' ?
-                                        this.state.templatesData[i]['default_version'] :
+                                    this.state.templatesData[i][
+                                        'template_name'
+                                    ],
+                                    this.state.templatesData[i][
+                                        'default_version'
+                                    ] === '-' ?
+                                        this.state.templatesData[i][
+                                            'default_version'
+                                        ] :
                                         '0.1'
                                 )
                             }
                         >
-              Open
+                            Open
                         </button>
                     </td>
                 </tr>
@@ -132,7 +131,7 @@ class Home extends Component {
                     <table
                         className={
                             'table table-striped table-responsive-md btn-table ' +
-              styles.tsTable
+                            styles.tsTable
                         }
                     >
                         <thead>
