@@ -4,6 +4,23 @@ import { withRouter } from 'react-router-dom';
 import styles from './../style/home.less';
 import SearchBox from './../components/searchBox.js';
 
+const escapeRegExp = (str = '') => (
+    str.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1')
+);
+
+const Highlight = ({ search = '', children = '' }) => {
+    const patt = new RegExp(`(${escapeRegExp(search)})`, 'i');
+    const parts = String(children).split(patt);
+
+    if (search) {
+        return parts.map((part, index) => (
+            patt.test(part) ? <mark key={index}>{part}</mark> : part
+        ));
+    } else {
+        return children;
+    }
+};
+
 class Home extends Component {
     constructor(props) {
         super(props);
@@ -65,7 +82,7 @@ class Home extends Component {
 
         for (let i = 0; i < filteredTemplates.length; i++) {
             let columnData = Object.values(filteredTemplates[i]).map(k => (
-                <td>{k !== '' ? k : '-'}</td>
+                <td> <Highlight search={this.state.searchText}>{k !== '' ? k : '-'}</Highlight></td>
             ));
             tableRows.push(
                 <tr>
