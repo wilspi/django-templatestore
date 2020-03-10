@@ -51,7 +51,7 @@ def get_templates_view(request):
     if request.method == "GET":
         try:
             offset = int(request.GET.get("offset", 0))
-            limit = int(request.GET.get("limit", 100))
+            limit = int(request.GET.get("limit", settings.TE_ROWLIMIT))
 
             templates = Template.objects.all()[offset : offset + limit]
             template_list = [
@@ -73,10 +73,14 @@ def get_templates_view(request):
 
         except Exception as e:
             print(e)
-            return HttpResponse(status=400)
+            return HttpResponse(json.dumps({
+                "message": str(e)
+            }), content_type='application/json', status=400)
 
     else:
-        return HttpResponse(status=404)
+        return HttpResponse(json.dumps({
+            "message": "no method found"
+        }), content_type='application/json', status=404)
 
 
 @csrf_exempt
@@ -155,7 +159,7 @@ def get_template_versions_view(request, name):
     if request.method == "GET":
         try:
             offset = int(request.GET.get("offset", 0))
-            limit = int(request.GET.get("limit", 100))
+            limit = int(request.GET.get("limit", settings.TE_ROWLIMIT))
 
             t = Template.objects.get(name=name)
             tvs = TemplateVersion.objects.filter(template_id=t.id).order_by("-id")[
@@ -314,7 +318,7 @@ def get_template_details_view(request, name, version):
 def get_config_view(request):
     if request.method == "GET":
         offset = int(request.GET.get("offset", 0))
-        limit = int(request.GET.get("limit", 100))
+        limit = int(request.GET.get("limit", settings.TE_ROWLIMIT))
         try:
             ts = TemplateConfig.objects.all()[offset : offset + limit]
 
