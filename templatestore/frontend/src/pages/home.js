@@ -36,7 +36,9 @@ class Home extends Component {
     }
 
     openTemplateScreenPage(name, version) {
-        this.props.history.push('/templatestore/t/' + name + '/' + version);
+        this.props.history.push(
+            '/templatestore/t/' + name + '/' + (version === '-' ? '0.1' : version)
+        );
     }
 
     getTableRowsJSX() {
@@ -70,7 +72,9 @@ class Home extends Component {
     }
 
     render() {
-        var tableHeaders = [...this.tableHeaderList, ...[' - ']].map(k => (<th>{k}</th>));
+        var tableHeaders = [...this.tableHeaderList, ...[' - ']].map(k => (
+            <th>{k}</th>
+        ));
         return (
             <div className={styles.tsPage}>
                 <div>
