@@ -139,10 +139,15 @@ def post_template_view(request):
 
         except Exception as e:
             print(e)
-            return HttpResponse(status=400)
+
+            return HttpResponse(json.dumps({
+                "message": str(e)
+            }), content_type='application/json', status=400)
 
     else:
-        return HttpResponse(status=404)
+        return HttpResponse(json.dumps({
+            "message": "no method found"
+        }), content_type='application/json', status=404)
 
 
 @csrf_exempt
@@ -170,15 +175,19 @@ def get_template_versions_view(request, name):
 
         except Exception as e:
             print(e)
-            return HttpResponse(status=400)
+            return HttpResponse(json.dumps({
+                "message": str(e)
+            }), content_type='application/json', status=400)
 
     else:
-        return HttpResponse(status=404)
+        return HttpResponse(json.dumps({
+            "message": "no method found"
+        }), content_type='application/json', status=404)
 
 
 @csrf_exempt
 def get_render_template_view(request, name, version=None):
-    if request.method == "POST":
+    if request.method == "GET":
         try:
             # Validations
             # if no version in params and no default_version_id exists, validation fails
@@ -210,10 +219,14 @@ def get_render_template_view(request, name, version=None):
             return JsonResponse(res, safe=False)
         except Exception as e:
             print(e)
-            return HttpResponse(status=400)
+            return HttpResponse(json.dumps({
+                "message": str(e)
+            }), content_type='application/json', status=400)
 
     else:
-        return HttpResponse(status=404)
+        return HttpResponse(json.dumps({
+            "message": "no method found"
+        }), content_type='application/json', status=404)
 
 
 @csrf_exempt
@@ -245,7 +258,9 @@ def get_template_details_view(request, name, version):
             return JsonResponse(res, safe=False)
         except Exception as e:
             print(e)
-            return HttpResponse(status=400)
+            return HttpResponse(json.dumps({
+                "message": str(e)
+            }), content_type='application/json', status=400)
 
     elif request.method == "POST":
         try:
@@ -286,9 +301,13 @@ def get_template_details_view(request, name, version):
 
         except Exception as e:
             print(e)
-            return HttpResponse(status=400)
+            return HttpResponse(json.dumps({
+                "message": str(e)
+            }), content_type='application/json', status=400)
     else:
-        return HttpResponse(status=404)
+        return HttpResponse(json.dumps({
+            "message": "no method found"
+        }), content_type='application/json', status=404)
 
 
 @csrf_exempt
@@ -314,7 +333,11 @@ def get_config_view(request):
 
         except Exception as e:
             print(e)
-            return HttpResponse(status=404)
+            return HttpResponse(json.dumps({
+                "message": str(e)
+            }), content_type='application/json', status=404)
 
     else:
-        return HttpResponse(status=404)
+        return HttpResponse(json.dumps({
+            "message": "no method found"
+        }), content_type='application/json', status=404)
