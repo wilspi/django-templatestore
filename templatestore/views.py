@@ -7,13 +7,18 @@ from django.conf import settings
 from datetime import datetime
 import json
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
+import structlog
+
+logger = structlog.get_logger()
 
 
 def index(request):
     export_settings = {
         "TE_TEMPLATE_ATTRIBUTE_KEYS": settings.TE_TEMPLATE_ATTRIBUTES_KEYS
     }
-    return render(request, "index.html", context={"settings": json.dumps(export_settings)})
+    return render(
+        request, "index.html", context={"settings": json.dumps(export_settings)}
+    )
 
 
 def render_via_jinja(template, context):
@@ -26,10 +31,13 @@ def render_via_jinja(template, context):
 def render_template_view(request):
     # log requests
     if request.method != "GET":
+        logger.error("Invalid Request", request=request.method)
         return HttpResponseBadRequest("invalid request method: " + request.method)
+
     template = request.GET.get("template", "")
     context = json.loads(request.GET.get("context", "{}"))
     handler = request.GET.get("handler", "")
+
     try:
         if handler == "jinja2":
             rendered_template = render_via_jinja(template, context)
@@ -38,9 +46,10 @@ def render_template_view(request):
                 "rendered_on": datetime.now(),
             }
         else:
+            logger.error("Invalid Template Handler", handler=handler)
             raise Exception("Invalid Template Handler: %s", handler)  # TOTEST
     except Exception as e:
-        print(e)
+        logger.error("ERROR", error=e)
         raise e
 
     return JsonResponse(data, safe=False)
@@ -54,6 +63,10 @@ def get_templates_view(request):
             limit = int(request.GET.get("limit", 100))
 
             templates = Template.objects.all()[offset : offset + limit]
+
+            if not len(templates):
+                logger.info("Empty templates list")
+
             template_list = [
                 {
                     "name": t.name,
@@ -72,10 +85,11 @@ def get_templates_view(request):
             return JsonResponse(template_list, safe=False)
 
         except Exception as e:
-            print(e)
+            logger.error("Error", error=e)
             return HttpResponse(status=400)
 
     else:
+        logger.error("Invalid Request", request=request.method)
         return HttpResponse(status=404)
 
 
@@ -89,6 +103,11 @@ def post_template_view(request):
             # Validate sub_types
 
             cfgs = TemplateConfig.objects.filter(type=data["type"])
+
+            if not len(cfgs):
+                logger.error("Invalid type", type=data["type"])
+                return HttpResponse(status=400)
+
             sub_types = {cfg.sub_type: cfg for cfg in cfgs}
 
             templates = Template.objects.filter(name=data["name"])
@@ -119,6 +138,10 @@ def post_template_view(request):
             tmp_ver.save()
 
             for sub_tmp in data["sub_template"]:
+                if sub_tmp["sub_type"] not in sub_types:
+                    logger.info("Invalid sub_type", sub_type=sub_tmp["sub_type"])
+                    return HttpResponse(status=400)
+
                 st = SubTemplate.objects.create(
                     template_version_id=tmp_ver,
                     config=sub_types[sub_tmp["sub_type"]],
@@ -135,10 +158,11 @@ def post_template_view(request):
             return JsonResponse(template_data, status=201)
 
         except Exception as e:
-            print(e)
+            logger.info("Error", error=e)
             return HttpResponse(status=400)
 
     else:
+        logger.error("Invalid Request", request=request.method)
         return HttpResponse(status=404)
 
 
@@ -148,11 +172,18 @@ def get_template_versions_view(request, name):
         try:
             offset = int(request.GET.get("offset", 0))
             limit = int(request.GET.get("limit", 100))
+            try:
+                t = Template.objects.get(name=name)
+            except Exception:
+                logger.error("Template with given name does not exist", name=name)
+                return HttpResponse(status=400)
 
-            t = Template.objects.get(name=name)
             tvs = TemplateVersion.objects.filter(template_id=t.id).order_by("-id")[
                 offset : offset + limit
             ]
+
+            if not len(tvs):
+                logger.info("Empty Versions List")
 
             version_list = [
                 {
@@ -166,10 +197,11 @@ def get_template_versions_view(request, name):
             return JsonResponse(version_list, safe=False)
 
         except Exception as e:
-            print(e)
+            logger.error("ERROR", error=e)
             return HttpResponse(status=400)
 
     else:
+        logger.error("INVALID Request", request=request.method)
         return HttpResponse(status=404)
 
 
@@ -180,13 +212,33 @@ def get_render_template_view(request, name, version=None):
             # Validations
             # if no version in params and no default_version_id exists, validation fails
             data = json.loads(request.body)
+            if "context_data" not in data:
+                logger.error("context_data not provided")
+                return HttpResponse(status=400)
 
-            t = Template.objects.get(name=name)
-            tv = (
-                TemplateVersion.objects.get(template_id=t.id, version=version)
-                if version
-                else TemplateVersion.objects.get(id=t.default_version_id)
-            )
+            if "version" in data:
+                version = data["version"]
+            try:
+                t = Template.objects.get(name=name)
+            except Exception:
+                logger.error("Template with given name does not exist")
+                return HttpResponse(status=400)
+
+            if not t.default_version_id and version == None:
+                logger.info(
+                    "No default version exists for this template. Specify version"
+                )
+                return HttpResponse(status=400)
+            try:
+                tv = (
+                    TemplateVersion.objects.get(template_id=t.id, version=version)
+                    if version
+                    else TemplateVersion.objects.get(id=t.default_version_id)
+                )
+            except Exception:
+                logger.error("Template with given name and version does not exist")
+                return HttpResponse(status=400)
+
             stpls = SubTemplate.objects.filter(template_version_id=tv.id)
 
             res = {
@@ -206,10 +258,11 @@ def get_render_template_view(request, name, version=None):
 
             return JsonResponse(res, safe=False)
         except Exception as e:
-            print(e)
+            logger.error("Error", error=e)
             return HttpResponse(status=400)
 
     else:
+        logger.error("Invalid request", request=request.method)
         return HttpResponse(status=404)
 
 
@@ -218,8 +271,18 @@ def get_render_template_view(request, name, version=None):
 def get_template_details_view(request, name, version):
     if request.method == "GET":
         try:
-            t = Template.objects.get(name=name)
-            tv = TemplateVersion.objects.get(template_id=t.id, version=version)
+            try:
+                t = Template.objects.get(name=name)
+            except Exception:
+                logger.error("Template with given name does not exist")
+                return HttpResponse(status=400)
+
+            try:
+                tv = TemplateVersion.objects.get(template_id=t.id, version=version)
+            except Exception:
+                logger.error("Template with given name and version does not exist")
+                return HttpResponse(status=400)
+
             stpls = SubTemplate.objects.filter(template_version_id=tv.id)
 
             res = {
@@ -241,23 +304,36 @@ def get_template_details_view(request, name, version):
 
             return JsonResponse(res, safe=False)
         except Exception as e:
-            print(e)
+            logger.error("Error", error=e)
             return HttpResponse(status=400)
 
     elif request.method == "POST":
         try:
             data = json.loads(request.body)
+
             if not data.get("default", False):
+                logger.info("default should be true to set default version")
+                return HttpResponse(status=400)
+            try:
+                tmp = Template.objects.get(name=name)
+            except:
+                logger.error("Template with given name does not exist")
                 return HttpResponse(status=400)
 
-            tmp = Template.objects.get(name=name)
             max_version = TemplateVersion.objects.filter(template_id=tmp).order_by(
                 -Length("version"), "-version"
             )[:1]
             major_version, minor_version = max_version[0].version.split(".")
             major_version = str(float(int(major_version) + 1))
 
-            tmp_ver = TemplateVersion.objects.get(template_id=tmp.id, version=version)
+            try:
+                tmp_ver = TemplateVersion.objects.get(
+                    template_id=tmp.id, version=version
+                )
+            except:
+                logger.error("Template with given name and version does not exist")
+                return HttpResponse(status=400)
+
             sts = SubTemplate.objects.filter(template_version_id=tmp_ver.id)
 
             tmp_ver_new = TemplateVersion.objects.create(
@@ -282,9 +358,10 @@ def get_template_details_view(request, name, version):
             return JsonResponse(template_data, status=200)
 
         except Exception as e:
-            print(e)
+            logger.error("ERROR", error=e)
             return HttpResponse(status=400)
     else:
+        logger.error("Invalid request", request=request.method)
         return HttpResponse(status=404)
 
 
@@ -295,6 +372,9 @@ def get_config_view(request):
         limit = int(request.GET.get("limit", 100))
         try:
             ts = TemplateConfig.objects.all()[offset : offset + limit]
+
+            if not len(ts):
+                logger.info("TemplateConfig is Empty")
 
             tes = {}
             for t in ts:
@@ -310,8 +390,9 @@ def get_config_view(request):
             return JsonResponse(tes, safe=False)
 
         except Exception as e:
-            print(e)
+            logger.error("ERROR", error=e)
             return HttpResponse(status=404)
 
     else:
+        logger.error("Invalid request", request=request.method)
         return HttpResponse(status=404)
