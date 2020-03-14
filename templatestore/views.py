@@ -130,7 +130,7 @@ def post_template_view(request):
                     major, minor = version["version"].split(".")
                     version_list.append((int(major), int(minor)))
 
-                version_list.sort(key=lambda ax: (int(ax[0]), ax[1]), reverse=True)
+                version_list.sort(key=lambda ax: (int(ax[0]), int(ax[1])), reverse=True)
 
                 version = str(version_list[0][0]) + "." + str(version_list[0][1] + 1)
 
@@ -241,7 +241,7 @@ def get_render_template_view(request, name, version=None):
                     major, minor = version["version"].split(".")
                     version_list.append((int(major), int(minor)))
 
-                version_list.sort(key=lambda ax: (int(ax[0]), ax[1]), reverse=True)
+                version_list.sort(key=lambda ax: (int(ax[0]), int(ax[1])), reverse=True)
                 version = str(version_list[0][0]) + "." + str(version_list[0][1])
 
             try:
@@ -343,7 +343,7 @@ def get_template_details_view(request, name, version):
                 major, minor = ver["version"].split(".")
                 version_list.append((int(major), int(minor)))
 
-            version_list.sort(key=lambda ax: (int(ax[0]), ax[1]), reverse=True)
+            version_list.sort(key=lambda ax: (int(ax[0]), int(ax[1])), reverse=True)
 
             new_version = str(float(version_list[0][0] + 1))
 
