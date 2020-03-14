@@ -122,13 +122,17 @@ def post_template_view(request):
 
             else:
                 template = templates[0]  # only one template should exist
-                max_version = TemplateVersion.objects.filter(
+                current_versions = TemplateVersion.objects.filter(
                     template_id=template
-                ).order_by(-Length("version"), "-version")[:1]
-                major_version, minor_version = max_version[0].version.split(".")
-                minor_version = str(int(minor_version) + 1)
+                ).values("version")
+                version_list = []
+                for version in current_versions:
+                    major, minor = version["version"].split(".")
+                    version_list.append((int(major), int(minor)))
 
-                version = major_version + "." + minor_version
+                version_list.sort(key=lambda ax: (int(ax[0]), ax[1]), reverse=True)
+
+                version = str(version_list[0][0]) + "." + str(version_list[0][1] + 1)
 
             tmp_ver = TemplateVersion.objects.create(
                 template_id=template,
@@ -226,9 +230,20 @@ def get_render_template_view(request, name, version=None):
 
             if not t.default_version_id and version == None:
                 logger.info(
-                    "No default version exists for this template. Specify version"
+                    "No default version exists for this template.Choosing latest version by default"
                 )
-                return HttpResponse(status=400)
+
+                current_versions = TemplateVersion.objects.filter(template_id=t).values(
+                    "version"
+                )
+                version_list = []
+                for version in current_versions:
+                    major, minor = version["version"].split(".")
+                    version_list.append((int(major), int(minor)))
+
+                version_list.sort(key=lambda ax: (int(ax[0]), ax[1]), reverse=True)
+                version = str(version_list[0][0]) + "." + str(version_list[0][1])
+
             try:
                 tv = (
                     TemplateVersion.objects.get(template_id=t.id, version=version)
@@ -320,11 +335,17 @@ def get_template_details_view(request, name, version):
                 logger.error("Template with given name does not exist")
                 return HttpResponse(status=400)
 
-            max_version = TemplateVersion.objects.filter(template_id=tmp).order_by(
-                -Length("version"), "-version"
-            )[:1]
-            major_version, minor_version = max_version[0].version.split(".")
-            major_version = str(float(int(major_version) + 1))
+            current_versions = TemplateVersion.objects.filter(template_id=tmp).values(
+                "version"
+            )
+            version_list = []
+            for ver in current_versions:
+                major, minor = ver["version"].split(".")
+                version_list.append((int(major), int(minor)))
+
+            version_list.sort(key=lambda ax: (int(ax[0]), ax[1]), reverse=True)
+
+            new_version = str(float(version_list[0][0] + 1))
 
             try:
                 tmp_ver = TemplateVersion.objects.get(
@@ -338,7 +359,7 @@ def get_template_details_view(request, name, version):
 
             tmp_ver_new = TemplateVersion.objects.create(
                 template_id=tmp,
-                version=major_version,
+                version=new_version,
                 sample_context_data=tmp_ver.sample_context_data,
             )
             tmp_ver_new.save()
