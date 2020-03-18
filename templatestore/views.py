@@ -11,6 +11,7 @@ import re
 
 logger = structlog.get_logger()
 
+
 def index(request):
     export_settings = {
         "TE_TEMPLATE_ATTRIBUTE_KEYS": settings.TE_TEMPLATE_ATTRIBUTES_KEYS
@@ -60,7 +61,7 @@ def get_templates_view(request):
             offset = int(request.GET.get("offset", 0))
             limit = int(request.GET.get("limit", 100))
 
-            templates = Template.objects.all()[offset: offset + limit]
+            templates = Template.objects.all()[offset : offset + limit]
 
             if not len(templates):
                 logger.info("Empty templates list")
@@ -188,8 +189,8 @@ def get_template_versions_view(request, name):
                 return HttpResponse(status=400)
 
             tvs = TemplateVersion.objects.filter(template_id=t.id).order_by("-id")[
-                  offset: offset + limit
-                  ]
+                offset : offset + limit
+            ]
 
             if not len(tvs):
                 logger.info("Empty Versions List")
@@ -407,7 +408,7 @@ def get_config_view(request):
         offset = int(request.GET.get("offset", 0))
         limit = int(request.GET.get("limit", 100))
         try:
-            ts = TemplateConfig.objects.all()[offset: offset + limit]
+            ts = TemplateConfig.objects.all()[offset : offset + limit]
 
             if not len(ts):
                 logger.info("TemplateConfig is Empty")
