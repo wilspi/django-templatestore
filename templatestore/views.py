@@ -1,16 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models.functions import Length
 from django.db import transaction
 from django.conf import settings
 from datetime import datetime
 import json
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
 import structlog
+import re
 
 logger = structlog.get_logger()
-
 
 def index(request):
     export_settings = {
@@ -29,7 +28,6 @@ def render_via_jinja(template, context):
 
 @csrf_exempt
 def render_template_view(request):
-    # log requests
     if request.method != "GET":
         logger.error("Invalid Request", request=request.method)
         return HttpResponseBadRequest("invalid request method: " + request.method)
@@ -62,7 +60,7 @@ def get_templates_view(request):
             offset = int(request.GET.get("offset", 0))
             limit = int(request.GET.get("limit", 100))
 
-            templates = Template.objects.all()[offset : offset + limit]
+            templates = Template.objects.all()[offset: offset + limit]
 
             if not len(templates):
                 logger.info("Empty templates list")
@@ -99,8 +97,10 @@ def post_template_view(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            # TODO: Validations
-            # Validate sub_types
+
+            if not re.match("(^[a-z|A-Z]+[a-z|A-Z|0-9|_]*$)", data["name"]):
+                logger.error("Enter valid template name")
+                return HttpResponse(status=400)
 
             cfgs = TemplateConfig.objects.filter(type=data["type"])
 
@@ -143,7 +143,7 @@ def post_template_view(request):
 
             for sub_tmp in data["sub_template"]:
                 if sub_tmp["sub_type"] not in sub_types:
-                    logger.info("Invalid sub_type", sub_type=sub_tmp["sub_type"])
+                    logger.error("Invalid sub_type", sub_type=sub_tmp["sub_type"])
                     return HttpResponse(status=400)
 
                 st = SubTemplate.objects.create(
@@ -162,7 +162,7 @@ def post_template_view(request):
             return JsonResponse(template_data, status=201)
 
         except Exception as e:
-            logger.info("Error", error=e)
+            logger.error("Error", error=e)
             return HttpResponse(status=400)
 
     else:
@@ -176,6 +176,11 @@ def get_template_versions_view(request, name):
         try:
             offset = int(request.GET.get("offset", 0))
             limit = int(request.GET.get("limit", 100))
+
+            if not re.match("(^[a-z|A-Z]+[a-z|A-Z|0-9|_]*$)", name):
+                logger.error("Enter valid template name")
+                return HttpResponse(status=400)
+
             try:
                 t = Template.objects.get(name=name)
             except Exception:
@@ -183,8 +188,8 @@ def get_template_versions_view(request, name):
                 return HttpResponse(status=400)
 
             tvs = TemplateVersion.objects.filter(template_id=t.id).order_by("-id")[
-                offset : offset + limit
-            ]
+                  offset: offset + limit
+                  ]
 
             if not len(tvs):
                 logger.info("Empty Versions List")
@@ -213,8 +218,10 @@ def get_template_versions_view(request, name):
 def get_render_template_view(request, name, version=None):
     if request.method == "GET":
         try:
-            # Validations
-            # if no version in params and no default_version_id exists, validation fails
+            if not re.match("(^[a-z|A-Z]+[a-z|A-Z|0-9|_]*$)", name):
+                logger.error("Enter valid template name")
+                return HttpResponse(status=400)
+
             data = json.loads(request.body)
             if "context_data" not in data:
                 logger.error("context_data not provided")
@@ -286,6 +293,10 @@ def get_render_template_view(request, name, version=None):
 def get_template_details_view(request, name, version):
     if request.method == "GET":
         try:
+            if not re.match("(^[a-z|A-Z]+[a-z|A-Z|0-9|_]*$)", name):
+                logger.error("Enter valid template name")
+                return HttpResponse(status=400)
+
             try:
                 t = Template.objects.get(name=name)
             except Exception:
@@ -324,10 +335,14 @@ def get_template_details_view(request, name, version):
 
     elif request.method == "POST":
         try:
+            if not re.match("(^[a-z|A-Z]+[a-z|A-Z|0-9|_]*$)", name):
+                logger.error("Enter valid template name")
+                return HttpResponse(status=400)
+
             data = json.loads(request.body)
 
             if not data.get("default", False):
-                logger.info("default should be true to set default version")
+                logger.error("default should be true to set default version")
                 return HttpResponse(status=400)
             try:
                 tmp = Template.objects.get(name=name)
@@ -392,7 +407,7 @@ def get_config_view(request):
         offset = int(request.GET.get("offset", 0))
         limit = int(request.GET.get("limit", 100))
         try:
-            ts = TemplateConfig.objects.all()[offset : offset + limit]
+            ts = TemplateConfig.objects.all()[offset: offset + limit]
 
             if not len(ts):
                 logger.info("TemplateConfig is Empty")
