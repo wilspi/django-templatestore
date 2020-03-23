@@ -2,8 +2,6 @@ from django.urls import path, re_path
 from templatestore import views
 
 urlpatterns = [
-    # frontend
-    path("", views.index, name="index"),
     # apis
     path("api/v1/template", views.post_template_view),
     path("api/v1/render", views.render_template_view),
@@ -25,4 +23,6 @@ urlpatterns = [
         views.get_render_template_view,
     ),
     path("api/v1/config", views.get_config_view),
+    # frontend
+    re_path(r"^(?:.*)/?$", views.index, name="index"),
 ]
