@@ -13,7 +13,9 @@ def index(request):
     export_settings = {
         "TE_TEMPLATE_ATTRIBUTE_KEYS": settings.TE_TEMPLATE_ATTRIBUTES_KEYS
     }
-    return render(request, "index.html", context={"settings": json.dumps(export_settings)})
+    return render(
+        request, "index.html", context={"settings": json.dumps(export_settings)}
+    )
 
 
 def render_via_jinja(template, context):
@@ -73,14 +75,18 @@ def get_templates_view(request):
 
         except Exception as e:
             print(e)
-            return HttpResponse(json.dumps({
-                "message": str(e)
-            }), content_type='application/json', status=400)
+            return HttpResponse(
+                json.dumps({"message": str(e)}),
+                content_type="application/json",
+                status=400,
+            )
 
     else:
-        return HttpResponse(json.dumps({
-            "message": "no method found"
-        }), content_type='application/json', status=404)
+        return HttpResponse(
+            json.dumps({"message": "no method found"}),
+            content_type="application/json",
+            status=404,
+        )
 
 
 @csrf_exempt
@@ -94,9 +100,19 @@ def post_template_view(request):
             cfgs = TemplateConfig.objects.filter(type=data["type"])
             sub_types = {cfg.sub_type: cfg for cfg in cfgs}
 
-            diff_keys = set(sub_types.keys()).difference(set([s["sub_type"] for s in data["sub_template"]]))
+            diff_keys = set(sub_types.keys()).difference(
+                set([s["sub_type"] for s in data["sub_template"]])
+            )
             if len(diff_keys):
-                raise(Exception("Validation: missing `" + str(diff_keys) + "` for type `" + data["type"] + "`"))
+                raise (
+                    Exception(
+                        "Validation: missing `"
+                        + str(diff_keys)
+                        + "` for type `"
+                        + data["type"]
+                        + "`"
+                    )
+                )
 
             templates = Template.objects.filter(name=data["name"])
             if not len(templates):
@@ -144,14 +160,18 @@ def post_template_view(request):
         except Exception as e:
             print(e)
 
-            return HttpResponse(json.dumps({
-                "message": str(e)
-            }), content_type='application/json', status=400)
+            return HttpResponse(
+                json.dumps({"message": str(e)}),
+                content_type="application/json",
+                status=400,
+            )
 
     else:
-        return HttpResponse(json.dumps({
-            "message": "no method found"
-        }), content_type='application/json', status=404)
+        return HttpResponse(
+            json.dumps({"message": "no method found"}),
+            content_type="application/json",
+            status=404,
+        )
 
 
 @csrf_exempt
@@ -179,14 +199,18 @@ def get_template_versions_view(request, name):
 
         except Exception as e:
             print(e)
-            return HttpResponse(json.dumps({
-                "message": str(e)
-            }), content_type='application/json', status=400)
+            return HttpResponse(
+                json.dumps({"message": str(e)}),
+                content_type="application/json",
+                status=400,
+            )
 
     else:
-        return HttpResponse(json.dumps({
-            "message": "no method found"
-        }), content_type='application/json', status=404)
+        return HttpResponse(
+            json.dumps({"message": "no method found"}),
+            content_type="application/json",
+            status=404,
+        )
 
 
 @csrf_exempt
@@ -223,14 +247,18 @@ def get_render_template_view(request, name, version=None):
             return JsonResponse(res, safe=False)
         except Exception as e:
             print(e)
-            return HttpResponse(json.dumps({
-                "message": str(e)
-            }), content_type='application/json', status=400)
+            return HttpResponse(
+                json.dumps({"message": str(e)}),
+                content_type="application/json",
+                status=400,
+            )
 
     else:
-        return HttpResponse(json.dumps({
-            "message": "no method found"
-        }), content_type='application/json', status=404)
+        return HttpResponse(
+            json.dumps({"message": "no method found"}),
+            content_type="application/json",
+            status=404,
+        )
 
 
 @csrf_exempt
@@ -262,9 +290,11 @@ def get_template_details_view(request, name, version):
             return JsonResponse(res, safe=False)
         except Exception as e:
             print(e)
-            return HttpResponse(json.dumps({
-                "message": str(e)
-            }), content_type='application/json', status=400)
+            return HttpResponse(
+                json.dumps({"message": str(e)}),
+                content_type="application/json",
+                status=400,
+            )
 
     elif request.method == "POST":
         try:
@@ -305,13 +335,17 @@ def get_template_details_view(request, name, version):
 
         except Exception as e:
             print(e)
-            return HttpResponse(json.dumps({
-                "message": str(e)
-            }), content_type='application/json', status=400)
+            return HttpResponse(
+                json.dumps({"message": str(e)}),
+                content_type="application/json",
+                status=400,
+            )
     else:
-        return HttpResponse(json.dumps({
-            "message": "no method found"
-        }), content_type='application/json', status=404)
+        return HttpResponse(
+            json.dumps({"message": "no method found"}),
+            content_type="application/json",
+            status=404,
+        )
 
 
 @csrf_exempt
@@ -337,11 +371,15 @@ def get_config_view(request):
 
         except Exception as e:
             print(e)
-            return HttpResponse(json.dumps({
-                "message": str(e)
-            }), content_type='application/json', status=404)
+            return HttpResponse(
+                json.dumps({"message": str(e)}),
+                content_type="application/json",
+                status=404,
+            )
 
     else:
-        return HttpResponse(json.dumps({
-            "message": "no method found"
-        }), content_type='application/json', status=404)
+        return HttpResponse(
+            json.dumps({"message": "no method found"}),
+            content_type="application/json",
+            status=404,
+        )
