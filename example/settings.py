@@ -29,12 +29,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "templatestore",
+    "viewlet",
 ]
 
 MIDDLEWARE = [
@@ -60,7 +62,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-            ]
+            ],
         },
     },
 ]
@@ -69,6 +71,17 @@ WSGI_APPLICATION = "example.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+#
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.contrib.gis.db.backends.postgis",
+#         "NAME": "ackodev_templates",
+#         "USER": "ackodev_templates_rw_v1",
+#         "PASSWORD": "9qMzTLnHLhS7bQXDo3Gj",
+#         "HOST": "acko-services.cpbwfp2vkm7a.ap-south-1.rds.amazonaws.com",
+#         "PORT": "5432",
+#     }
+# }
 
 DATABASES = {
     "default": {
