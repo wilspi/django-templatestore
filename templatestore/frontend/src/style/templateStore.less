@@ -1,0 +1,155 @@
+@import url('https://fonts.googleapis.com/css?family=PT+Mono|PT+Sans');
+
+:root {
+  --color-primary: hsl(203, 100%, 38%);
+  --color-text:  hsl(203, 30%, 15%);
+  --color-background: hsl(203, 100%, 98%);
+  --color-border: hsl(203, 33%, 83%);;
+  --color-white: #fff;
+}
+
+body {
+  font-family: 'PT Sans', sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  font-size: 1rem;
+}
+
+.tsTable {
+  background-color: var(--color-white);
+  width: 100%;
+  border-radius: 4px;
+  border-collapse: collapse;
+  max-width: 800px;
+  margin: 0 auto;
+  margin-top: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 67, 115, 0.2);
+}
+
+.tsTableHeader {
+  text-transform: uppercase;
+  font-weight: normal;
+  font-size: 0.75rem;
+}
+
+.tsTableLink {
+  text-decoration: none;
+  color: var(--color-primary);
+}
+
+.tsTableRow {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table__row--last {
+  border-bottom: 0;
+}
+
+.table__cell {
+  padding: 1rem 1.5rem;
+}
+
+.u-text-left {
+  text-align: left;
+}
+
+.u-text-right {
+  text-align: right;
+}
+
+.u-text-center {
+  text-align: center;
+}
+
+.u-font-mono {
+  font-family: 'PT Mono', monospace;
+}
+
+.btn {
+  background-color: transparent;
+  box-shadow: 0 0 0 1px var(--color-primary) inset;
+  text-align: center;
+  color: var(--color-primary);
+  display: inline-block;
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 0.75rem;
+  position: relative;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  line-height: 20px;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media only screen and (max-width: 650px) {
+
+  html {
+    font-size: 14px;
+  }
+
+  .table__header {
+    display: none;
+  }
+
+  .table__row {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-column-gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .table__cell {
+    padding: 0;
+  }
+
+  .table__account {
+    grid-column: 1;
+    grid-row: span 2;
+  }
+
+  .table__account-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .table__account-number {
+    order: 2;
+    font-size: 12px;
+    padding-top: 0.25rem;
+  }
+
+  .table__balance {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: 0.75rem;
+    padding-top: 0.125rem;
+  }
+
+  .table__balance::before {
+    content: "Balance: ";
+  }
+
+  .table__available {
+    grid-column: 2;
+    grid-row: 1;
+    padding-bottom: 0.125rem;
+  }
+
+  .table__limit {
+    display: none;
+  }
+
+  .table__transfer {
+    grid-column: 3;
+    grid-row: span 2;
+  }
+}
+.text-center {
+  text-align: center;
+}

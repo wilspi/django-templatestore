@@ -18,7 +18,7 @@
                     "Add Template"
                 ],
                 "summary":"Add a new template to the template store",
-                "description":"",
+                "description":"This will create a new template with version '0.1'. To make this default version, read complete documentation.",
                 "operationId":"post_template",
                 "consumes":[
                     "application/json"
@@ -114,7 +114,7 @@
                     "Get all templates"
                 ],
                 "summary":"Get all templates",
-                "description":"This returns all templates with their default version. If no default version exists this will give the latest version.",
+                "description":"This returns all templates with their default version. If not specified explicitly, the default version remains null. See complete documentation to update the default version.",
                 "operationId":"get_templates",
                 "produces":[
                     "application/json"
@@ -171,7 +171,7 @@
                         "schema":{
                             "type":"object",
                             "properties":{
-                                "error":{
+                                "message":{
                                     "type":"string"
                                 }
                             }
@@ -186,7 +186,7 @@
                     "Get all versions of the template"
                 ],
                 "summary":"Get all versions of the template",
-                "description":"",
+                "description":"This will list all versions of the template",
                 "operationId":"get_template_versions",
                 "produces":[
                     "application/json"
@@ -228,7 +228,7 @@
                         "schema":{
                             "type":"object",
                             "properties":{
-                                "error":{
+                                "message":{
                                     "type":"string"
                                 }
                             }
@@ -243,7 +243,7 @@
                     "Get rendered template"
                 ],
                 "summary":"Get rendered template",
-                "description":"",
+                "description":"This will return the rendered output of the template given the context_data",
                 "operationId":"get_rendered_template",
                 "produces":[
                     "application/json"
@@ -312,7 +312,7 @@
                         "schema":{
                             "type":"object",
                             "properties":{
-                                "error":{
+                                "message":{
                                     "type":"string"
                                 }
                             }
@@ -403,7 +403,7 @@
                         "schema":{
                             "type":"object",
                             "properties":{
-                                "error":{
+                                "message":{
                                     "type":"string"
                                 }
                             }
@@ -485,7 +485,7 @@
                     "Get rendered versioned template"
                 ],
                 "summary":"Get rendered versioned template",
-                "description":"",
+                "description":"This will return the rendered output of the template given the context_data",
                 "operationId":"get_rendered_versioned_template",
                 "produces":[
                     "application/json"
@@ -562,7 +562,7 @@
                         "schema":{
                             "type":"object",
                             "properties":{
-                                "error":{
+                                "message":{
                                     "type":"string"
                                 }
                             }
@@ -630,7 +630,7 @@
                         "schema":{
                             "type":"object",
                             "properties":{
-                                "error":{
+                                "message":{
                                     "type":"string"
                                 }
                             }

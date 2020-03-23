@@ -1,11 +1,8 @@
 {
   "name": "django-templatestore",
-  "version": "0.1.2",
-  "description": "### Supports",
-  "main": "./src/templateScreen.js",
-  "directories": {
-    "example": "example"
-  },
+  "version": "0.1.4",
+  "description": "Interface to add, and update templates",
+  "main": "./src/index.js",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "format": "prettier --write \"src/**/*.js\"",
@@ -22,8 +19,6 @@
     "django-templatestore",
     "explorer",
     "ses",
-    "ses-explorer",
-    "ses-editor",
     "editor",
     "template-store"
   ],
@@ -39,7 +34,8 @@
     "react": "^16.12.0",
     "react-ace": "^8.0.0",
     "react-ace-builds": "^7.3.0",
-    "react-dom": "^16.12.0"
+    "react-dom": "^16.12.0",
+    "react-router-dom": "^5.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.8.3",
