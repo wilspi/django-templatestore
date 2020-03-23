@@ -24,5 +24,5 @@ urlpatterns = [
     ),
     path("api/v1/config", views.get_config_view),
     # frontend
-    re_path(r'^(?:.*)/?$', views.index, name="index"),
+    re_path(r"^(?:.*)/?$", views.index, name="index"),
 ]
