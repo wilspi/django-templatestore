@@ -126,13 +126,16 @@ def post_template_view(request):
 
             else:
                 template = templates[0]  # only one template should exist
-                max_version = TemplateVersion.objects.filter(
+                current_versions = TemplateVersion.objects.filter(
                     template_id=template
-                ).order_by(-Length("version"), "-version")[:1]
-                major_version, minor_version = max_version[0].version.split(".")
-                minor_version = str(int(minor_version) + 1)
+                ).values("version")
+                version_list = []
+                for version in current_versions:
+                    major, minor = version["version"].split(".")
+                    version_list.append((int(major), int(minor)))
 
-                version = major_version + "." + minor_version
+                version_list.sort(key=lambda ax: (int(ax[0]), int(ax[1])), reverse=True)
+                version = str(version_list[0][0]) + "." + str(version_list[0][1] + 1)
 
             tmp_ver = TemplateVersion.objects.create(
                 template_id=template,
@@ -303,18 +306,23 @@ def get_template_details_view(request, name, version):
                 return HttpResponse(status=400)
 
             tmp = Template.objects.get(name=name)
-            max_version = TemplateVersion.objects.filter(template_id=tmp).order_by(
-                -Length("version"), "-version"
-            )[:1]
-            major_version, minor_version = max_version[0].version.split(".")
-            major_version = str(float(int(major_version) + 1))
+            current_versions = TemplateVersion.objects.filter(template_id=tmp).values(
+                "version"
+            )
+            version_list = []
+            for ver in current_versions:
+                major, minor = ver["version"].split(".")
+                version_list.append((int(major), int(minor)))
+
+            version_list.sort(key=lambda ax: (int(ax[0]), int(ax[1])), reverse=True)
+            new_version = str(float(version_list[0][0] + 1))
 
             tmp_ver = TemplateVersion.objects.get(template_id=tmp.id, version=version)
             sts = SubTemplate.objects.filter(template_version_id=tmp_ver.id)
 
             tmp_ver_new = TemplateVersion.objects.create(
                 template_id=tmp,
-                version=major_version,
+                version=new_version,
                 sample_context_data=tmp_ver.sample_context_data,
             )
             tmp_ver_new.save()
