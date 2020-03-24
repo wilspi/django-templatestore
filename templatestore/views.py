@@ -6,6 +6,7 @@ from django.db import transaction
 from django.conf import settings
 from datetime import datetime
 import json
+import re
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
 
 
@@ -88,31 +89,42 @@ def get_templates_view(request):
             status=404,
         )
 
-
 @csrf_exempt
 @transaction.atomic
 def post_template_view(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            # TODO: Validations
+
+            required_fields = {"name", "type", "sub_template", "attributes", "sample_context_data"}
+            missing_fields = required_fields.difference(set(data.keys()))
+            if len(missing_fields):
+                raise (Exception("Validation: missing fields `" + str(missing_fields) + "`"))
+
+            if not re.match("(^[a-z|A-Z]+[a-z|A-Z|0-9|_]*$)", data["name"]):
+                raise (Exception("Validation: `" + data["name"] + "` is not a valid template name"))
 
             cfgs = TemplateConfig.objects.filter(type=data["type"])
+            if not len(cfgs):
+                raise (Exception("Validation: `" + data["type"] + "` is not a valid type"))
+
             sub_types = {cfg.sub_type: cfg for cfg in cfgs}
+
+            invalid_subtypes = set([s["sub_type"] for s in data["sub_template"]]).difference(set(sub_types.keys()))
+            if len(invalid_subtypes):
+                raise (Exception("Validation: invalid subtypes `" + str(invalid_subtypes) + "` for type `" + data["type"] + "`"))
 
             diff_keys = set(sub_types.keys()).difference(
                 set([s["sub_type"] for s in data["sub_template"]])
             )
             if len(diff_keys):
-                raise (
-                    Exception(
-                        "Validation: missing `"
-                        + str(diff_keys)
-                        + "` for type `"
-                        + data["type"]
-                        + "`"
-                    )
-                )
+                raise (Exception("Validation: missing `" + str(diff_keys) + "` for type `" + data["type"] + "`"))
+
+            if not len(data["attributes"]):
+                raise (Exception("Validation: attributes field can not be empty"))
+
+            if not len(data["sample_context_data"]):
+                raise (Exception("Validation: sample_context_data field can not be empty"))
 
             templates = Template.objects.filter(name=data["name"])
             if not len(templates):
@@ -181,7 +193,11 @@ def get_template_versions_view(request, name):
             offset = int(request.GET.get("offset", 0))
             limit = int(request.GET.get("limit", settings.TE_ROWLIMIT))
 
-            t = Template.objects.get(name=name)
+            try:
+                t = Template.objects.get(name=name)
+            except Exception:
+                raise (Exception("Validation: Template with name `" + name + "` does not exist"))
+
             tvs = TemplateVersion.objects.filter(template_id=t.id).order_by("-id")[
                 offset : offset + limit
             ]
@@ -217,11 +233,22 @@ def get_template_versions_view(request, name):
 def get_render_template_view(request, name, version=None):
     if request.method == "GET":
         try:
-            # Validations
-            # if no version in params and no default_version_id exists, validation fails
             data = json.loads(request.body)
 
-            t = Template.objects.get(name=name)
+            if "context_data" not in data:
+                raise (Exception("Validation: context_data is missing"))
+
+            try:
+                t = Template.objects.get(name=name)
+            except Exception:
+                raise (Exception("Validation: Template with name `" + name + "` does not exist"))
+
+            if not version:
+                try:
+                    TemplateVersion.objects.get(id=t.default_version_id)
+                except Exception:
+                    raise (Exception("Validation: No default version exists for the given template"))
+
             tv = (
                 TemplateVersion.objects.get(template_id=t.id, version=version)
                 if version
@@ -266,8 +293,17 @@ def get_render_template_view(request, name, version=None):
 def get_template_details_view(request, name, version):
     if request.method == "GET":
         try:
-            t = Template.objects.get(name=name)
-            tv = TemplateVersion.objects.get(template_id=t.id, version=version)
+
+            try:
+                t = Template.objects.get(name=name)
+            except Exception:
+                raise (Exception("Validation: Template with given name does not exist"))
+
+            try:
+                tv = TemplateVersion.objects.get(template_id=t.id, version=version)
+            except Exception:
+                raise (Exception("Validation: Template with given name and version does not exist"))
+
             stpls = SubTemplate.objects.filter(template_version_id=tv.id)
 
             res = {
@@ -299,17 +335,26 @@ def get_template_details_view(request, name, version):
     elif request.method == "POST":
         try:
             data = json.loads(request.body)
+
             if not data.get("default", False):
                 return HttpResponse(status=400)
 
-            tmp = Template.objects.get(name=name)
+            try:
+                tmp = Template.objects.get(name=name)
+            except Exception:
+                raise (Exception("Validation: Template with given name does not exist"))
+
             max_version = TemplateVersion.objects.filter(template_id=tmp).order_by(
                 -Length("version"), "-version"
             )[:1]
             major_version, minor_version = max_version[0].version.split(".")
             major_version = str(float(int(major_version) + 1))
 
-            tmp_ver = TemplateVersion.objects.get(template_id=tmp.id, version=version)
+            try:
+                tmp_ver = TemplateVersion.objects.get(template_id=tmp.id, version=version)
+            except Exception:
+                raise (Exception("Validation: Template with given name and version does not exist"))
+
             sts = SubTemplate.objects.filter(template_version_id=tmp_ver.id)
 
             tmp_ver_new = TemplateVersion.objects.create(
@@ -383,3 +428,4 @@ def get_config_view(request):
             content_type="application/json",
             status=404,
         )
+
