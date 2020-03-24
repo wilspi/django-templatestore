@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models.functions import Length
 from django.db import transaction
 from django.conf import settings
 from datetime import datetime
