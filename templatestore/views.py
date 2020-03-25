@@ -176,16 +176,13 @@ def post_template_view(request):
 
             else:
                 template = templates[0]  # only one template should exist
-                current_versions = TemplateVersion.objects.filter(
-                    template_id=template
-                ).values("version")
-                version_list = []
-                for version in current_versions:
-                    major, minor = version["version"].split(".")
-                    version_list.append((int(major), int(minor)))
+                max_version = TemplateVersion.objects.filter(
+                        template_id=template
+                    ).order_by('-id')[:1]
 
-                version_list.sort(key=lambda ax: (int(ax[0]), int(ax[1])), reverse=True)
-                version = str(version_list[0][0]) + "." + str(version_list[0][1] + 1)
+                major_version, minor_version = max_version[0].version.split(".")
+                minor_version = str(int(minor_version) + 1)
+                version = major_version + "." + minor_version
 
             tmp_ver = TemplateVersion.objects.create(
                 template_id=template,
@@ -401,16 +398,12 @@ def get_template_details_view(request, name, version):
             except Exception:
                 raise (Exception("Validation: Template with given name does not exist"))
 
-            current_versions = TemplateVersion.objects.filter(template_id=tmp).values(
-                "version"
-            )
-            version_list = []
-            for ver in current_versions:
-                major, minor = ver["version"].split(".")
-                version_list.append((int(major), int(minor)))
+            max_version = TemplateVersion.objects.filter(
+                template_id=tmp
+            ).order_by('-id')[:1]
 
-            version_list.sort(key=lambda ax: (int(ax[0]), int(ax[1])), reverse=True)
-            new_version = str(float(version_list[0][0] + 1))
+            major_version, minor_version = max_version[0].version.split(".")
+            major_version = str(float(major_version) + 1)
 
             try:
                 tmp_ver = TemplateVersion.objects.get(
@@ -427,7 +420,7 @@ def get_template_details_view(request, name, version):
 
             tmp_ver_new = TemplateVersion.objects.create(
                 template_id=tmp,
-                version=new_version,
+                version=major_version,
                 sample_context_data=tmp_ver.sample_context_data,
             )
             tmp_ver_new.save()
