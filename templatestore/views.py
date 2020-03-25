@@ -177,8 +177,8 @@ def post_template_view(request):
             else:
                 template = templates[0]  # only one template should exist
                 max_version = TemplateVersion.objects.filter(
-                        template_id=template
-                    ).order_by('-id')[:1]
+                    template_id=template
+                ).order_by("-id")[:1]
 
                 major_version, minor_version = max_version[0].version.split(".")
                 minor_version = str(int(minor_version) + 1)
@@ -398,12 +398,12 @@ def get_template_details_view(request, name, version):
             except Exception:
                 raise (Exception("Validation: Template with given name does not exist"))
 
-            max_version = TemplateVersion.objects.filter(
-                template_id=tmp
-            ).order_by('-id')[:1]
+            max_version = TemplateVersion.objects.filter(template_id=tmp).order_by(
+                "-id"
+            )[:1]
 
             major_version, minor_version = max_version[0].version.split(".")
-            major_version = str(float(major_version) + 1)
+            new_version = str(float(major_version) + 1)
 
             try:
                 tmp_ver = TemplateVersion.objects.get(
@@ -420,7 +420,7 @@ def get_template_details_view(request, name, version):
 
             tmp_ver_new = TemplateVersion.objects.create(
                 template_id=tmp,
-                version=major_version,
+                version=new_version,
                 sample_context_data=tmp_ver.sample_context_data,
             )
             tmp_ver_new.save()

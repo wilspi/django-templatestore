@@ -13,9 +13,6 @@ const backendSettings = JSON.parse(
 const Root = () => (
     <Router forceRefresh>
         <Switch>
-            <Route exact path="/home/">
-                <Home />
-            </Route>
             <Route exact path="/templatestore/">
                 <Home
                     fixedAttributeKeys={
