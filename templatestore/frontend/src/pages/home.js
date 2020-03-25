@@ -47,6 +47,12 @@ class Home extends Component {
         );
     }
 
+    addNewTemplate() {
+        this.props.history.push(
+            '/templatestore/t/add'
+        );
+    }
+
     getTableRowsJSX() {
         let tableRows = [];
         let filteredTemplates = this.state.templatesData.reduce(
@@ -139,6 +145,11 @@ class Home extends Component {
                         </thead>
                         <tbody>{this.getTableRowsJSX()}</tbody>
                     </table>
+                </div>
+                <div>
+                    <button type="button" onClick={() => this.addNewTemplate()}>
+                            Add New Template
+                    </button>
                 </div>
             </div>
         );
