@@ -223,6 +223,7 @@ class TemplateScreen extends Component {
             contextData: newValue
         });
     }
+
     onAttributesChange(newValue) {
         this.setState({
             attributes: newValue
@@ -285,14 +286,9 @@ class TemplateScreen extends Component {
         let tableHeaders = ['version', 'created_on', ' - ', ' - '].map(k => (
             <th>{k}</th>
         ));
-        let templateName = <input type="text"/>;
+        let templateName = <input type="text" id="tmp_name"/>;
         if (this.state.templateData.name) {
             templateName = <input readOnly type="text" value={this.state.templateData.name} />;
-        }
-        let templateVersion = <input readOnly type="text" value="0.1" />;
-        if (this.state.templateData.version) {
-            templateVersion = (<select id="type" className={styles.teButtons} value={this.state.templateData.version}
-                onChange={e => this.openTemplateVersion(e.target.value)} > {chooseVersion} </select>);
         }
         let templateHeader = "Create New Template";
         if (this.state.templateData.name) {
@@ -399,11 +395,18 @@ class TemplateScreen extends Component {
                         <label>Name : </label>
                         {templateName}
                         <br />
-                        <label>Version : </label>
-                        {templateVersion}
-                        {this.state.templateData.default ?
-                            'default' :
-                            'not_default'}
+                        {
+                            this.state.templateData.name && this.state.templateData.version ?
+                                <div>
+                                    <label>Version : </label>
+                                    <select id="type" className={styles.teButtons} value={this.state.templateData.version}
+                                        onChange={e => this.openTemplateVersion(e.target.value)} > {chooseVersion} </select>
+                                    { this.state.templateData.default ?
+                                        'default' :
+                                        'not_default'
+                                    }
+                                </div> : ""
+                        }
                         <br />
                     </div>
                 </div>
