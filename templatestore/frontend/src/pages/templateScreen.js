@@ -255,6 +255,10 @@ class TemplateScreen extends Component {
             this.setState({
                 subTemplatesData: a
             });
+        } else {
+            this.setState({
+                subTemplatesData: {}
+            });
         }
     }
 
