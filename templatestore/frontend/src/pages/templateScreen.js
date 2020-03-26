@@ -218,6 +218,17 @@ class TemplateScreen extends Component {
         });
     }
 
+    onContextChange(newValue) {
+        this.setState({
+            contextData: newValue
+        });
+    }
+    onAttributesChange(newValue) {
+        this.setState({
+            attributes: newValue
+        });
+    }
+
     getTemplateOutput() {
         axios
             .get('/template-editor/api/v1/render', {
@@ -260,6 +271,9 @@ class TemplateScreen extends Component {
                 subTemplatesData: {}
             });
         }
+        this.setState({
+            type: type
+        });
     }
 
     render() {
@@ -374,6 +388,7 @@ class TemplateScreen extends Component {
         //                </div>
         //            </div>
         //        );
+
         return (
             <div>
                 <div>
@@ -406,6 +421,51 @@ class TemplateScreen extends Component {
                     }
                 </div>
                 <div className={styles.teScreenTable}>{editors}</div>
+                <div>
+                    {
+                        !this.state.templateData.name && !this.state.templateData.version && this.state.type ?
+                            <div className={styles.teRowBlock}>
+                                <div className={styles.teSubTemplateBlock}>
+                                    <div className={styles.teTemplateEditor}>
+                                        <div>
+                                            <h3>Sample Context Data</h3>
+                                        </div>
+                                        <AceEditor
+                                            name="template-editor"
+                                            placeholder="Write sample_context_data here..."
+                                            theme={this.aceconfig.theme}
+                                            mode="handlebars"
+                                            fontSize={this.aceconfig.fontSize}
+                                            height={this.aceconfig.height}
+                                            width={this.aceconfig.width}
+                                            value={this.state.contextData}
+                                            onChange={n => {
+                                                this.onContextChange(n);
+                                            }}
+                                        />
+                                    </div>
+                                    <div className={styles.teOutputEditor}>
+                                        <div>
+                                            <h3> Attributes </h3>
+                                        </div>
+                                        <AceEditor
+                                            name="template-editor"
+                                            placeholder="Write attributes here..."
+                                            theme={this.aceconfig.theme}
+                                            mode="handlebars"
+                                            fontSize={this.aceconfig.fontSize}
+                                            height={this.aceconfig.height}
+                                            width={this.aceconfig.width}
+                                            value={this.state.attributes}
+                                            onChange={n => {
+                                                this.onAttributesChange(n);
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </div> : ""
+                    }
+                </div>
                 <div>
                     {this.state.templateData.name && this.state.templateData.version ?
                         <SearchBox onChange={this.onSearchTextChange.bind(this)} /> : "" }
