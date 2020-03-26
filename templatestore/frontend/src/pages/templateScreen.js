@@ -38,63 +38,65 @@ class TemplateScreen extends Component {
         this.onTemplateChange = this.onTemplateChange.bind(this);
     }
     componentDidMount() {
-        axios
-            .get(
-                '/templatestore/api/v1/template/' +
+        if (this.state.templateData.name && this.state.templateData.name) {
+            axios
+                .get(
+                    '/templatestore/api/v1/template/' +
                     this.state.templateData.name +
                     '/' +
                     this.state.templateData.version
-            )
-            .then(response => {
-                console.log(response.data);
-                this.setState({
-                    subTemplatesData: response.data.sub_templates.reduce(
-                        (result, k) => {
-                            result[k.sub_type] = {
-                                data: k.data,
-                                subType: k.sub_type,
-                                renderMode: k.render_mode,
-                                output: ''
-                            };
-                            return result;
+                )
+                .then(response => {
+                    console.log(response.data);
+                    this.setState({
+                        subTemplatesData: response.data.sub_templates.reduce(
+                            (result, k) => {
+                                result[k.sub_type] = {
+                                    data: k.data,
+                                    subType: k.sub_type,
+                                    renderMode: k.render_mode,
+                                    output: ''
+                                };
+                                return result;
+                            },
+                            {}
+                        ),
+                        templateData: {
+                            name: this.props.match.params.name,
+                            version: this.props.match.params.version,
+                            default: response.data.default
                         },
-                        {}
-                    ),
-                    templateData: {
-                        name: this.props.match.params.name,
-                        version: this.props.match.params.version,
-                        default: response.data.default
-                    },
-                    contextData: response.data.sample_context_data,
-                    attributes: response.data.attributes,
-                    type: response.data.type
+                        contextData: response.data.sample_context_data,
+                        attributes: response.data.attributes,
+                        type: response.data.type
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                    if (error.response.status === 400) {
+                        this.props.history.push('/templatestore/404');
+                    }
                 });
-            })
-            .catch(error => {
-                console.log(error);
-                if (error.response.status === 400) {
-                    this.props.history.push('/templatestore/404');
-                }
-            });
 
-        axios
-            .get(
-                '/templatestore/api/v1/template/' +
+            axios
+                .get(
+                    '/templatestore/api/v1/template/' +
                     this.state.templateData.name +
                     '/versions'
-            )
-            .then(response => {
-                this.setState({
-                    versions: response.data.map(t => ({
-                        version: t.version,
-                        default: t.default,
-                        created_on: this.getDateInSimpleFormat(t.created_on)
-                    }))
+                )
+                .then(response => {
+                    this.setState({
+                        versions: response.data.map(t => ({
+                            version: t.version,
+                            default: t.default,
+                            created_on: this.getDateInSimpleFormat(t.created_on)
+                        }))
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
                 });
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        }
     }
 
     getDateInSimpleFormat(datestr) {
