@@ -371,6 +371,18 @@ class TemplateScreen extends Component {
                         <br />
                     </div>
                 </div>
+                <div>
+                    {
+                        this.state.templateData.name && this.state.templateData.version ? "" :
+                            <div>
+                                <label> Type : </label>
+                                <select className={styles.teButtons}>
+                                    <option value="email"> Email </option>
+                                    <option value="sms"> Sms </option>
+                                </select>
+                            </div>
+                    }
+                </div>
                 <div className={styles.teScreenTable}>{editors}</div>
                 <div>
                     {this.state.templateData.name && this.state.templateData.version ?
