@@ -241,6 +241,23 @@ class TemplateScreen extends Component {
         return this.state.valueTemplate;
     }
 
+    displayEditors(type) {
+        if (type === "email") {
+            let a = { subject: { data: "", subType: "subject", renderMode: "text", output: "" },
+                textpart: { data: "", subType: "textpart", renderMode: "text", output: "" },
+                htmlpart: { data: "", subType: "htmlpart", renderMode: "html", output: "" }
+            };
+            this.setState({
+                subTemplatesData: a
+            });
+        } else if (type === "sms") {
+            let a = { textpart: { data: "", subType: "textpart", renderMode: "text", output: "" } };
+            this.setState({
+                subTemplatesData: a
+            });
+        }
+    }
+
     render() {
         let chooseVersion = this.state.versions.map(versions => {
             return (
@@ -376,7 +393,8 @@ class TemplateScreen extends Component {
                         this.state.templateData.name && this.state.templateData.version ? "" :
                             <div>
                                 <label> Type : </label>
-                                <select className={styles.teButtons}>
+                                <select className={styles.teButtons} onChange={e => this.displayEditors(e.target.value)}>
+                                    <option value="none"> None </option>
                                     <option value="email"> Email </option>
                                     <option value="sms"> Sms </option>
                                 </select>
