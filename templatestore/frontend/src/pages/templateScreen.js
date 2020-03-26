@@ -263,6 +263,17 @@ class TemplateScreen extends Component {
         if (this.state.templateData.name) {
             templateHeader = this.state.templateData.name;
         }
+        let versionTable = (<table
+            className={
+                'table table-striped table-responsive-md btn-table ' +
+                            styles.tsTable
+            }
+        >
+            <thead>
+                <tr>{tableHeaders}</tr>
+            </thead>
+            <tbody>{this.getTableRowsJSX()}</tbody>
+        </table>);
 
         let editors = Object.keys(this.state.subTemplatesData).map(t => {
             let outputView =
@@ -360,6 +371,7 @@ class TemplateScreen extends Component {
                         <h1>{templateHeader}</h1>
                     </div>
                     <div>
+                        <label>Name : </label>
                         {templateName}
                         <br />
                         <label>Version : </label>
@@ -372,20 +384,11 @@ class TemplateScreen extends Component {
                 </div>
                 <div className={styles.teScreenTable}>{editors}</div>
                 <div>
-                    <SearchBox onChange={this.onSearchTextChange.bind(this)} />
+                    {this.state.templateData.name && this.state.templateData.version ?
+                        <SearchBox onChange={this.onSearchTextChange.bind(this)} /> : "" }
                 </div>
                 <div>
-                    <table
-                        className={
-                            'table table-striped table-responsive-md btn-table ' +
-                            styles.tsTable
-                        }
-                    >
-                        <thead>
-                            <tr>{tableHeaders}</tr>
-                        </thead>
-                        <tbody>{this.getTableRowsJSX()}</tbody>
-                    </table>
+                    {this.state.templateData.name && this.state.templateData.version ? { versionTable } : "" }
                 </div>
             </div>
         );
