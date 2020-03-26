@@ -248,6 +248,19 @@ class TemplateScreen extends Component {
         let tableHeaders = ['version', 'created_on', ' - ', ' - '].map(k => (
             <th>{k}</th>
         ));
+        let templateName = <input type="text"/>;
+        if (this.state.templateData.name) {
+            templateName = <input readOnly type="text" value={this.state.templateData.name} />;
+        }
+        let templateVersion = <input readOnly type="text" value="0.1" />;
+        if (this.state.templateData.version) {
+            templateVersion = (<select id="type" className={styles.teButtons} value={this.state.templateData.version}
+                onChange={e => this.openTemplateVersion(e.target.value)} > {chooseVersion} </select>);
+        }
+        let templateHeader = "Create New Template";
+        if (this.state.templateData.name) {
+            templateHeader = this.state.templateData.name;
+        }
 
         let editors = Object.keys(this.state.subTemplatesData).map(t => {
             let outputView =
@@ -342,26 +355,13 @@ class TemplateScreen extends Component {
             <div>
                 <div>
                     <div>
-                        <h1>{this.state.templateData.name}</h1>
+                        <h1>{templateHeader}</h1>
                     </div>
                     <div>
-                        <input
-                            readOnly
-                            type="text"
-                            value={this.state.templateData.name}
-                        />
+                        {templateName}
                         <br />
                         <label>Version : </label>
-                        <select
-                            id="type"
-                            className={styles.teButtons}
-                            value={this.state.templateData.version}
-                            onChange={e =>
-                                this.openTemplateVersion(e.target.value)
-                            }
-                        >
-                            {chooseVersion}
-                        </select>
+                        {templateVersion}
                         {this.state.templateData.default ?
                             'default' :
                             'not_default'}
