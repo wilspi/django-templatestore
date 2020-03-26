@@ -263,17 +263,6 @@ class TemplateScreen extends Component {
         if (this.state.templateData.name) {
             templateHeader = this.state.templateData.name;
         }
-        let versionTable = (<table
-            className={
-                'table table-striped table-responsive-md btn-table ' +
-                            styles.tsTable
-            }
-        >
-            <thead>
-                <tr>{tableHeaders}</tr>
-            </thead>
-            <tbody>{this.getTableRowsJSX()}</tbody>
-        </table>);
 
         let editors = Object.keys(this.state.subTemplatesData).map(t => {
             let outputView =
@@ -388,7 +377,17 @@ class TemplateScreen extends Component {
                         <SearchBox onChange={this.onSearchTextChange.bind(this)} /> : "" }
                 </div>
                 <div>
-                    {this.state.templateData.name && this.state.templateData.version ? { versionTable } : "" }
+                    {
+                        this.state.templateData.name && this.state.templateData.version ?
+                            <table className={'table table-striped table-responsive-md btn-table ' + styles.tsTable}>
+                                <thead>
+                                    <tr>{tableHeaders}</tr>
+                                </thead>
+                                <tbody>
+                                    {this.getTableRowsJSX()}
+                                </tbody>
+                            </table> : ""
+                    }
                 </div>
             </div>
         );
