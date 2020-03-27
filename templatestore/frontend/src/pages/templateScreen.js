@@ -290,11 +290,11 @@ class TemplateScreen extends Component {
             name: name,
             type: type,
             sub_template: subTemplates,
-            sample_context_data: contextData,
-            attributes: attributes
+            sample_context_data: JSON.parse(contextData),
+            attributes: JSON.parse(attributes)
         };
         axios
-            .post('/templatestore/api/v1/template', JSON.stringify(data)).then(response => {
+            .post('/templatestore/api/v1/template', data).then(response => {
                 this.props.history.push(
                     '/templatestore/t/' +
                         response.data.name +
