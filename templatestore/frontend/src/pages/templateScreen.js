@@ -463,7 +463,7 @@ class TemplateScreen extends Component {
                         !this.state.templateData.name && !this.state.templateData.version && this.state.type ?
                             <div className={styles.teRowBlock}>
                                 <div className={styles.teSubTemplateBlock}>
-                                    <div className={styles.teTemplateEditor}>
+                                    <div className={styles.teContextEditor}>
                                         <div>
                                             <h3>Sample Context Data</h3>
                                         </div>
@@ -471,7 +471,7 @@ class TemplateScreen extends Component {
                                             name="template-editor"
                                             placeholder="Write sample_context_data here..."
                                             theme={this.aceconfig.theme}
-                                            mode="handlebars"
+                                            mode="json"
                                             fontSize={this.aceconfig.fontSize}
                                             height={this.aceconfig.height}
                                             width={this.aceconfig.width}
@@ -481,7 +481,7 @@ class TemplateScreen extends Component {
                                             }}
                                         />
                                     </div>
-                                    <div className={styles.teOutputEditor}>
+                                    <div className={styles.teContextEditor}>
                                         <div>
                                             <h3> Attributes </h3>
                                         </div>
@@ -489,7 +489,7 @@ class TemplateScreen extends Component {
                                             name="template-editor"
                                             placeholder="Write attributes here..."
                                             theme={this.aceconfig.theme}
-                                            mode="handlebars"
+                                            mode="json"
                                             fontSize={this.aceconfig.fontSize}
                                             height={this.aceconfig.height}
                                             width={this.aceconfig.width}
