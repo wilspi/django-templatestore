@@ -450,7 +450,7 @@ class TemplateScreen extends Component {
                             <div>
                                 <label> Type : </label>
                                 <select className={styles.teButtons} onChange={e => this.displayEditors(e.target.value)}>
-                                    <option value="none"> None </option>
+                                    <option value=""> None </option>
                                     <option value="email"> Email </option>
                                     <option value="sms"> Sms </option>
                                 </select>
