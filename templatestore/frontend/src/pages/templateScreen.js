@@ -320,14 +320,6 @@ class TemplateScreen extends Component {
         let tableHeaders = ['version', 'created_on', ' - ', ' - '].map(k => (
             <th>{k}</th>
         ));
-        let templateName = <input type="text" id="tmp_name"/>;
-        if (this.state.templateData.name) {
-            templateName = <input readOnly type="text" value={this.state.templateData.name} />;
-        }
-        let templateHeader = "Create New Template";
-        if (this.state.templateData.name) {
-            templateHeader = this.state.templateData.name;
-        }
 
         let editors = Object.keys(this.state.subTemplatesData).map(t => {
             let outputView =
@@ -423,11 +415,18 @@ class TemplateScreen extends Component {
             <div>
                 <div>
                     <div>
-                        <h1>{templateHeader}</h1>
+                        <h1>
+                            {
+                                this.state.templateData.name ? this.state.templateData.name : "Create New Template"
+                            }
+                        </h1>
                     </div>
                     <div>
                         <label>Name : </label>
-                        {templateName}
+                        {
+                            this.state.templateData.name ?
+                                <input readOnly type="text" value={this.state.templateData.name} /> : <input type="text" id="tmp_name"/>
+                        }
                         <br />
                         {
                             this.state.templateData.name && this.state.templateData.version ?
