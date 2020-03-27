@@ -36,6 +36,10 @@ class TemplateScreen extends Component {
         this.getDateInSimpleFormat = this.getDateInSimpleFormat.bind(this);
         this.getRenderedTemplate = this.getRenderedTemplate.bind(this);
         this.onTemplateChange = this.onTemplateChange.bind(this);
+        this.onContextChange = this.onContextChange.bind(this);
+        this.onAttributesChange = this.onAttributesChange.bind(this);
+        this.displayEditors = this.displayEditors.bind(this);
+        this.createTemplate = this.createTemplate.bind(this);
     }
     componentDidMount() {
         if (this.state.templateData.name && this.state.templateData.name) {
