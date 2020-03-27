@@ -277,6 +277,36 @@ class TemplateScreen extends Component {
         });
     }
 
+    createTemplate(name, type, contextData, attributes) {
+        let subTemplates = [];
+        Object.keys(this.state.subTemplatesData).map(t => {
+            let subTemplate = {
+                sub_type: this.state.subTemplatesData[t].subType,
+                data: this.state.subTemplatesData[t].data
+            };
+            subTemplates.push(subTemplate);
+        });
+        let data = {
+            name: name,
+            type: type,
+            sub_template: subTemplates,
+            sample_context_data: contextData,
+            attributes: attributes
+        };
+        axios
+            .post('/templatestore/api/v1/template', JSON.stringify(data)).then(response => {
+                this.props.history.push(
+                    '/templatestore/t/' +
+                        response.data.name +
+                        '/' +
+                        response.data.version
+                );
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     render() {
         let chooseVersion = this.state.versions.map(versions => {
             return (
@@ -484,6 +514,24 @@ class TemplateScreen extends Component {
                                     {this.getTableRowsJSX()}
                                 </tbody>
                             </table> : ""
+                    }
+                </div>
+                <div>
+                    {
+                        this.state.templateData.name && this.state.templateData.version ? "" :
+                            <button
+                                className={styles.teButtons}
+                                onClick={() => {
+                                    this.createTemplate(
+                                        document.getElementById('tmp_name').value,
+                                        this.state.type,
+                                        this.state.contextData,
+                                        this.state.attributes
+                                    );
+                                }}
+                            >
+                                Create
+                            </button>
                     }
                 </div>
             </div>
