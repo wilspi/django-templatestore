@@ -19,6 +19,7 @@ class Home extends Component {
         ];
         this.getTableRowsJSX = this.getTableRowsJSX.bind(this);
         this.openTemplateScreenPage = this.openTemplateScreenPage.bind(this);
+        this.addNewTemplate = this.addNewTemplate.bind(this);
     }
 
     componentDidMount() {
