@@ -6,8 +6,11 @@ from django.db import transaction
 from django.conf import settings
 from datetime import datetime
 import json
+import logging
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
 from templatestore import app_settings as ts_settings
+
+logger = logging.getLogger(__name__)
 
 
 def index(request):
@@ -43,7 +46,7 @@ def render_template_view(request):
         else:
             raise Exception("Invalid Template Handler: %s", handler)  # TOTEST
     except Exception as e:
-        print(e)
+        logger.exception(e)
         raise e
 
     return JsonResponse(data, safe=False)
@@ -75,7 +78,7 @@ def get_templates_view(request):
             return JsonResponse(template_list, safe=False)
 
         except Exception as e:
-            print(e)
+            logger.exception(e)
             return HttpResponse(
                 json.dumps({"message": str(e)}),
                 content_type="application/json",
@@ -159,7 +162,7 @@ def post_template_view(request):
             return JsonResponse(template_data, status=201)
 
         except Exception as e:
-            print(e)
+            logger.exception(e)
 
             return HttpResponse(
                 json.dumps({"message": str(e)}),
@@ -199,7 +202,7 @@ def get_template_versions_view(request, name):
             return JsonResponse(version_list, safe=False)
 
         except Exception as e:
-            print(e)
+            logger.exception(e)
             return HttpResponse(
                 json.dumps({"message": str(e)}),
                 content_type="application/json",
@@ -247,7 +250,7 @@ def get_render_template_view(request, name, version=None):
 
             return JsonResponse(res, safe=False)
         except Exception as e:
-            print(e)
+            logger.exception(e)
             return HttpResponse(
                 json.dumps({"message": str(e)}),
                 content_type="application/json",
@@ -290,7 +293,7 @@ def get_template_details_view(request, name, version):
 
             return JsonResponse(res, safe=False)
         except Exception as e:
-            print(e)
+            logger.exception(e)
             return HttpResponse(
                 json.dumps({"message": str(e)}),
                 content_type="application/json",
@@ -335,7 +338,7 @@ def get_template_details_view(request, name, version):
             return JsonResponse(template_data, status=200)
 
         except Exception as e:
-            print(e)
+            logger.exception(e)
             return HttpResponse(
                 json.dumps({"message": str(e)}),
                 content_type="application/json",
@@ -371,7 +374,7 @@ def get_config_view(request):
             return JsonResponse(tes, safe=False)
 
         except Exception as e:
-            print(e)
+            logger.exception(e)
             return HttpResponse(
                 json.dumps({"message": str(e)}),
                 content_type="application/json",
