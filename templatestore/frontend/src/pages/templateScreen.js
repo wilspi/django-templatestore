@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router';
+import { encode, decode } from './../components/base64.js';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox.js';
 import Highlight from './../components/highlight.js';
@@ -51,7 +52,7 @@ class TemplateScreen extends Component {
                     subTemplatesData: response.data.sub_templates.reduce(
                         (result, k) => {
                             result[k.sub_type] = {
-                                data: k.data,
+                                data: decode(k.data),
                                 subType: k.sub_type,
                                 renderMode: k.render_mode,
                                 output: ''
