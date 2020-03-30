@@ -7,11 +7,12 @@ from django.conf import settings
 from datetime import datetime
 import json
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
+from templatestore import app_settings as ts_settings
 
 
 def index(request):
     export_settings = {
-        "TE_TEMPLATE_ATTRIBUTE_KEYS": settings.TE_TEMPLATE_ATTRIBUTES_KEYS
+        "TE_TEMPLATE_ATTRIBUTE_KEYS": ts_settings.TE_TEMPLATE_ATTRIBUTES_KEYS
     }
     return render(
         request, "index.html", context={"settings": json.dumps(export_settings)}
@@ -53,7 +54,7 @@ def get_templates_view(request):
     if request.method == "GET":
         try:
             offset = int(request.GET.get("offset", 0))
-            limit = int(request.GET.get("limit", settings.TE_ROWLIMIT))
+            limit = int(request.GET.get("limit", ts_settings.TE_ROWLIMIT))
 
             templates = Template.objects.all()[offset : offset + limit]
             template_list = [
@@ -179,7 +180,7 @@ def get_template_versions_view(request, name):
     if request.method == "GET":
         try:
             offset = int(request.GET.get("offset", 0))
-            limit = int(request.GET.get("limit", settings.TE_ROWLIMIT))
+            limit = int(request.GET.get("limit", ts_settings.TE_ROWLIMIT))
 
             t = Template.objects.get(name=name)
             tvs = TemplateVersion.objects.filter(template_id=t.id).order_by("-id")[
@@ -352,7 +353,7 @@ def get_template_details_view(request, name, version):
 def get_config_view(request):
     if request.method == "GET":
         offset = int(request.GET.get("offset", 0))
-        limit = int(request.GET.get("limit", settings.TE_ROWLIMIT))
+        limit = int(request.GET.get("limit", ts_settings.TE_ROWLIMIT))
         try:
             ts = TemplateConfig.objects.all()[offset : offset + limit]
 

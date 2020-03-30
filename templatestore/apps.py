@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-from templatestore import app_settings as templatestore_settings
+from templatestore import app_settings as ts_settings
 
 
 class TemplateStoreAppConfig(AppConfig):

@@ -3,12 +3,13 @@ from django.contrib.postgres.fields import JSONField
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from templatestore import app_settings as ts_settings
 import re
 
 
 class Template(models.Model):
     def attributes_default():
-        return {k: "" for k in settings.TE_TEMPLATE_ATTRIBUTES_KEYS}
+        return {k: "" for k in ts_settings.TE_TEMPLATE_ATTRIBUTES_KEYS}
 
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=1000)
@@ -39,7 +40,7 @@ class Template(models.Model):
                 }
             )
         # add default attributes
-        for k in settings.TE_TEMPLATE_ATTRIBUTES_KEYS:
+        for k in ts_settings.TE_TEMPLATE_ATTRIBUTES_KEYS:
             if k not in self.attributes:
                 self.attributes[k] = ""
 
