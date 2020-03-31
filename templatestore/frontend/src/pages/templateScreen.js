@@ -176,7 +176,7 @@ class TemplateScreen extends Component {
         axios
             .get('/templatestore/api/v1/render', {
                 params: {
-                    template: templateData,
+                    template: encode(templateData),
                     context: contextData,
                     handler: 'jinja2',
                     output: renderMode
@@ -190,7 +190,7 @@ class TemplateScreen extends Component {
                         result[k] = this.state.subTemplatesData[k];
                         result[k].output =
                             k === subType ?
-                                response.data.rendered_template :
+                                decode(response.data.rendered_template) :
                                 this.state.subTemplatesData[k].output;
                         return result;
                     }, {})
@@ -221,7 +221,7 @@ class TemplateScreen extends Component {
         axios
             .get('/template-editor/api/v1/render', {
                 params: {
-                    template: this.state.valueTemplate, //TODO: base64encode
+                    template: encode(this.state.valueTemplate), //TODO: base64encode
                     context: this.state.valueContext,
                     handler: 'jinja2',
                     output: 'text'
@@ -229,7 +229,7 @@ class TemplateScreen extends Component {
             })
             .then(response => {
                 console.log(response);
-                this.setState({ valueOutput: response.data.rendered_template });
+                this.setState({ valueOutput: decode(response.data.rendered_template) });
             })
             .catch(function(error) {
                 console.log(error);
