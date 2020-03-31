@@ -3,7 +3,6 @@ from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import Length
 from django.db import transaction
-from django.conf import settings
 from datetime import datetime
 import json
 import logging
@@ -105,7 +104,7 @@ def post_template_view(request):
             sub_types = {cfg.sub_type: cfg for cfg in cfgs}
 
             diff_keys = set(sub_types.keys()).difference(
-                set([s["sub_type"] for s in data["sub_template"]])
+                set([s["sub_type"] for s in data["sub_templates"]])
             )
             if len(diff_keys):
                 raise (
@@ -145,7 +144,7 @@ def post_template_view(request):
             )
             tmp_ver.save()
 
-            for sub_tmp in data["sub_template"]:
+            for sub_tmp in data["sub_templates"]:
                 st = SubTemplate.objects.create(
                     template_version_id=tmp_ver,
                     config=sub_types[sub_tmp["sub_type"]],
