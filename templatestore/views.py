@@ -7,6 +7,17 @@ from django.conf import settings
 from datetime import datetime
 import json
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
+import base64
+
+
+def base64decode(template):
+    decoded_bytes = base64.b64decode(template)
+    return str(decoded_bytes, "utf-8")
+
+
+def base64encode(rendered_output):
+    encoded_bytes = base64.b64encode(rendered_output.encode("utf-8"))
+    return str(encoded_bytes, "utf-8")
 
 
 def index(request):
@@ -21,7 +32,7 @@ def index(request):
 def render_via_jinja(template, context):
     from jinja2 import Template
 
-    return Template(template).render(context)
+    return base64encode(Template(base64decode(template)).render(context))
 
 
 @csrf_exempt
