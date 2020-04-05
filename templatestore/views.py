@@ -103,7 +103,7 @@ def post_template_view(request):
             required_fields = {
                 "name",
                 "type",
-                "sub_template",
+                "sub_templates",
                 "attributes",
                 "sample_context_data",
             }
@@ -133,7 +133,7 @@ def post_template_view(request):
             sub_types = {cfg.sub_type: cfg for cfg in cfgs}
 
             invalid_subtypes = set(
-                [s["sub_type"] for s in data["sub_template"]]
+                [s["sub_type"] for s in data["sub_templates"]]
             ).difference(set(sub_types.keys()))
             if len(invalid_subtypes):
                 raise (
