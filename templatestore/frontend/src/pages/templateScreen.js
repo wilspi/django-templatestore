@@ -293,7 +293,7 @@ class TemplateScreen extends Component {
         let data = {
             name: name,
             type: type,
-            sub_template: subTemplates,
+            sub_templates: subTemplates,
             sample_context_data: JSON.parse(contextData),
             attributes: JSON.parse(attributes)
         };
