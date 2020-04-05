@@ -7,6 +7,7 @@ import json
 import re
 import logging
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
+from templatestore.utils import base64decode, base64encode
 from templatestore import app_settings as ts_settings
 
 logger = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ def index(request):
 def render_via_jinja(template, context):
     from jinja2 import Template
 
-    return Template(template).render(context)
+    return base64encode(Template(base64decode(template)).render(context))
 
 
 @csrf_exempt
