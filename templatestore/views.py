@@ -2,16 +2,19 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
-from django.conf import settings
 from datetime import datetime
 import json
 import re
+import logging
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
+from templatestore import app_settings as ts_settings
+
+logger = logging.getLogger(__name__)
 
 
 def index(request):
     export_settings = {
-        "TE_TEMPLATE_ATTRIBUTE_KEYS": settings.TE_TEMPLATE_ATTRIBUTES_KEYS
+        "TE_TEMPLATE_ATTRIBUTE_KEYS": ts_settings.TE_TEMPLATE_ATTRIBUTES_KEYS
     }
     return render(
         request, "index.html", context={"settings": json.dumps(export_settings)}
@@ -42,7 +45,7 @@ def render_template_view(request):
         else:
             raise Exception("Invalid Template Handler: %s", handler)  # TOTEST
     except Exception as e:
-        print(e)
+        logger.exception(e)
         raise e
 
     return JsonResponse(data, safe=False)
@@ -53,7 +56,7 @@ def get_templates_view(request):
     if request.method == "GET":
         try:
             offset = int(request.GET.get("offset", 0))
-            limit = int(request.GET.get("limit", settings.TE_ROWLIMIT))
+            limit = int(request.GET.get("limit", ts_settings.TE_ROWLIMIT))
 
             templates = Template.objects.all()[offset : offset + limit]
             template_list = [
@@ -74,7 +77,7 @@ def get_templates_view(request):
             return JsonResponse(template_list, safe=False)
 
         except Exception as e:
-            print(e)
+            logger.exception(e)
             return HttpResponse(
                 json.dumps({"message": str(e)}),
                 content_type="application/json",
@@ -143,7 +146,7 @@ def post_template_view(request):
                 )
 
             diff_keys = set(sub_types.keys()).difference(
-                set([s["sub_type"] for s in data["sub_template"]])
+                set([s["sub_type"] for s in data["sub_templates"]])
             )
             if len(diff_keys):
                 raise (
@@ -191,7 +194,7 @@ def post_template_view(request):
             )
             tmp_ver.save()
 
-            for sub_tmp in data["sub_template"]:
+            for sub_tmp in data["sub_templates"]:
                 st = SubTemplate.objects.create(
                     template_version_id=tmp_ver,
                     config=sub_types[sub_tmp["sub_type"]],
@@ -208,7 +211,7 @@ def post_template_view(request):
             return JsonResponse(template_data, status=201)
 
         except Exception as e:
-            print(e)
+            logger.exception(e)
 
             return HttpResponse(
                 json.dumps({"message": str(e)}),
@@ -229,7 +232,7 @@ def get_template_versions_view(request, name):
     if request.method == "GET":
         try:
             offset = int(request.GET.get("offset", 0))
-            limit = int(request.GET.get("limit", settings.TE_ROWLIMIT))
+            limit = int(request.GET.get("limit", ts_settings.TE_ROWLIMIT))
 
             try:
                 t = Template.objects.get(name=name)
@@ -256,7 +259,7 @@ def get_template_versions_view(request, name):
             return JsonResponse(version_list, safe=False)
 
         except Exception as e:
-            print(e)
+            logger.exception(e)
             return HttpResponse(
                 json.dumps({"message": str(e)}),
                 content_type="application/json",
@@ -323,7 +326,7 @@ def get_render_template_view(request, name, version=None):
 
             return JsonResponse(res, safe=False)
         except Exception as e:
-            print(e)
+            logger.exception(e)
             return HttpResponse(
                 json.dumps({"message": str(e)}),
                 content_type="application/json",
@@ -379,7 +382,7 @@ def get_template_details_view(request, name, version):
 
             return JsonResponse(res, safe=False)
         except Exception as e:
-            print(e)
+            logger.exception(e)
             return HttpResponse(
                 json.dumps({"message": str(e)}),
                 content_type="application/json",
@@ -440,7 +443,7 @@ def get_template_details_view(request, name, version):
             return JsonResponse(template_data, status=200)
 
         except Exception as e:
-            print(e)
+            logger.exception(e)
             return HttpResponse(
                 json.dumps({"message": str(e)}),
                 content_type="application/json",
@@ -458,7 +461,7 @@ def get_template_details_view(request, name, version):
 def get_config_view(request):
     if request.method == "GET":
         offset = int(request.GET.get("offset", 0))
-        limit = int(request.GET.get("limit", settings.TE_ROWLIMIT))
+        limit = int(request.GET.get("limit", ts_settings.TE_ROWLIMIT))
         try:
             ts = TemplateConfig.objects.all()[offset : offset + limit]
 
@@ -476,7 +479,7 @@ def get_config_view(request):
             return JsonResponse(tes, safe=False)
 
         except Exception as e:
-            print(e)
+            logger.exception(e)
             return HttpResponse(
                 json.dumps({"message": str(e)}),
                 content_type="application/json",

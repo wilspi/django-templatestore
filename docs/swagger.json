@@ -39,7 +39,7 @@
                                     "type":"string",
                                     "maxLength":1000
                                 },
-                                "sub_template": {
+                                "sub_templates": {
                                     "type":"array",
                                     "items": {
                                         "type": "object",
@@ -278,7 +278,7 @@
                         "schema":{
                             "type":"object",
                             "properties":{
-                                "sub_template":{
+                                "sub_templates":{
                                     "type": "array",
                                     "items": {
                                         "type": "object",
@@ -367,7 +367,7 @@
                                     "type":"string",
                                     "maxLength":1000
                                 },
-                                "sub_template":{
+                                "sub_templates":{
                                     "type": "array",
                                     "items": {
                                         "type": "object",
@@ -528,7 +528,7 @@
                         "schema":{
                             "type":"object",
                             "properties":{
-                                "sub_template":{
+                                "sub_templates":{
                                     "type": "array",
                                     "items": {
                                         "type": "object",

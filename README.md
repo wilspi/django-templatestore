@@ -68,13 +68,9 @@ Currently following templating libraries are supported:
     ```
 
 * #### Run
-  * Build js 
+  * Build js and collect static files
     ```
-    cd templatestore/frontend/ && npm run build && cd -
-    ```
-  * Collect static files
-    ```
-    python manage.py collectstatic
+    cd templatestore/frontend/ && npm run build && cd - && python manage.py collectstatic --noinput
     ```
   * Run application
     ```
