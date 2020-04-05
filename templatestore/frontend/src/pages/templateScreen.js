@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router';
-import { encode, decode } from './../components/base64.js';
+import { encode, decode } from './../utils.js';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox.js';
 import Highlight from './../components/highlight.js';
