@@ -124,6 +124,22 @@ def post_template_view(request):
                     )
                 )
 
+            invalid_data = set()
+
+            for sub_template in data["sub_templates"]:
+                if not re.match("(^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$)", sub_template["data"]):
+                    invalid_data.add(sub_template["sub_type"])
+
+            if len(invalid_data):
+                raise(
+                    Exception(
+                        "Validation: `"
+                        + str(invalid_data)
+                        + "` data is not base64 encoded"
+                    )
+                )
+
+
             cfgs = TemplateConfig.objects.filter(type=data["type"])
             if not len(cfgs):
                 raise (
