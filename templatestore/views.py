@@ -115,7 +115,7 @@ def post_template_view(request):
                     )
                 )
 
-            if not re.match("(^[a-z|A-Z]+[a-z|A-Z|0-9|_]*$)", data["name"]):
+            if not re.match("(^[a-zA-Z]+[a-zA-Z0-9_]*$)", data["name"]):
                 raise (
                     Exception(
                         "Validation: `"
