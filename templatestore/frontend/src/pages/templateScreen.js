@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router';
+import { encode, decode } from './../utils.js';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox.js';
 import Highlight from './../components/highlight.js';
@@ -286,7 +287,7 @@ class TemplateScreen extends Component {
         Object.keys(this.state.subTemplatesData).map(t => {
             let subTemplate = {
                 sub_type: this.state.subTemplatesData[t].subType,
-                data: this.state.subTemplatesData[t].data
+                data: encode(this.state.subTemplatesData[t].data)
             };
             subTemplates.push(subTemplate);
         });
