@@ -103,7 +103,7 @@ def post_template_view(request):
             required_fields = {
                 "name",
                 "type",
-                "sub_template",
+                "sub_templates",
                 "attributes",
                 "sample_context_data",
             }
@@ -115,12 +115,30 @@ def post_template_view(request):
                     )
                 )
 
-            if not re.match("(^[a-z|A-Z]+[a-z|A-Z|0-9|_]*$)", data["name"]):
+            if not re.match("(^[a-zA-Z]+[a-zA-Z0-9_]*$)", data["name"]):
                 raise (
                     Exception(
                         "Validation: `"
                         + data["name"]
                         + "` is not a valid template name"
+                    )
+                )
+
+            invalid_data = set()
+
+            for sub_template in data["sub_templates"]:
+                if not re.match(
+                    "(^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$)",
+                    sub_template["data"],
+                ):
+                    invalid_data.add(sub_template["sub_type"])
+
+            if len(invalid_data):
+                raise (
+                    Exception(
+                        "Validation: `"
+                        + str(invalid_data)
+                        + "` data is not base64 encoded"
                     )
                 )
 
@@ -133,7 +151,7 @@ def post_template_view(request):
             sub_types = {cfg.sub_type: cfg for cfg in cfgs}
 
             invalid_subtypes = set(
-                [s["sub_type"] for s in data["sub_template"]]
+                [s["sub_type"] for s in data["sub_templates"]]
             ).difference(set(sub_types.keys()))
             if len(invalid_subtypes):
                 raise (
