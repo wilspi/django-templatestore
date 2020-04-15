@@ -87,16 +87,16 @@ class Home extends Component {
                             type="button"
                             onClick={() =>
                                 this.openTemplateScreenPage(
-                                    this.state.templatesData[i][
+                                    filteredTemplates[i][
                                         'template_name'
                                     ],
-                                    this.state.templatesData[i][
+                                    filteredTemplates[i][
                                         'default_version'
                                     ] === '-' ?
-                                        this.state.templatesData[i][
+                                        '0.1' :
+                                        filteredTemplates[i][
                                             'default_version'
-                                        ] :
-                                        '0.1'
+                                        ]
                                 )
                             }
                         >
