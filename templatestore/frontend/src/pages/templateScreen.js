@@ -22,6 +22,7 @@ class TemplateScreen extends Component {
                 name: this.props.match.params.name,
                 version: this.props.match.params.version
             },
+            searchText: '',
             versions: [{ version: this.props.match.params.version }],
             subTemplatesData: {}
         };
@@ -139,7 +140,15 @@ class TemplateScreen extends Component {
     }
 
     getTableRowsJSX() {
-        let tableRows = Object.values(this.state.versions).map(k => (
+        let filteredVersionList = this.state.versions.filter((version) => {
+            for (var key in version) {
+                if (version[key].toString().indexOf(this.state.searchText) !== -1) {
+                    return version;
+                }
+            }
+        });
+
+        let tableRows = Object.values(filteredVersionList).map(k => (
             <tr>
                 <td>
                     <Highlight search={this.state.searchText}>
