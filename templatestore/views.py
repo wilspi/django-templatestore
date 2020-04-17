@@ -32,19 +32,19 @@ def render_via_jinja(template, context):
 @csrf_exempt
 def render_template_view(request):
     # log requests
+    print("enter render view")
     if request.method != "GET":
         return HttpResponseBadRequest("invalid request method: " + request.method)
-    # template = request.GET.get("template", "")
-    # context = json.loads(request.GET.get("context", "{}"))
-    # handler = request.GET.get("handler", "")
-    data = json.loads(request.body)
-    template = data["template"]
-    handler = data["handler"]
-    context = data["context"]
-    print(data)
+
+    print("now fetching data")
+    template = request.GET.get("template", "")
+    context = json.loads(request.GET.get("context", "{}"))
+    handler = request.GET.get("handler", "")
+    print("fetched data")
     print(template)
     print(handler)
     print(context)
+    print("entering try")
     try:
         if handler == "jinja2":
             print("calling render")
