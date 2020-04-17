@@ -25,6 +25,7 @@ def index(request):
 def render_via_jinja(template, context):
     from jinja2 import Template
 
+    print("inside render")
     return base64encode(Template(base64decode(template)).render(context))
 
 
@@ -40,16 +41,24 @@ def render_template_view(request):
     template = data["template"]
     handler = data["handler"]
     context = data["context"]
+    print(data)
+    print(template)
+    print(handler)
+    print(context)
     try:
         if handler == "jinja2":
+            print("calling render")
             rendered_template = render_via_jinja(template, context)
+            print("got rendered template", rendered_template)
             data = {
                 "rendered_template": rendered_template,
                 "rendered_on": datetime.now(),
             }
         else:
+            print("got exception")
             raise Exception("Invalid Template Handler: %s", handler)  # TOTEST
     except Exception as e:
+        print("got major exception")
         logger.exception(e)
         raise e
 
