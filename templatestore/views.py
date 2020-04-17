@@ -33,9 +33,13 @@ def render_template_view(request):
     # log requests
     if request.method != "GET":
         return HttpResponseBadRequest("invalid request method: " + request.method)
-    template = request.GET.get("template", "")
-    context = json.loads(request.GET.get("context", "{}"))
-    handler = request.GET.get("handler", "")
+    # template = request.GET.get("template", "")
+    # context = json.loads(request.GET.get("context", "{}"))
+    # handler = request.GET.get("handler", "")
+    data = json.loads(request.body)
+    template = data["template"]
+    handler = data["handler"]
+    context = data["context"]
     try:
         if handler == "jinja2":
             rendered_template = render_via_jinja(template, context)
