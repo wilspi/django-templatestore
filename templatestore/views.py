@@ -26,7 +26,6 @@ def index(request):
 def render_via_jinja(template, context):
     print("HI render_via_jinja")
     from jinja2 import Template
-
     return base64encode(Template(base64decode(template)).render(context))
 
 
@@ -36,19 +35,30 @@ def render_template_view(request):
     print("HI render_template_view")
     if request.method != "GET":
         return HttpResponseBadRequest("invalid request method: " + request.method)
+
+    print("now fetching data")
     template = request.GET.get("template", "")
     context = json.loads(request.GET.get("context", "{}"))
     handler = request.GET.get("handler", "")
+    print("fetched data")
+    print(template)
+    print(handler)
+    print(context)
+    print("entering try")
     try:
         if handler == "jinja2":
+            print("calling render")
             rendered_template = render_via_jinja(template, context)
+            print("got rendered template", rendered_template)
             data = {
                 "rendered_template": rendered_template,
                 "rendered_on": datetime.now(),
             }
         else:
+            print("got exception")
             raise Exception("Invalid Template Handler: %s", handler)  # TOTEST
     except Exception as e:
+        print("got major exception")
         logger.exception(e)
         raise e
 
