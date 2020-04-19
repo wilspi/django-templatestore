@@ -30,6 +30,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "django.contrib.auth",
+    "django.contrib.admin",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -80,6 +81,18 @@ DATABASES = {
         "PORT": "5432",
     }
 }
+
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.contrib.gis.db.backends.postgis",
+#         "NAME": "ackodev_templates",
+#         "USER": "ackodev_templates_rw_v1",
+#         "PASSWORD": "9qMzTLnHLhS7bQXDo3Gj",
+#         "HOST": "acko-services.cpbwfp2vkm7a.ap-south-1.rds.amazonaws.com",
+#         "PORT": "5432",
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
