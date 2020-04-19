@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def index(request):
+    print("index")
     export_settings = {
         "TE_TEMPLATE_ATTRIBUTE_KEYS": ts_settings.TE_TEMPLATE_ATTRIBUTES_KEYS
     }
@@ -23,6 +24,7 @@ def index(request):
 
 
 def render_via_jinja(template, context):
+    print("render_via_jinja")
     from jinja2 import Template
 
     return base64encode(Template(base64decode(template)).render(context))
@@ -30,6 +32,7 @@ def render_via_jinja(template, context):
 
 @csrf_exempt
 def render_template_view(request):
+    print("render template view")
     # log requests
     if request.method != "GET":
         return HttpResponseBadRequest("invalid request method: " + request.method)
@@ -54,6 +57,7 @@ def render_template_view(request):
 
 @csrf_exempt
 def get_templates_view(request):
+    print("get template view")
     if request.method == "GET":
         try:
             offset = int(request.GET.get("offset", 0))
@@ -96,6 +100,7 @@ def get_templates_view(request):
 @csrf_exempt
 @transaction.atomic
 def post_template_view(request):
+    print("post template view")
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -248,6 +253,7 @@ def post_template_view(request):
 
 @csrf_exempt
 def get_template_versions_view(request, name):
+    print("get template versions")
     if request.method == "GET":
         try:
             offset = int(request.GET.get("offset", 0))
@@ -295,6 +301,7 @@ def get_template_versions_view(request, name):
 
 @csrf_exempt
 def get_render_template_view(request, name, version=None):
+    print("get render template view")
     if request.method == "GET":
         try:
             data = json.loads(request.body)
@@ -363,6 +370,7 @@ def get_render_template_view(request, name, version=None):
 @csrf_exempt
 @transaction.atomic
 def get_template_details_view(request, name, version):
+    print("get template details view")
     if request.method == "GET":
         try:
 
