@@ -14,7 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import include, path
+from django.conf import settings
 
+TE_BASEPATH = settings.TE_BASEPATH.lstrip("/").rstrip("/")
+TE_BASEPATH = "" if TE_BASEPATH == "" else (TE_BASEPATH + "/")
 urlpatterns = [
-    path("templatestore/", include("templatestore.urls")),
+    path(TE_BASEPATH, include("templatestore.urls")),
 ]

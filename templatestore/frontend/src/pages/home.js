@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import styles from './../style/home.less';
+import { backendSettings } from './../utils.js';
 import SearchBox from './../components/searchBox.js';
 import Highlight from './../components/highlight.js';
 
@@ -52,7 +53,8 @@ class Home extends Component {
     openTemplateScreenPage(name, version) {
         console.log("Opening the name and version page", name, version);
         this.props.history.push(
-            '/templatestore/t/' +
+            backendSettings.TE_BASEPATH +
+                '/t/' +
                 name +
                 '/' +
                 (version === '-' ? '0.1' : version)

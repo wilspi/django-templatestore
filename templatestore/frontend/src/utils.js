@@ -9,3 +9,7 @@ export function decode(str) {
     var decodedString = atob(str);
     return decodedString;
 }
+
+export const backendSettings = JSON.parse(
+    document.getElementById('settings-data').textContent.replace(/&quot;/g, '"')
+);
