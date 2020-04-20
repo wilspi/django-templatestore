@@ -7,3 +7,5 @@ STATICFILES_DIRS.append(os.path.join(DIRNAME, "frontend/dist/"))
 
 TE_TEMPLATE_ATTRIBUTES_KEYS = getattr(settings, "TE_TEMPLATE_ATTRIBUTES_KEYS", {})
 TE_ROWLIMIT = getattr(settings, "TE_ROWLIMIT", 1000)
+TE_BASEPATH = "/" + getattr(settings, "TE_BASEPATH", "").lstrip("/").rstrip("/")
+TE_BASEPATH = "" if TE_BASEPATH == "/" else TE_BASEPATH

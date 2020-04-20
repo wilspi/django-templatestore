@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router';
-import { encode, decode } from './../utils.js';
+import { encode, decode, backendSettings } from './../utils.js';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox.js';
 import Highlight from './../components/highlight.js';
@@ -42,7 +42,8 @@ class TemplateScreen extends Component {
     componentDidMount() {
         axios
             .get(
-                '/templatestore/api/v1/template/' +
+                backendSettings.TE_BASEPATH +
+                    '/api/v1/template/' +
                     this.state.templateData.name +
                     '/' +
                     this.state.templateData.version
@@ -75,13 +76,16 @@ class TemplateScreen extends Component {
             .catch(error => {
                 console.log(error);
                 if (error.response.status === 400) {
-                    this.props.history.push('/templatestore/404');
+                    this.props.history.push(
+                        backendSettings.TE_BASEPATH + '/404'
+                    );
                 }
             });
 
         axios
             .get(
-                '/templatestore/api/v1/template/' +
+                backendSettings.TE_BASEPATH +
+                    '/api/v1/template/' +
                     this.state.templateData.name +
                     '/versions'
             )
@@ -106,13 +110,18 @@ class TemplateScreen extends Component {
 
     openTemplateVersion(version) {
         this.props.history.push(
-            '/templatestore/t/' + this.state.templateData.name + '/' + version
+            backendSettings.TE_BASEPATH +
+                '/t/' +
+                this.state.templateData.name +
+                '/' +
+                version
         );
     }
     setDefaultVersion(version) {
         axios
             .post(
-                '/templatestore/api/v1/template/' +
+                backendSettings.TE_BASEPATH +
+                    '/api/v1/template/' +
                     this.state.templateData.name +
                     '/' +
                     version,
@@ -122,7 +131,8 @@ class TemplateScreen extends Component {
             )
             .then(response => {
                 this.props.history.push(
-                    '/templatestore/t/' +
+                    backendSettings.TE_BASEPATH +
+                        '/t/' +
                         response.data.name +
                         '/' +
                         response.data.version
@@ -183,7 +193,7 @@ class TemplateScreen extends Component {
 
     getRenderedTemplate(subType, templateData, contextData, renderMode) {
         axios
-            .get('/templatestore/api/v1/render', {
+            .get(backendSettings.TE_BASEPATH + '/api/v1/render', {
                 params: {
                     template: encode(templateData),
                     context: contextData,
@@ -238,7 +248,9 @@ class TemplateScreen extends Component {
             })
             .then(response => {
                 console.log(response);
-                this.setState({ valueOutput: decode(response.data.rendered_template) });
+                this.setState({
+                    valueOutput: decode(response.data.rendered_template)
+                });
             })
             .catch(function(error) {
                 console.log(error);
@@ -310,7 +322,11 @@ class TemplateScreen extends Component {
                         <label className={styles.teLabel}>
                             Choose a type :
                         </label>
-                        <select readOnly className={styles.teButtons} value={this.state.subTemplatesData[t].renderMode}>
+                        <select
+                            readOnly
+                            className={styles.teButtons}
+                            value={this.state.subTemplatesData[t].renderMode}
+                        >
                             <option value="text"> Text </option>
                             <option value="html"> HTML </option>
                         </select>
