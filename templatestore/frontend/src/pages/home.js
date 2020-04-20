@@ -22,7 +22,9 @@ class Home extends Component {
     }
 
     componentDidMount() {
+        console.log("Enter componentdidmount");
         axios.get('./api/v1/templates').then(response => {
+            console.log("Request sent and got response");
             this.setState({
                 templatesData: response.data.map(t => ({
                     ...{
@@ -35,19 +37,32 @@ class Home extends Component {
                     }, {})
                 }))
             });
-        });
+            console.log("Response: ", response);
+            console.log("exit response");
+        })
+            .catch(error => {
+                console.log("Got this error", error);
+                if (error.response.status === 400) {
+                    this.props.history.push('/templatestore/404');
+                }
+            });
+        console.log("Exit componentdidmount");
     }
 
     openTemplateScreenPage(name, version) {
+        console.log("Opening the name and version page", name, version);
         this.props.history.push(
             '/templatestore/t/' +
                 name +
                 '/' +
                 (version === '-' ? '0.1' : version)
         );
+        console.log("Opened that name and version page");
     }
 
     getTableRowsJSX() {
+        console.log("Now adding rows to table");
+        console.log("Data that we have", this.state.templatesData);
         let tableRows = [];
         let filteredTemplates = this.state.templatesData.reduce(
             (result, template) => {
@@ -70,7 +85,8 @@ class Home extends Component {
             },
             []
         );
-
+        console.log("Filtered Templates", filteredTemplates);
+        console.log("Trying to add rows now");
         for (let i = 0; i < filteredTemplates.length; i++) {
             let columnData = Object.values(filteredTemplates[i]).map(k => (
                 <td>
@@ -106,19 +122,24 @@ class Home extends Component {
                 </tr>
             );
         }
+        console.log("added rows successfully");
         return tableRows;
     }
 
     onSearchTextChange(searchValue) {
+        console.log("searching text", searchValue);
         this.setState({
             searchText: searchValue
         });
     }
 
     render() {
+        console.log("Renderinh");
         var tableHeaders = [...this.tableHeaderList, ...[' - ']].map(k => (
             <th>{k}</th>
         ));
+        console.log("Headers of table rendered");
+        console.log("Now going to add rows by callingh add rows method");
         return (
             <div className={styles.tsPage}>
                 <div>
@@ -142,6 +163,7 @@ class Home extends Component {
                 </div>
             </div>
         );
+        console.log("called the method to add rows");
     }
 }
 
