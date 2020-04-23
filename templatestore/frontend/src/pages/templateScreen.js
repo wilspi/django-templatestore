@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router';
-import { encode, decode } from './../utils.js';
+import { encode, decode, backendSettings } from './../utils.js';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox.js';
 import Highlight from './../components/highlight.js';
@@ -40,16 +40,17 @@ class TemplateScreen extends Component {
         this.onContextChange = this.onContextChange.bind(this);
         this.onAttributesChange = this.onAttributesChange.bind(this);
         this.displayEditors = this.displayEditors.bind(this);
-        this.createTemplate = this.createTemplate.bind(this);
+        this.postTemplate = this.postTemplate.bind(this);
     }
     componentDidMount() {
-        if (this.state.templateData.name && this.state.templateData.name) {
+        if (this.state.templateData.name && this.state.templateData.version) {
             axios
                 .get(
-                    '/templatestore/api/v1/template/' +
-                    this.state.templateData.name +
-                    '/' +
-                    this.state.templateData.version
+                    backendSettings.TE_BASEPATH +
+                        '/api/v1/template/' +
+                        this.state.templateData.name +
+                        '/' +
+                        this.state.templateData.version
                 )
                 .then(response => {
                     console.log(response.data);
@@ -57,7 +58,7 @@ class TemplateScreen extends Component {
                         subTemplatesData: response.data.sub_templates.reduce(
                             (result, k) => {
                                 result[k.sub_type] = {
-                                    data: k.data,
+                                    data: decode(k.data),
                                     subType: k.sub_type,
                                     renderMode: k.render_mode,
                                     output: ''
@@ -79,22 +80,27 @@ class TemplateScreen extends Component {
                 .catch(error => {
                     console.log(error);
                     if (error.response.status === 400) {
-                        this.props.history.push('/templatestore/404');
+                        this.props.history.push(
+                            backendSettings.TE_BASEPATH + '/404'
+                        );
                     }
                 });
 
             axios
                 .get(
-                    '/templatestore/api/v1/template/' +
-                    this.state.templateData.name +
-                    '/versions'
+                    backendSettings.TE_BASEPATH +
+                        '/api/v1/template/' +
+                        this.state.templateData.name +
+                        '/versions'
                 )
                 .then(response => {
                     this.setState({
                         versions: response.data.map(t => ({
                             version: t.version,
                             default: t.default,
-                            created_on: this.getDateInSimpleFormat(t.created_on)
+                            created_on: this.getDateInSimpleFormat(
+                                t.created_on
+                            )
                         }))
                     });
                 })
@@ -111,13 +117,18 @@ class TemplateScreen extends Component {
 
     openTemplateVersion(version) {
         this.props.history.push(
-            '/templatestore/t/' + this.state.templateData.name + '/' + version
+            backendSettings.TE_BASEPATH +
+                '/t/' +
+                this.state.templateData.name +
+                '/' +
+                version
         );
     }
     setDefaultVersion(version) {
         axios
             .post(
-                '/templatestore/api/v1/template/' +
+                backendSettings.TE_BASEPATH +
+                    '/api/v1/template/' +
                     this.state.templateData.name +
                     '/' +
                     version,
@@ -127,7 +138,8 @@ class TemplateScreen extends Component {
             )
             .then(response => {
                 this.props.history.push(
-                    '/templatestore/t/' +
+                    backendSettings.TE_BASEPATH +
+                        '/t/' +
                         response.data.name +
                         '/' +
                         response.data.version
@@ -180,9 +192,9 @@ class TemplateScreen extends Component {
 
     getRenderedTemplate(subType, templateData, contextData, renderMode) {
         axios
-            .get('/templatestore/api/v1/render', {
+            .get(backendSettings.TE_BASEPATH + '/api/v1/render', {
                 params: {
-                    template: templateData,
+                    template: encode(templateData),
                     context: contextData,
                     handler: 'jinja2',
                     output: renderMode
@@ -196,7 +208,7 @@ class TemplateScreen extends Component {
                         result[k] = this.state.subTemplatesData[k];
                         result[k].output =
                             k === subType ?
-                                response.data.rendered_template :
+                                decode(response.data.rendered_template) :
                                 this.state.subTemplatesData[k].output;
                         return result;
                     }, {})
@@ -237,17 +249,19 @@ class TemplateScreen extends Component {
 
     getTemplateOutput() {
         axios
-            .get('/template-editor/api/v1/render', {
+            .get(backendSettings.TE_BASEPATH + '/api/v1/render', {
                 params: {
-                    template: this.state.valueTemplate, //TODO: base64encode
+                    template: encode(this.state.valueTemplate),
                     context: this.state.valueContext,
                     handler: 'jinja2',
-                    output: 'text'
+                    output: 'text' // get renderMode
                 }
             })
             .then(response => {
                 console.log(response);
-                this.setState({ valueOutput: response.data.rendered_template });
+                this.setState({
+                    valueOutput: decode(response.data.rendered_template)
+                });
             })
             .catch(function(error) {
                 console.log(error);
@@ -259,16 +273,39 @@ class TemplateScreen extends Component {
     }
 
     displayEditors(type) {
-        if (type === "email") {
-            let a = { subject: { data: "", subType: "subject", renderMode: "text", output: "" },
-                textpart: { data: "", subType: "textpart", renderMode: "text", output: "" },
-                htmlpart: { data: "", subType: "htmlpart", renderMode: "html", output: "" }
+        if (type === 'email') {
+            let a = {
+                subject: {
+                    data: '',
+                    subType: 'subject',
+                    renderMode: 'text',
+                    output: ''
+                },
+                textpart: {
+                    data: '',
+                    subType: 'textpart',
+                    renderMode: 'text',
+                    output: ''
+                },
+                htmlpart: {
+                    data: '',
+                    subType: 'htmlpart',
+                    renderMode: 'html',
+                    output: ''
+                }
             };
             this.setState({
                 subTemplatesData: a
             });
-        } else if (type === "sms") {
-            let a = { textpart: { data: "", subType: "textpart", renderMode: "text", output: "" } };
+        } else if (type === 'sms') {
+            let a = {
+                textpart: {
+                    data: '',
+                    subType: 'textpart',
+                    renderMode: 'text',
+                    output: ''
+                }
+            };
             this.setState({
                 subTemplatesData: a
             });
@@ -282,7 +319,7 @@ class TemplateScreen extends Component {
         });
     }
 
-    createTemplate(name, type, contextData, attributes) {
+    postTemplate(name, type, contextData, attributes) {
         let subTemplates = [];
         Object.keys(this.state.subTemplatesData).map(t => {
             let subTemplate = {
@@ -299,7 +336,8 @@ class TemplateScreen extends Component {
             attributes: JSON.parse(attributes)
         };
         axios
-            .post('/templatestore/api/v1/template', data).then(response => {
+            .post('/templatestore/api/v1/template', data)
+            .then(response => {
                 this.props.history.push(
                     '/templatestore/t/' +
                         response.data.name +
@@ -373,7 +411,11 @@ class TemplateScreen extends Component {
                         <label className={styles.teLabel}>
                             Choose a type :
                         </label>
-                        <select readOnly className={styles.teButtons} value={this.state.subTemplatesData[t].renderMode}>
+                        <select
+                            readOnly
+                            className={styles.teButtons}
+                            value={this.state.subTemplatesData[t].renderMode}
+                        >
                             <option value="text"> Text </option>
                             <option value="html"> HTML </option>
                         </select>
@@ -417,50 +459,73 @@ class TemplateScreen extends Component {
                 <div>
                     <div>
                         <h1>
-                            {
-                                this.state.templateData.name ? this.state.templateData.name : "Create New Template"
-                            }
+                            {this.state.templateData.name ?
+                                this.state.templateData.name :
+                                'Create New Template'}
                         </h1>
                     </div>
                     <div>
                         <label>Name : </label>
-                        {
-                            this.state.templateData.name ?
-                                <input readOnly type="text" value={this.state.templateData.name} /> : <input type="text" id="tmp_name"/>
-                        }
+                        {this.state.templateData.name ? (
+                            <input
+                                readOnly
+                                type="text"
+                                value={this.state.templateData.name}
+                            />
+                        ) : (
+                            <input type="text" id="tmp_name" />
+                        )}
                         <br />
-                        {
-                            this.state.templateData.name && this.state.templateData.version ?
+                        {this.state.templateData.name &&
+                        this.state.templateData.version ? (
                                 <div>
                                     <label>Version : </label>
-                                    <select id="type" className={styles.teButtons} value={this.state.templateData.version}
-                                        onChange={e => this.openTemplateVersion(e.target.value)} > {chooseVersion} </select>
-                                    { this.state.templateData.default ?
+                                    <select
+                                        id="type"
+                                        className={styles.teButtons}
+                                        value={this.state.templateData.version}
+                                        onChange={e =>
+                                            this.openTemplateVersion(e.target.value)
+                                        }
+                                    >
+                                        {' '}
+                                        {chooseVersion}{' '}
+                                    </select>
+                                    {this.state.templateData.default ?
                                         'default' :
-                                        'not_default'
-                                    }
-                                </div> : ""
-                        }
+                                        'not_default'}
+                                </div>
+                            ) : (
+                                ''
+                            )}
                         <br />
                     </div>
                 </div>
                 <div>
-                    {
-                        this.state.templateData.name && this.state.templateData.version ? "" :
+                    {this.state.templateData.name &&
+                    this.state.templateData.version ? (
+                            ''
+                        ) : (
                             <div>
                                 <label> Type : </label>
-                                <select className={styles.teButtons} onChange={e => this.displayEditors(e.target.value)}>
+                                <select
+                                    className={styles.teButtons}
+                                    onChange={e =>
+                                        this.displayEditors(e.target.value)
+                                    }
+                                >
                                     <option value=""> None </option>
                                     <option value="email"> Email </option>
                                     <option value="sms"> Sms </option>
                                 </select>
                             </div>
-                    }
+                        )}
                 </div>
                 <div className={styles.teScreenTable}>{editors}</div>
                 <div>
-                    {
-                        !this.state.templateData.name && !this.state.templateData.version && this.state.type ?
+                    {!this.state.templateData.name &&
+                    !this.state.templateData.version &&
+                    this.state.type ? (
                             <div className={styles.teRowBlock}>
                                 <div className={styles.teSubTemplateBlock}>
                                     <div className={styles.teContextEditor}>
@@ -500,33 +565,48 @@ class TemplateScreen extends Component {
                                         />
                                     </div>
                                 </div>
-                            </div> : ""
-                    }
+                            </div>
+                        ) : (
+                            ''
+                        )}
                 </div>
                 <div>
-                    {this.state.templateData.name && this.state.templateData.version ?
-                        <SearchBox onChange={this.onSearchTextChange.bind(this)} /> : "" }
+                    {this.state.templateData.name &&
+                    this.state.templateData.version ? (
+                            <SearchBox
+                                onChange={this.onSearchTextChange.bind(this)}
+                            />
+                        ) : (
+                            ''
+                        )}
                 </div>
                 <div>
-                    {
-                        this.state.templateData.name && this.state.templateData.version ?
-                            <table className={'table table-striped table-responsive-md btn-table ' + styles.tsTable}>
+                    {this.state.templateData.name &&
+                    this.state.templateData.version ? (
+                            <table
+                                className={
+                                    'table table-striped table-responsive-md btn-table ' +
+                                styles.tsTable
+                                }
+                            >
                                 <thead>
                                     <tr>{tableHeaders}</tr>
                                 </thead>
-                                <tbody>
-                                    {this.getTableRowsJSX()}
-                                </tbody>
-                            </table> : ""
-                    }
+                                <tbody>{this.getTableRowsJSX()}</tbody>
+                            </table>
+                        ) : (
+                            ''
+                        )}
                 </div>
                 <div>
-                    {
-                        this.state.templateData.name && this.state.templateData.version ? "" :
+                    {this.state.templateData.name &&
+                    this.state.templateData.version ? (
+                            ''
+                        ) : (
                             <button
                                 className={styles.teButtons}
                                 onClick={() => {
-                                    this.createTemplate(
+                                    this.postTemplate(
                                         document.getElementById('tmp_name').value,
                                         this.state.type,
                                         this.state.contextData,
@@ -534,9 +614,9 @@ class TemplateScreen extends Component {
                                     );
                                 }}
                             >
-                                Create
+                            Create
                             </button>
-                    }
+                        )}
                 </div>
             </div>
         );

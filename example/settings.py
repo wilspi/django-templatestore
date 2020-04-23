@@ -113,6 +113,7 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = []
 STATIC_ROOT = "static/"
 
-# Template Editor - Example Configs
+# Template Store - Example Configs
 TE_TEMPLATE_ATTRIBUTES_KEYS = ["attribute1", "attribute2"]
 TE_ROWLIMIT = 1000
+TE_BASEPATH = "/"
