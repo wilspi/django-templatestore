@@ -23,7 +23,8 @@ class TemplateScreen extends Component {
                 version: this.props.match.params.version
             },
             versions: [{ version: this.props.match.params.version }],
-            subTemplatesData: {}
+            subTemplatesData: {},
+            editable: true //this.props.match.params.editable
         };
         this.aceconfig = {
             theme: 'monokai',
@@ -39,11 +40,11 @@ class TemplateScreen extends Component {
         this.onTemplateChange = this.onTemplateChange.bind(this);
         this.onContextChange = this.onContextChange.bind(this);
         this.onAttributesChange = this.onAttributesChange.bind(this);
-        this.displayEditors = this.displayEditors.bind(this);
+        this.getTypesConfig = this.getTypesConfig.bind(this);
         this.postTemplate = this.postTemplate.bind(this);
     }
     componentDidMount() {
-        if (this.state.templateData.name && this.state.templateData.version) {
+        if this.state.editable {
             axios
                 .get(
                     backendSettings.TE_BASEPATH +
@@ -272,52 +273,24 @@ class TemplateScreen extends Component {
         return this.state.valueTemplate;
     }
 
-    displayEditors(type) {
-        if (type === 'email') {
-            let a = {
-                subject: {
-                    data: '',
-                    subType: 'subject',
-                    renderMode: 'text',
-                    output: ''
-                },
-                textpart: {
-                    data: '',
-                    subType: 'textpart',
-                    renderMode: 'text',
-                    output: ''
-                },
-                htmlpart: {
-                    data: '',
-                    subType: 'htmlpart',
-                    renderMode: 'html',
-                    output: ''
-                }
-            };
-            this.setState({
-                subTemplatesData: a
-            });
-        } else if (type === 'sms') {
-            let a = {
-                textpart: {
-                    data: '',
-                    subType: 'textpart',
-                    renderMode: 'text',
-                    output: ''
-                }
-            };
-            this.setState({
-                subTemplatesData: a
-            });
-        } else {
-            this.setState({
-                subTemplatesData: {}
-            });
-        }
-        this.setState({
-            type: type
-        });
+    getTypesConfig(type) {
+        axios
+            .get(backendSettings.TE_BASEPATH + '/api/v1/config')
+            .then(response => {
+                console.log(response);
+                this.setState({
+                    subTemplatesData: response.data[type].reduce((result, k) => {
+                        result[k.subject] = k;
+                        return result;
+                    },
+                    {});
+                });
+            })
+            .catch(function(error) {
+                console.log(error);
+            })
     }
+
 
     postTemplate(name, type, contextData, attributes) {
         let subTemplates = [];
@@ -336,10 +309,11 @@ class TemplateScreen extends Component {
             attributes: JSON.parse(attributes)
         };
         axios
-            .post('/templatestore/api/v1/template', data)
+            .post(backendSettings.TE_BASEPATH + '/api/v1/template', data)
             .then(response => {
                 this.props.history.push(
-                    '/templatestore/t/' +
+                    backendSettings.TE_BASEPATH +
+                    '/t/' +
                         response.data.name +
                         '/' +
                         response.data.version
@@ -465,7 +439,6 @@ class TemplateScreen extends Component {
                         </h1>
                     </div>
                     <div>
-                        <label>Name : </label>
                         {this.state.templateData.name ? (
                             <input
                                 readOnly
@@ -473,7 +446,7 @@ class TemplateScreen extends Component {
                                 value={this.state.templateData.name}
                             />
                         ) : (
-                            <input type="text" id="tmp_name" />
+                            <input type="text" id="tmp_name" placeholder="Add template name" />
                         )}
                         <br />
                         {this.state.templateData.name &&
@@ -511,11 +484,11 @@ class TemplateScreen extends Component {
                                 <select
                                     className={styles.teButtons}
                                     onChange={e =>
-                                        this.displayEditors(e.target.value)
+                                        this.getTypesConfig(e.target.value)
                                     }
                                 >
                                     <option value=""> None </option>
-                                    <option value="email"> Email </option>
+                                    <option value="email" selected> Email </option>
                                     <option value="sms"> Sms </option>
                                 </select>
                             </div>
