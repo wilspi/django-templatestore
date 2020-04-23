@@ -19,6 +19,7 @@ class Home extends Component {
         ];
         this.getTableRowsJSX = this.getTableRowsJSX.bind(this);
         this.openTemplateScreenPage = this.openTemplateScreenPage.bind(this);
+        this.addNewTemplate = this.addNewTemplate.bind(this);
     }
 
     componentDidMount() {
@@ -44,6 +45,12 @@ class Home extends Component {
                 name +
                 '/' +
                 (version === '-' ? '0.1' : version)
+        );
+    }
+
+    addNewTemplate() {
+        this.props.history.push(
+            '/templatestore/t/add'
         );
     }
 
@@ -139,6 +146,11 @@ class Home extends Component {
                         </thead>
                         <tbody>{this.getTableRowsJSX()}</tbody>
                     </table>
+                </div>
+                <div>
+                    <button type="button" onClick={() => this.addNewTemplate()}>
+                            Add New Template
+                    </button>
                 </div>
             </div>
         );
