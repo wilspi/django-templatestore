@@ -320,16 +320,13 @@ class TemplateScreen extends Component {
                     </div>
                     <div>
                         <label className={styles.teLabel}>
-                            Choose a type :
+                            Render Mode :
                         </label>
-                        <select
+                        <input
                             readOnly
-                            className={styles.teButtons}
+                            type="text"
                             value={this.state.subTemplatesData[t].renderMode}
-                        >
-                            <option value="text"> Text </option>
-                            <option value="html"> HTML </option>
-                        </select>
+                        />
                         <button
                             className={styles.teButtons}
                             onClick={() => {
