@@ -44,7 +44,7 @@ class TemplateScreen extends Component {
         this.postTemplate = this.postTemplate.bind(this);
     }
     componentDidMount() {
-        if this.state.editable {
+        if (this.state.editable) {
             axios
                 .get(
                     backendSettings.TE_BASEPATH +
@@ -279,18 +279,19 @@ class TemplateScreen extends Component {
             .then(response => {
                 console.log(response);
                 this.setState({
-                    subTemplatesData: response.data[type].reduce((result, k) => {
-                        result[k.subject] = k;
-                        return result;
-                    },
-                    {});
+                    subTemplatesData: response.data[type].reduce(
+                        (result, k) => {
+                            result[k.subject] = k;
+                            return result;
+                        },
+                        {}
+                    )
                 });
             })
             .catch(function(error) {
                 console.log(error);
-            })
+            });
     }
-
 
     postTemplate(name, type, contextData, attributes) {
         let subTemplates = [];
@@ -313,7 +314,7 @@ class TemplateScreen extends Component {
             .then(response => {
                 this.props.history.push(
                     backendSettings.TE_BASEPATH +
-                    '/t/' +
+                        '/t/' +
                         response.data.name +
                         '/' +
                         response.data.version
@@ -446,7 +447,11 @@ class TemplateScreen extends Component {
                                 value={this.state.templateData.name}
                             />
                         ) : (
-                            <input type="text" id="tmp_name" placeholder="Add template name" />
+                            <input
+                                type="text"
+                                id="tmp_name"
+                                placeholder="Add template name"
+                            />
                         )}
                         <br />
                         {this.state.templateData.name &&
@@ -488,7 +493,10 @@ class TemplateScreen extends Component {
                                     }
                                 >
                                     <option value=""> None </option>
-                                    <option value="email" selected> Email </option>
+                                    <option value="email" selected>
+                                        {' '}
+                                    Email{' '}
+                                    </option>
                                     <option value="sms"> Sms </option>
                                 </select>
                             </div>
