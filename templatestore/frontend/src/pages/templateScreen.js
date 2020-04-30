@@ -192,15 +192,16 @@ class TemplateScreen extends Component {
     }
 
     getRenderedTemplate(subType, templateData, contextData, renderMode) {
+        let data = {
+            template: encode(templateData),
+            context: contextData,
+            handler: 'jinja2',
+            output: renderMode
+        };
         axios
-            .get(backendSettings.TE_BASEPATH + '/api/v1/render', {
-                params: {
-                    template: encode(templateData),
-                    context: contextData,
-                    handler: 'jinja2',
-                    output: renderMode
-                }
-            })
+            .post(
+                backendSettings.TE_BASEPATH + '/api/v1/render', data
+            )
             .then(response => {
                 this.setState({
                     subTemplatesData: Object.keys(
