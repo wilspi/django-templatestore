@@ -117,6 +117,3 @@ STATIC_ROOT = "static/"
 TE_TEMPLATE_ATTRIBUTES_KEYS = ["attribute1", "attribute2"]
 TE_ROWLIMIT = 1000
 TE_BASEPATH = "/"
-
-USER_SERVICE_URL = "http://entity-service.internal.ackodev.com/api/user"
-LOGIN_URL = "https://master.acko.com/login/?next="
