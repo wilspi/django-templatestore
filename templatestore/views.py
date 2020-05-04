@@ -48,26 +48,22 @@ def render_template_view(request):
         template = data["template"]
         context = data["context"]
         handler = data["handler"]
-        
+
         if not re.match(
             "(^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$)", template
         ):
             raise (Exception("Validation: Template data is not base64 encoded"))
 
-        try:
-            if handler == "jinja2":
-                rendered_template = render_via_jinja(template, context)
-                data = {
-                    "rendered_template": rendered_template,
-                    "rendered_on": datetime.now(),
-                }
-                return JsonResponse(data, safe=False)
+        if handler == "jinja2":
+            rendered_template = render_via_jinja(template, context)
+            data = {
+                "rendered_template": rendered_template,
+                "rendered_on": datetime.now(),
+            }
+            return JsonResponse(data, safe=False)
 
-            else:
-                raise Exception("Invalid Template Handler: %s", handler)  # TOTEST
-        except Exception as e:
-            logger.exception(e)
-            raise e
+        else:
+            raise Exception("Invalid Template Handler: %s", handler)
 
     except Exception as e:
         logger.exception(e)
