@@ -24,9 +24,17 @@ def index(request):
 
 
 def render_via_jinja(template, context):
-    from jinja2 import Template
+    try:
+        from jinja2 import Template
+        return base64encode(Template(base64decode(template)).render(context))
 
-    return base64encode(Template(base64decode(template)).render(context))
+    except Exception as e:
+        logger.exception(e)
+        return HttpResponse(
+            json.dumps({"message": str(e)}),
+            content_type="application/json",
+            status=400,
+        )
 
 
 @csrf_exempt
