@@ -323,11 +323,14 @@ class TemplateScreen extends Component {
                         <label className={styles.teLabel}>
                             Render Mode :
                         </label>
-                        <input
+                        <select
                             readOnly
-                            type="text"
+                            className={styles.teButtons}
                             value={this.state.subTemplatesData[t].renderMode}
-                        />
+                        >
+                            <option value="text" disabled> Text </option>
+                            <option value="html" disabled> HTML </option>
+                        </select>
                         <button
                             className={styles.teButtons}
                             onClick={() => {
