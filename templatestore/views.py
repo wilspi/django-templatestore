@@ -48,7 +48,7 @@ def render_template_view(request):
         template = data["template"]
         context = data["context"]
         handler = data["handler"]
-
+        
         if not re.match(
             "(^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$)", template
         ):
