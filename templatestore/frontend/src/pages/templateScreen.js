@@ -150,14 +150,27 @@ class TemplateScreen extends Component {
     }
 
     getTableRowsJSX() {
-        let filteredVersionList = this.state.versions.filter((version) => {
-            for (var key in version) {
-                if (version[key].toString().indexOf(this.state.searchText) !== -1) {
-                    return version;
+        let filteredVersionList = this.state.versions.reduce(
+            (result, version) => {
+                if (
+                    Object.keys(version).reduce((res, t) => {
+                        res =
+                            res ||
+                            (
+                                version[t]
+                                    .toString()
+                                    .indexOf(
+                                        this.state.searchText
+                                    ) !== -1);
+                        return res;
+                    }, false)
+                ) {
+                    result.push(version);
                 }
-            }
-        });
-
+                return result;
+            },
+            []
+        );
         let tableRows = Object.values(filteredVersionList).map(k => (
             <tr>
                 <td>
