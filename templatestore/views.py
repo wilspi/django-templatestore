@@ -24,18 +24,9 @@ def index(request):
 
 
 def render_via_jinja(template, context):
-    try:
-        from jinja2 import Template
+    from jinja2 import Template
 
-        return base64encode(Template(base64decode(template)).render(context))
-
-    except Exception as e:
-        logger.exception(e)
-        return HttpResponse(
-            json.dumps({"message": str(e)}),
-            content_type="application/json",
-            status=400,
-        )
+    return base64encode(Template(base64decode(template)).render(context))
 
 
 @csrf_exempt
@@ -338,20 +329,28 @@ def get_render_template_view(request, name, version=None):
             )
             stpls = SubTemplate.objects.filter(template_version_id=tv.id)
 
-            res = {
-                "version": tv.version,
-                "type": t.type,
-                "attributes": t.attributes,
-                "sub_templates": [
-                    {
-                        "sub_type": stpl.config.sub_type,
-                        "rendered_data": render_via_jinja(
-                            stpl.data, data["context_data"]
-                        ),
-                    }
-                    for stpl in stpls
-                ],
-            }
+            try:
+                res = {
+                    "version": tv.version,
+                    "type": t.type,
+                    "attributes": t.attributes,
+                    "sub_templates": [
+                        {
+                            "sub_type": stpl.config.sub_type,
+                            "rendered_data": render_via_jinja(
+                                stpl.data, data["context_data"]
+                            ),
+                        }
+                        for stpl in stpls
+                    ],
+                }
+            except Exception as e:
+                logger.exception(e)
+                return HttpResponse(
+                    json.dumps({"Failed to render template due to " + str(e)}),
+                    content_type="application/json",
+                    status=400,
+                )
 
             return JsonResponse(res, safe=False)
         except Exception as e:
