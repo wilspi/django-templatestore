@@ -347,7 +347,7 @@ def get_render_template_view(request, name, version=None):
             except Exception as e:
                 logger.exception(e)
                 return HttpResponse(
-                    json.dumps({"Failed to render template due to " + str(e)}),
+                    json.dumps({"Failed to render template due to ": str(e)}),
                     content_type="application/json",
                     status=400,
                 )
