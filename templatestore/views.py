@@ -26,6 +26,7 @@ def index(request):
 def render_via_jinja(template, context):
     try:
         from jinja2 import Template
+
         return base64encode(Template(base64decode(template)).render(context))
 
     except Exception as e:
