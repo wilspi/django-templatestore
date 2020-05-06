@@ -249,7 +249,13 @@ class TemplateScreen extends Component {
         axios.post(
             backendSettings.TE_BASEPATH + '/api/v1/template', data
         ).then(response => {
-            console.log(response);
+            this.props.history.push(
+                backendSettings.TE_BASEPATH +
+                    '/t/' +
+                    response.data.name +
+                    '/' +
+                    response.data.version
+            );
         });
     }
 
