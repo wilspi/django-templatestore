@@ -124,9 +124,6 @@ class Home extends Component {
         return (
             <div className={styles.tsPage}>
                 <div>
-                    <h1>Template Store</h1>
-                </div>
-                <div>
                     <SearchBox onChange={this.onSearchTextChange.bind(this)} />
                 </div>
                 <div>
