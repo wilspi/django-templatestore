@@ -37,6 +37,7 @@ class TemplateScreen extends Component {
         this.getDateInSimpleFormat = this.getDateInSimpleFormat.bind(this);
         this.getRenderedTemplate = this.getRenderedTemplate.bind(this);
         this.onTemplateChange = this.onTemplateChange.bind(this);
+        this.saveTemplate = this.saveTemplate.bind(this);
     }
     componentDidMount() {
         axios
@@ -227,6 +228,31 @@ class TemplateScreen extends Component {
         });
     }
 
+    saveTemplate() {
+        let subTemplatesList = [];
+        Object.keys(this.state.subTemplatesData).map(k => {
+            let subTemplate = {
+                data: encode(this.state.subTemplatesData[k].data),
+                sub_type: this.state.subTemplatesData[k].subType
+            };
+            subTemplatesList.push(subTemplate);
+        });
+
+        let data = {
+            name: this.state.templateData.name,
+            type: this.state.type,
+            sample_context_data: this.state.contextData,
+            attributes: this.state.attributes,
+            sub_templates: subTemplatesList
+        };
+
+        axios.post(
+            backendSettings.TE_BASEPATH + '/api/v1/template', data
+        ).then(response => {
+            console.log(response);
+        });
+    }
+
     getTemplateOutput() {
         axios
             .get('/template-editor/api/v1/render', {
@@ -334,7 +360,10 @@ class TemplateScreen extends Component {
                         >
                             Render
                         </button>
-                        <button className={styles.teButtons}>
+                        <button
+                            className={styles.teButtons}
+                            onClick={() => this.saveTemplate()}
+                        >
                             Save
                         </button>
                     </div>
