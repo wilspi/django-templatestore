@@ -246,17 +246,22 @@ class TemplateScreen extends Component {
             sub_templates: subTemplatesList
         };
 
-        axios.post(
-            backendSettings.TE_BASEPATH + '/api/v1/template', data
-        ).then(response => {
-            this.props.history.push(
-                backendSettings.TE_BASEPATH +
-                    '/t/' +
-                    response.data.name +
-                    '/' +
-                    response.data.version
-            );
-        });
+        axios
+            .post(
+                backendSettings.TE_BASEPATH + '/api/v1/template', data
+            )
+            .then(response => {
+                this.props.history.push(
+                    backendSettings.TE_BASEPATH +
+                        '/t/' +
+                        response.data.name +
+                        '/' +
+                        response.data.version
+                );
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
     }
 
     getTemplateOutput() {
