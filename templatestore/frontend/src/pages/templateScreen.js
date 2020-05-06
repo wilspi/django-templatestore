@@ -334,6 +334,9 @@ class TemplateScreen extends Component {
                         >
                             Render
                         </button>
+                        <button className={styles.teButtons}>
+                            Save
+                        </button>
                     </div>
                 </div>
             );
