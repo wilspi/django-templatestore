@@ -15,7 +15,9 @@ class Home extends Component {
         };
         this.tableHeaderList = [
             'template_name',
+            'type',
             'default_version',
+            'created_on',
             ...this.props.fixedAttributeKeys
         ];
         this.getTableRowsJSX = this.getTableRowsJSX.bind(this);
@@ -28,9 +30,11 @@ class Home extends Component {
                 templatesData: response.data.map(t => ({
                     ...{
                         template_name: t.name,
-                        default_version: t.default ? t.version : '-'
+                        default_version: t.default ? t.version : '-',
+                        type: t.type,
+                        created_on: t.created_on
                     },
-                    ...this.tableHeaderList.slice(2).reduce((result, k) => {
+                    ...this.tableHeaderList.slice(4).reduce((result, k) => {
                         result[k] = t.attributes[k];
                         return result;
                     }, {})
