@@ -162,12 +162,11 @@ class TemplateScreen extends Component {
                     </Highlight>
                 </td>
                 <td>
-                    <button
-                        type="button"
-                        onClick={() => this.openTemplateVersion(k.version)}
-                    >
-                        Open
-                    </button>
+                    {
+                        k.version === this.state.templateData.version ?
+                            <button type="button"> Opened </button> :
+                            <button type="button" onClick={() => this.openTemplateVersion(k.version)}> Open </button>
+                    }
                 </td>
                 <td>
                     <button
