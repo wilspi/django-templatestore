@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import styles from './../style/home.less';
-import { backendSettings } from './../utils.js';
+import { backendSettings, getDateInSimpleFormat } from './../utils.js';
 import SearchBox from './../components/searchBox.js';
 import Highlight from './../components/highlight.js';
 
@@ -32,7 +32,7 @@ class Home extends Component {
                         template_name: t.name,
                         default_version: t.default ? t.version : '-',
                         type: t.type,
-                        created_on: t.created_on
+                        created_on: getDateInSimpleFormat(t.created_on)
                     },
                     ...this.tableHeaderList.slice(4).reduce((result, k) => {
                         result[k] = t.attributes[k];
