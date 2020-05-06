@@ -24,7 +24,7 @@ class TemplateScreen extends Component {
             },
             versions: [{ version: this.props.match.params.version }],
             subTemplatesData: {},
-            editable: true //this.props.match.params.editable
+            editable: this.props.editable
         };
         this.aceconfig = {
             theme: 'monokai',
@@ -411,24 +411,6 @@ class TemplateScreen extends Component {
                 </div>
             );
         });
-        //        editors.push(
-        //            <div className={styles.teRowBlock}>
-        //                <div className={styles.teContextEditor}>
-        //                    <AceEditor
-        //                        name="context-editor"
-        //                        placeholder="Enter your template values here..."
-        //                        theme={this.aceconfig.theme}
-        //                        mode="json"
-        //                        fontSize={this.aceconfig.fontSize}
-        //                        height={this.aceconfig.height}
-        //                        width={this.aceconfig.width}
-        //                        value={this.state.contextData}
-        //                        /*onChange={this.onContextChange*/
-        //                    />
-        //                </div>
-        //            </div>
-        //        );
-
         return (
             <div>
                 <div>

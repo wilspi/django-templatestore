@@ -51,9 +51,7 @@ class Home extends Component {
     }
 
     openNewTemplatePage() {
-        this.props.history.push(
-            backendSettings.TE_BASEPATH + '/templatestore/t/add'
-        );
+        this.props.history.push(backendSettings.TE_BASEPATH + '/a/add');
     }
 
     getTableRowsJSX() {
