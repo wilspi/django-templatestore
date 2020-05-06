@@ -164,14 +164,14 @@ class TemplateScreen extends Component {
                 <td>
                     {
                         k.version === this.state.templateData.version ?
-                            <button type="button"> Opened </button> :
+                            <button type="button" disabled> Opened </button> :
                             <button type="button" onClick={() => this.openTemplateVersion(k.version)}> Open </button>
                     }
                 </td>
                 <td>
                     {
                         k.default ?
-                            <button type="button"> Defaulted </button> :
+                            <button type="button" disabled> Defaulted </button> :
                             <button type="button" onClick={() => this.setDefaultVersion(k.version)}>
                                 Set Default Version
                             </button>
