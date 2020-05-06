@@ -169,12 +169,13 @@ class TemplateScreen extends Component {
                     }
                 </td>
                 <td>
-                    <button
-                        type="button"
-                        onClick={() => this.setDefaultVersion(k.version)}
-                    >
-                        Set Default Version
-                    </button>
+                    {
+                        k.default ?
+                            <button type="button"> Defaulted </button> :
+                            <button type="button" onClick={() => this.setDefaultVersion(k.version)}>
+                                Set Default Version
+                            </button>
+                    }
                 </td>
             </tr>
         ));
