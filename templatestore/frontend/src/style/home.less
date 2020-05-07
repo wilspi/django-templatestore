@@ -1,9 +1,24 @@
 
-.tsTable {
-     margin: 40px 40px;
-     box-shadow: 2px 2px 6px #000000;
-     display: table;
-}
+
 
 .tsPage {
+     h1 {
+          margin: 20px 0;
+     }
+     .tableWrapper {
+          height: 60vh;
+          overflow: auto;
+          margin-top: 40px;
+          .tsTable {
+               box-shadow: 2px 2px 6px #000000;
+               width: 100%;
+               tbody {
+                    height: 400px;
+                    overflow-y: auto;
+                    width: 100%;
+               }
+          }
+     }     
+     
 }
+
