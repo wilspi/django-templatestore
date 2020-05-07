@@ -9,16 +9,29 @@
           height: 60vh;
           overflow: auto;
           margin-top: 40px;
-          .tsTable {
-               box-shadow: 2px 2px 6px #000000;
-               width: 100%;
+
+          // .tsTable {
+          //      box-shadow: 2px 2px 6px #000000;
+          //      width: 100%;
+               thead {
+                    background-color: #dedede;
+               }
                tbody {
                     height: 400px;
                     overflow-y: auto;
                     width: 100%;
+                    tr {
+                         td {
+                              button {
+                                   border-radius: 5px;
+                                   border: 1px solid #9ca1a7;
+                                   color: #9ca1a7;
+                                   background-color: transparent;
+                              }
+                         }
+                    }
                }
-          }
+          // }
      }     
-     
 }
 
