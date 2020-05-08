@@ -371,12 +371,6 @@ class TemplateScreen extends Component {
                         >
                             Render
                         </button>
-                        <button
-                            className={styles.teButtons}
-                            onClick={() => this.saveTemplate()}
-                        >
-                            Save
-                        </button>
                     </div>
                 </div>
             );
@@ -429,6 +423,14 @@ class TemplateScreen extends Component {
                     </div>
                 </div>
                 <div className={styles.teScreenTable}>{editors}</div>
+                <div>
+                    <button
+                        className={styles.teButtons}
+                        onClick={() => this.saveTemplate()}
+                    >
+                        Save
+                    </button>
+                </div>
                 <div>
                     <SearchBox onChange={this.onSearchTextChange.bind(this)} />
                 </div>
