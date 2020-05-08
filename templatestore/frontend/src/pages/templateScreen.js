@@ -3,7 +3,7 @@ import axios from 'axios';
 import { withRouter } from 'react-router';
 import { encode, decode, backendSettings } from './../utils.js';
 import styles from './../style/templateScreen.less';
-import SearchBox from './../components/searchBox.js';
+import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/theme-monokai';
@@ -29,7 +29,7 @@ class TemplateScreen extends Component {
             theme: 'monokai',
             fontSize: 16,
             width: 'auto',
-            height: '700px'
+            height: '400px'
         };
         this.getTableRowsJSX = this.getTableRowsJSX.bind(this);
         this.openTemplateVersion = this.openTemplateVersion.bind(this);
@@ -309,7 +309,7 @@ class TemplateScreen extends Component {
                             {outputView}
                         </div>
                     </div>
-                    <div>
+                    <div className={styles.teVersionWrapper}>
                         <label className={styles.teLabel}>
                             Choose a type :
                         </label>
@@ -356,8 +356,8 @@ class TemplateScreen extends Component {
         //            </div>
         //        );
         return (
-            <div>
-                <div>
+            <div className="container ">
+                <div className={styles.teDetailPage}>
                     <div>
                         <h1>{this.state.templateData.name}</h1>
                     </div>
@@ -368,28 +368,28 @@ class TemplateScreen extends Component {
                             value={this.state.templateData.name}
                         />
                         <br />
-                        <label>Version : </label>
-                        <select
-                            id="type"
-                            className={styles.teButtons}
-                            value={this.state.templateData.version}
-                            onChange={e =>
-                                this.openTemplateVersion(e.target.value)
-                            }
-                        >
-                            {chooseVersion}
-                        </select>
-                        {this.state.templateData.default ?
-                            'default' :
-                            'not_default'}
-                        <br />
+                        <div className={styles.teVersionWrapper}>
+                            <label>Version : </label>
+                            <select
+                                id="type"
+                                className={styles.teButtons}
+                                value={this.state.templateData.version}
+                                onChange={e =>
+                                    this.openTemplateVersion(e.target.value)
+                                }
+                            >
+                                {chooseVersion}
+                            </select>
+                            <div className={styles.teDefaultLabel}>{this.state.templateData.default ? 'default' : 'not_default'}</div>
+                            <br />
+                        </div>
                     </div>
                 </div>
                 <div className={styles.teScreenTable}>{editors}</div>
                 <div>
                     <SearchBox onChange={this.onSearchTextChange.bind(this)} />
                 </div>
-                <div>
+                <div className={styles.teTableWrapper}>
                     <table
                         className={
                             'table table-striped table-responsive-md btn-table ' +
