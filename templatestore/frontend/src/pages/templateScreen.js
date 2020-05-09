@@ -426,7 +426,7 @@ class TemplateScreen extends Component {
                 <div>
                     <button
                         className={styles.teButtons}
-                        onClick={() => this.saveTemplate()}
+                        onClick={() => { if (window.confirm('Are you sure ?')) this.saveTemplate();}} // eslint-disable-line no-alert
                     >
                         Save
                     </button>
