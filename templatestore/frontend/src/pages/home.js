@@ -3,7 +3,7 @@ import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import styles from './../style/home.less';
 import { backendSettings, getDateInSimpleFormat } from './../utils.js';
-import SearchBox from './../components/searchBox.js';
+import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
 
 class Home extends Component {
@@ -128,27 +128,27 @@ class Home extends Component {
             <th>{k}</th>
         ));
         return (
-            <div className={styles.tsPage}>
+            <div className={styles.tsPage + ' container'}>
                 <div>
                     <h1>Template Store</h1>
                 </div>
                 <div>
                     <SearchBox onChange={this.onSearchTextChange.bind(this)} />
                 </div>
-                <div>
+                <div className={styles.tableWrapper}>
                     <table
                         className={
-                            'table table-striped table-responsive-md btn-table ' +
+                            'table table-striped table-bordered mb-0' +
                             styles.tsTable
                         }
                     >
                         <thead>
                             <tr>{tableHeaders}</tr>
                         </thead>
-                        <tbody>{this.getTableRowsJSX()}</tbody>
+                        <tbody className={styles.tableBody}>{this.getTableRowsJSX()}</tbody>
                     </table>
                 </div>
-                <div>
+                <div className={styles.tsAddTemplateBtn}>
                     <button
                         type="button"
                         onClick={() => this.openNewTemplatePage()}
