@@ -24,7 +24,8 @@ class TemplateScreen extends Component {
             },
             searchText: '',
             versions: [{ version: this.props.match.params.version }],
-            subTemplatesData: {}
+            subTemplatesData: {},
+            editable: this.props.editable
         };
         this.aceconfig = {
             theme: 'monokai',
@@ -38,69 +39,78 @@ class TemplateScreen extends Component {
         this.getDateInSimpleFormat = this.getDateInSimpleFormat.bind(this);
         this.getRenderedTemplate = this.getRenderedTemplate.bind(this);
         this.onTemplateChange = this.onTemplateChange.bind(this);
+        this.onContextChange = this.onContextChange.bind(this);
+        this.onAttributesChange = this.onAttributesChange.bind(this);
+        this.getTypesConfig = this.getTypesConfig.bind(this);
+        this.postTemplate = this.postTemplate.bind(this);
     }
     componentDidMount() {
-        axios
-            .get(
-                backendSettings.TE_BASEPATH +
-                    '/api/v1/template/' +
-                    this.state.templateData.name +
-                    '/' +
-                    this.state.templateData.version
-            )
-            .then(response => {
-                console.log(response.data);
-                this.setState({
-                    subTemplatesData: response.data.sub_templates.reduce(
-                        (result, k) => {
-                            result[k.sub_type] = {
-                                data: decode(k.data),
-                                subType: k.sub_type,
-                                renderMode: k.render_mode,
-                                output: ''
-                            };
-                            return result;
+        if (!this.state.editable) {
+            axios
+                .get(
+                    backendSettings.TE_BASEPATH +
+                        '/api/v1/template/' +
+                        this.state.templateData.name +
+                        '/' +
+                        this.state.templateData.version
+                )
+                .then(response => {
+                    this.setState({
+                        subTemplatesData: response.data.sub_templates.reduce(
+                            (result, k) => {
+                                result[k.sub_type] = {
+                                    data: decode(k.data),
+                                    subType: k.sub_type,
+                                    renderMode: k.render_mode,
+                                    output: ''
+                                };
+                                return result;
+                            },
+                            {}
+                        ),
+                        templateData: {
+                            name: this.props.match.params.name,
+                            version: this.props.match.params.version,
+                            default: response.data.default
                         },
-                        {}
-                    ),
-                    templateData: {
-                        name: this.props.match.params.name,
-                        version: this.props.match.params.version,
-                        default: response.data.default
-                    },
-                    contextData: response.data.sample_context_data,
-                    attributes: response.data.attributes,
-                    type: response.data.type
+                        contextData: response.data.sample_context_data,
+                        attributes: response.data.attributes,
+                        type: response.data.type
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                    if (error.response.status === 400) {
+                        this.props.history.push(
+                            backendSettings.TE_BASEPATH + '/404'
+                        );
+                    }
                 });
-            })
-            .catch(error => {
-                console.log(error);
-                if (error.response.status === 400) {
-                    this.props.history.push(
-                        backendSettings.TE_BASEPATH + '/404'
-                    );
-                }
-            });
 
-        axios
-            .get(
-                backendSettings.TE_BASEPATH +
-                    '/api/v1/template/' +
-                    this.state.templateData.name +
-                    '/versions'
-            )
-            .then(response => {
-                this.setState({
-                    versions: response.data.map(t => ({
-                        version: t.version,
-                        default: t.default,
-                        created_on: this.getDateInSimpleFormat(t.created_on)
-                    }))
+            axios
+                .get(
+                    backendSettings.TE_BASEPATH +
+                        '/api/v1/template/' +
+                        this.state.templateData.name +
+                        '/versions'
+                )
+                .then(response => {
+                    this.setState({
+                        versions: response.data.map(t => ({
+                            version: t.version,
+                            default: t.default,
+                            created_on: this.getDateInSimpleFormat(
+                                t.created_on
+                            )
+                        }))
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
                 });
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        } else {
+            this.getTypesConfig('email');
+        }
     }
 
     getDateInSimpleFormat(datestr) {
@@ -117,6 +127,7 @@ class TemplateScreen extends Component {
                 version
         );
     }
+
     setDefaultVersion(version) {
         axios
             .post(
@@ -250,18 +261,29 @@ class TemplateScreen extends Component {
         });
     }
 
+    onContextChange(newValue) {
+        this.setState({
+            contextData: newValue
+        });
+    }
+
+    onAttributesChange(newValue) {
+        this.setState({
+            attributes: newValue
+        });
+    }
+
     getTemplateOutput() {
         axios
-            .get('/template-editor/api/v1/render', {
+            .get(backendSettings.TE_BASEPATH + '/api/v1/render', {
                 params: {
-                    template: encode(this.state.valueTemplate), //TODO: base64encode
+                    template: encode(this.state.valueTemplate),
                     context: this.state.valueContext,
                     handler: 'jinja2',
-                    output: 'text'
+                    output: 'text' // get renderMode
                 }
             })
             .then(response => {
-                console.log(response);
                 this.setState({
                     valueOutput: decode(response.data.rendered_template)
                 });
@@ -273,6 +295,62 @@ class TemplateScreen extends Component {
                 // always executed
             });
         return this.state.valueTemplate;
+    }
+
+    getTypesConfig(type) {
+        axios
+            .get(backendSettings.TE_BASEPATH + '/api/v1/config')
+            .then(response => {
+                this.setState({
+                    subTemplatesData: response.data[type].sub_type.reduce(
+                        (result, k) => {
+                            result[k.type] = {
+                                subType: k.type,
+                                renderMode: k.render_mode,
+                                data: '',
+                                output: ''
+                            };
+                            return result;
+                        },
+                        {}
+                    )
+                });
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
+    }
+
+    postTemplate(name, type, contextData, attributes) {
+        let subTemplates = [];
+        Object.keys(this.state.subTemplatesData).map(t => {
+            let subTemplate = {
+                sub_type: this.state.subTemplatesData[t].subType,
+                data: encode(this.state.subTemplatesData[t].data)
+            };
+            subTemplates.push(subTemplate);
+        });
+        let data = {
+            name: name,
+            type: type,
+            sub_templates: subTemplates,
+            sample_context_data: contextData,
+            attributes: attributes
+        };
+        axios
+            .post(backendSettings.TE_BASEPATH + '/api/v1/template', data)
+            .then(response => {
+                this.props.history.push(
+                    backendSettings.TE_BASEPATH +
+                        '/t/' +
+                        response.data.name +
+                        '/' +
+                        response.data.version
+                );
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     render() {
@@ -307,6 +385,21 @@ class TemplateScreen extends Component {
                         highlightActiveLine="false"
                     />
                 );
+            let inputView = (
+                <AceEditor
+                    name="template-editor"
+                    placeholder="Write your template file here..."
+                    theme={this.aceconfig.theme}
+                    mode="handlebars"
+                    fontSize={this.aceconfig.fontSize}
+                    height={this.aceconfig.height}
+                    width={this.aceconfig.width}
+                    value={this.state.subTemplatesData[t].data}
+                    onChange={n => {
+                        this.onTemplateChange(t, n);
+                    }}
+                />
+            );
             return (
                 <div className={styles.teRowBlock}>
                     <div>
@@ -314,19 +407,7 @@ class TemplateScreen extends Component {
                     </div>
                     <div className={styles.teSubTemplateBlock}>
                         <div className={styles.teTemplateEditor}>
-                            <AceEditor
-                                name="template-editor"
-                                placeholder="Write your template file here..."
-                                theme={this.aceconfig.theme}
-                                mode="handlebars"
-                                fontSize={this.aceconfig.fontSize}
-                                height={this.aceconfig.height}
-                                width={this.aceconfig.width}
-                                value={this.state.subTemplatesData[t].data}
-                                onChange={n => {
-                                    this.onTemplateChange(t, n);
-                                }}
-                            />
+                            {inputView}
                         </div>
                         <div className={styles.teOutputEditor}>
                             {outputView}
@@ -361,69 +442,178 @@ class TemplateScreen extends Component {
                 </div>
             );
         });
-        //        editors.push(
-        //            <div className={styles.teRowBlock}>
-        //                <div className={styles.teContextEditor}>
-        //                    <AceEditor
-        //                        name="context-editor"
-        //                        placeholder="Enter your template values here..."
-        //                        theme={this.aceconfig.theme}
-        //                        mode="json"
-        //                        fontSize={this.aceconfig.fontSize}
-        //                        height={this.aceconfig.height}
-        //                        width={this.aceconfig.width}
-        //                        value={this.state.contextData}
-        //                        /*onChange={this.onContextChange*/
-        //                    />
-        //                </div>
-        //            </div>
-        //        );
         return (
             <div>
                 <div>
                     <div>
-                        <h1>{this.state.templateData.name}</h1>
+                        <h1>
+                            {this.state.editable ?
+                                'Create New Template' :
+                                this.state.templateData.name}
+                        </h1>
                     </div>
                     <div>
-                        <input
-                            readOnly
-                            type="text"
-                            value={this.state.templateData.name}
-                        />
+                        {this.state.editable ? (
+                            <input
+                                type="text"
+                                id="tmp_name"
+                                placeholder="Add template name"
+                            />
+                        ) : (
+                            <input
+                                readOnly
+                                type="text"
+                                value={this.state.templateData.name}
+                            />
+                        )}
                         <br />
-                        <label>Version : </label>
-                        <select
-                            id="type"
-                            className={styles.teButtons}
-                            value={this.state.templateData.version}
-                            onChange={e =>
-                                this.openTemplateVersion(e.target.value)
-                            }
-                        >
-                            {chooseVersion}
-                        </select>
-                        {this.state.templateData.default ?
-                            'default' :
-                            'not_default'}
+                        <div>
+                            <label>Version : </label>
+                            {!this.state.editable ? (
+                                <select
+                                    id="type"
+                                    className={styles.teButtons}
+                                    value={this.state.templateData.version}
+                                    onChange={e =>
+                                        this.openTemplateVersion(e.target.value)
+                                    }
+                                >
+                                    {' '}
+                                    {chooseVersion}{' '}
+                                </select>
+                            ) : (
+                                <select
+                                    id="type"
+                                    className={styles.teButtons}
+                                    value={0.1}
+                                />
+                            )}
+                            {!this.state.editable &&
+                            this.state.templateData.default ?
+                                'default' :
+                                'not_default'}
+                        </div>
+
                         <br />
                     </div>
+                </div>
+                <div>
+                    {this.state.editable ? (
+                        <div>
+                            <label> Type : </label>
+                            <select
+                                className={styles.teButtons}
+                                onChange={e =>
+                                    this.getTypesConfig(e.target.value)
+                                }
+                            >
+                                <option value="email" selected>
+                                    {' '}
+                                    Email{' '}
+                                </option>
+                                <option value="sms"> Sms </option>
+                            </select>
+                        </div>
+                    ) : (
+                        ''
+                    )}
                 </div>
                 <div className={styles.teScreenTable}>{editors}</div>
                 <div>
-                    <SearchBox onChange={this.onSearchTextChange.bind(this)} />
+                    {
+                        <div className={styles.teRowBlock}>
+                            <div className={styles.teSubTemplateBlock}>
+                                <div className={styles.teContextEditor}>
+                                    <div>
+                                        <h3>Sample Context Data</h3>
+                                    </div>
+                                    <AceEditor
+                                        name="template-editor"
+                                        placeholder="Write sample_context_data here..."
+                                        theme={this.aceconfig.theme}
+                                        mode="json"
+                                        fontSize={this.aceconfig.fontSize}
+                                        height={this.aceconfig.height}
+                                        width={this.aceconfig.width}
+                                        value={JSON.stringify(
+                                            this.state.contextData
+                                        )}
+                                        onChange={n => {
+                                            this.onContextChange(JSON.parse(n));
+                                        }}
+                                    />
+                                </div>
+                                <div className={styles.teContextEditor}>
+                                    <div>
+                                        <h3> Attributes </h3>
+                                    </div>
+                                    <AceEditor
+                                        name="template-editor"
+                                        placeholder="Write attributes here..."
+                                        theme={this.aceconfig.theme}
+                                        mode="json"
+                                        fontSize={this.aceconfig.fontSize}
+                                        height={this.aceconfig.height}
+                                        width={this.aceconfig.width}
+                                        value={JSON.stringify(
+                                            this.state.attributes
+                                        )}
+                                        onChange={n => {
+                                            this.onAttributesChange(
+                                                JSON.parse(n)
+                                            );
+                                        }}
+                                        readOnly={!this.state.editable}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
                 <div>
-                    <table
-                        className={
-                            'table table-striped table-responsive-md btn-table ' +
-                            styles.tsTable
-                        }
-                    >
-                        <thead>
-                            <tr>{tableHeaders}</tr>
-                        </thead>
-                        <tbody>{this.getTableRowsJSX()}</tbody>
-                    </table>
+                    {this.state.editable ? (
+                        ''
+                    ) : (
+                        <SearchBox
+                            onChange={this.onSearchTextChange.bind(this)}
+                        />
+                    )}
+                </div>
+                <div>
+                    {this.state.editable ? (
+                        ''
+                    ) : (
+                        <table
+                            className={
+                                'table table-striped table-responsive-md btn-table ' +
+                                styles.tsTable
+                            }
+                        >
+                            <thead>
+                                <tr>{tableHeaders}</tr>
+                            </thead>
+                            <tbody>{this.getTableRowsJSX()}</tbody>
+                        </table>
+                    )}
+                </div>
+                <div>
+                    {this.state.editable ? (
+                        <button
+                            className={styles.teButtons}
+                            onClick={() => {
+                                this.postTemplate(
+                                    document.getElementById('tmp_name').value,
+                                    this.state.type,
+                                    this.state.contextData,
+                                    this.state.attributes
+                                );
+                            }}
+                        >
+                            Create
+                        </button>
+                    ) : (
+                        ''
+                    )}
                 </div>
             </div>
         );
