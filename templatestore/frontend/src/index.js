@@ -17,8 +17,8 @@ const Root = () => (
                     }
                 />
             </Route>
-            <Route exact path={backendSettings.TE_BASEPATH + '/t/add'}>
-                <TemplateScreen />
+            <Route exact path={backendSettings.TE_BASEPATH + '/a/add'}>
+                <TemplateScreen editable />
             </Route>
             <Route
                 exact

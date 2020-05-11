@@ -20,6 +20,7 @@ class Home extends Component {
         ];
         this.getTableRowsJSX = this.getTableRowsJSX.bind(this);
         this.openTemplateScreenPage = this.openTemplateScreenPage.bind(this);
+        this.openNewTemplatePage = this.openNewTemplatePage.bind(this);
     }
 
     componentDidMount() {
@@ -47,6 +48,10 @@ class Home extends Component {
                 '/' +
                 (version === '-' ? '0.1' : version)
         );
+    }
+
+    openNewTemplatePage() {
+        this.props.history.push(backendSettings.TE_BASEPATH + '/a/add');
     }
 
     getTableRowsJSX() {
@@ -89,16 +94,16 @@ class Home extends Component {
                             type="button"
                             onClick={() =>
                                 this.openTemplateScreenPage(
-                                    this.state.templatesData[i][
+                                    filteredTemplates[i][
                                         'template_name'
                                     ],
-                                    this.state.templatesData[i][
+                                    filteredTemplates[i][
                                         'default_version'
                                     ] === '-' ?
-                                        this.state.templatesData[i][
+                                        '0.1' :
+                                        filteredTemplates[i][
                                             'default_version'
-                                        ] :
-                                        '0.1'
+                                        ]
                                 )
                             }
                         >
@@ -141,6 +146,14 @@ class Home extends Component {
                         </thead>
                         <tbody>{this.getTableRowsJSX()}</tbody>
                     </table>
+                </div>
+                <div>
+                    <button
+                        type="button"
+                        onClick={() => this.openNewTemplatePage()}
+                    >
+                        Add New Template
+                    </button>
                 </div>
             </div>
         );
