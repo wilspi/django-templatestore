@@ -1,17 +1,5 @@
-
-.teButtons {
-    flex: 1;
-    margin-left:10px;
-    margin-right:40px;
-    flex-direction: column;
-    border: 1px solid black;
-    background-color: white;
-    font-color: black;
-    font-size: 18px;
-}
-
 .teScreenTable {
-    margin: 10px;
+    // margin: 10px;
 }
 
 .teRowBlock {
@@ -23,13 +11,61 @@
 }
 .teTemplateEditor {
     flex: 1;
-    margin: 10px;
+    margin: 0 10px 0 0;
 }
 .teOutputEditor {
     flex: 1;
-    margin: 10px;
 }
 .teContextEditor {
     flex: 1;
-    margin: 10px;
+    margin: 0 10px 0 0;
+}
+
+.teDetailPage {
+    h1 {
+        margin-top: 20px;
+    }
+    input {
+        margin-top: 20px;
+        padding-left: 20px;
+        padding-right: 20px;
+        border: 1px solid #9ca1a7;
+        border-radius: 5px;
+        color: #000;
+        font-size: 16px;
+        &:focus {
+            outline: none;
+        }
+    }
+}
+
+.teVersionWrapper {
+    margin: 20px 0;
+    .teButtons {
+        width: 100px;
+        margin-left:10px;
+        margin-right:40px;
+        border-radius: 5px;
+        border: 1px solid black;
+        background-color: white;
+        color: black;
+        font-size: 16px;
+        padding: 0px 5px;
+    }
+    .teDefaultLabel {
+        text-transform: uppercase;
+        display: inline-block;
+    }
+}
+
+.teTableWrapper {
+    margin: 5px 0 100px 0;
+    table {
+        button {
+            border-radius: 5px;
+            border: 1px solid #9ca1a7;
+            color: #9ca1a7;
+            background-color: transparent;
+        }
+    }
 }
