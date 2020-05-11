@@ -22,6 +22,7 @@ class TemplateScreen extends Component {
                 name: this.props.match.params.name,
                 version: this.props.match.params.version
             },
+            searchText: '',
             versions: [{ version: this.props.match.params.version }],
             subTemplatesData: {},
             editable: this.props.editable
@@ -160,7 +161,28 @@ class TemplateScreen extends Component {
     }
 
     getTableRowsJSX() {
-        let tableRows = Object.values(this.state.versions).map(k => (
+        let filteredVersionList = this.state.versions.reduce(
+            (result, version) => {
+                if (
+                    Object.keys(version).reduce((res, t) => {
+                        res =
+                            res ||
+                            (
+                                version[t]
+                                    .toString()
+                                    .indexOf(
+                                        this.state.searchText
+                                    ) !== -1);
+                        return res;
+                    }, false)
+                ) {
+                    result.push(version);
+                }
+                return result;
+            },
+            []
+        );
+        let tableRows = Object.values(filteredVersionList).map(k => (
             <tr>
                 <td>
                     <Highlight search={this.state.searchText}>
@@ -194,15 +216,16 @@ class TemplateScreen extends Component {
     }
 
     getRenderedTemplate(subType, templateData, contextData, renderMode) {
+        let data = {
+            template: encode(templateData),
+            context: contextData,
+            handler: 'jinja2',
+            output: renderMode
+        };
         axios
-            .get(backendSettings.TE_BASEPATH + '/api/v1/render', {
-                params: {
-                    template: encode(templateData),
-                    context: contextData,
-                    handler: 'jinja2',
-                    output: renderMode
-                }
-            })
+            .post(
+                backendSettings.TE_BASEPATH + '/api/v1/render', data
+            )
             .then(response => {
                 this.setState({
                     subTemplatesData: Object.keys(
@@ -392,15 +415,15 @@ class TemplateScreen extends Component {
                     </div>
                     <div>
                         <label className={styles.teLabel}>
-                            Choose a type :
+                            Render Mode :
                         </label>
                         <select
                             readOnly
                             className={styles.teButtons}
                             value={this.state.subTemplatesData[t].renderMode}
                         >
-                            <option value="text"> Text </option>
-                            <option value="html"> HTML </option>
+                            <option value="text" disabled> Text </option>
+                            <option value="html" disabled> HTML </option>
                         </select>
                         <button
                             className={styles.teButtons}
