@@ -28,8 +28,6 @@ class TemplateScreen extends Component {
                 version: this.props.match.params.version
             },
             searchText: '',
-            contextData: '',
-            attributes: '',
             versions: [{ version: this.props.match.params.version }],
             subTemplatesData: {},
             editable: this.props.editable
@@ -232,10 +230,6 @@ class TemplateScreen extends Component {
             handler: 'jinja2',
             output: renderMode
         };
-        console.log("Meow", data);
-        console.log("a", this.state.contextData);
-        console.log("b", JSON.stringify(this.state.contextData));
-        console.log("c", JSON.parse(JSON.stringify(this.state.contextData)));
         axios
             .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
             .then(response => {
