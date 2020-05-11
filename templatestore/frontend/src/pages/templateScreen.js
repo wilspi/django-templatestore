@@ -319,7 +319,8 @@ class TemplateScreen extends Component {
                             return result;
                         },
                         {}
-                    )
+                    ),
+                    type: type
                 });
             })
             .catch(function(error) {
