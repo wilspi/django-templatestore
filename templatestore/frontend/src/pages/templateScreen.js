@@ -8,7 +8,7 @@ import {
     getDateInSimpleFormat
 } from './../utils.js';
 import styles from './../style/templateScreen.less';
-import SearchBox from './../components/searchBox.js';
+import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/theme-monokai';
@@ -36,7 +36,7 @@ class TemplateScreen extends Component {
             theme: 'monokai',
             fontSize: 16,
             width: 'auto',
-            height: '700px'
+            height: '400px'
         };
         this.getTableRowsJSX = this.getTableRowsJSX.bind(this);
         this.openTemplateVersion = this.openTemplateVersion.bind(this);
@@ -419,7 +419,7 @@ class TemplateScreen extends Component {
                             {outputView}
                         </div>
                     </div>
-                    <div>
+                    <div className={styles.teVersionWrapper}>
                         <label className={styles.teLabel}>Render Mode :</label>
                         <select
                             readOnly
@@ -453,8 +453,8 @@ class TemplateScreen extends Component {
             );
         });
         return (
-            <div>
-                <div>
+            <div className="container ">
+                <div className={styles.teDetailPage}>
                     <div>
                         <h1>
                             {this.state.editable ?
@@ -477,7 +477,7 @@ class TemplateScreen extends Component {
                             />
                         )}
                         <br />
-                        <div>
+                        <div className={styles.teVersionWrapper}>
                             <label>Version : </label>
                             {!this.state.editable ? (
                                 <select
@@ -580,7 +580,7 @@ class TemplateScreen extends Component {
                         </div>
                     }
                 </div>
-                <div>
+                <div className={styles.teSearchWrapper}>
                     {this.state.editable ? (
                         ''
                     ) : (
@@ -589,7 +589,7 @@ class TemplateScreen extends Component {
                         />
                     )}
                 </div>
-                <div>
+                <div className={styles.teTableWrapper}>
                     {this.state.editable ? (
                         ''
                     ) : (
