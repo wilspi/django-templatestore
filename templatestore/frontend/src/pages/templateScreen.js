@@ -44,7 +44,7 @@ class TemplateScreen extends Component {
         this.postTemplate = this.postTemplate.bind(this);
     }
     componentDidMount() {
-        if (this.state.editable) {
+        if (!this.state.editable) {
             axios
                 .get(
                     backendSettings.TE_BASEPATH +
@@ -54,7 +54,6 @@ class TemplateScreen extends Component {
                         this.state.templateData.version
                 )
                 .then(response => {
-                    console.log(response.data);
                     this.setState({
                         subTemplatesData: response.data.sub_templates.reduce(
                             (result, k) => {
@@ -108,6 +107,8 @@ class TemplateScreen extends Component {
                 .catch(error => {
                     console.log(error);
                 });
+        } else {
+            this.getTypesConfig('email');
         }
     }
 
@@ -125,6 +126,7 @@ class TemplateScreen extends Component {
                 version
         );
     }
+
     setDefaultVersion(version) {
         axios
             .post(
@@ -259,7 +261,6 @@ class TemplateScreen extends Component {
                 }
             })
             .then(response => {
-                console.log(response);
                 this.setState({
                     valueOutput: decode(response.data.rendered_template)
                 });
@@ -277,11 +278,15 @@ class TemplateScreen extends Component {
         axios
             .get(backendSettings.TE_BASEPATH + '/api/v1/config')
             .then(response => {
-                console.log(response);
                 this.setState({
-                    subTemplatesData: response.data[type].reduce(
+                    subTemplatesData: response.data[type].sub_type.reduce(
                         (result, k) => {
-                            result[k.subject] = k;
+                            result[k.type] = {
+                                subType: k.type,
+                                renderMode: k.render_mode,
+                                data: '',
+                                output: ''
+                            };
                             return result;
                         },
                         {}
@@ -306,8 +311,8 @@ class TemplateScreen extends Component {
             name: name,
             type: type,
             sub_templates: subTemplates,
-            sample_context_data: JSON.parse(contextData),
-            attributes: JSON.parse(attributes)
+            sample_context_data: contextData,
+            attributes: attributes
         };
         axios
             .post(backendSettings.TE_BASEPATH + '/api/v1/template', data)
@@ -357,6 +362,21 @@ class TemplateScreen extends Component {
                         highlightActiveLine="false"
                     />
                 );
+            let inputView = (
+                <AceEditor
+                    name="template-editor"
+                    placeholder="Write your template file here..."
+                    theme={this.aceconfig.theme}
+                    mode="handlebars"
+                    fontSize={this.aceconfig.fontSize}
+                    height={this.aceconfig.height}
+                    width={this.aceconfig.width}
+                    value={this.state.subTemplatesData[t].data}
+                    onChange={n => {
+                        this.onTemplateChange(t, n);
+                    }}
+                />
+            );
             return (
                 <div className={styles.teRowBlock}>
                     <div>
@@ -364,19 +384,7 @@ class TemplateScreen extends Component {
                     </div>
                     <div className={styles.teSubTemplateBlock}>
                         <div className={styles.teTemplateEditor}>
-                            <AceEditor
-                                name="template-editor"
-                                placeholder="Write your template file here..."
-                                theme={this.aceconfig.theme}
-                                mode="handlebars"
-                                fontSize={this.aceconfig.fontSize}
-                                height={this.aceconfig.height}
-                                width={this.aceconfig.width}
-                                value={this.state.subTemplatesData[t].data}
-                                onChange={n => {
-                                    this.onTemplateChange(t, n);
-                                }}
-                            />
+                            {inputView}
                         </div>
                         <div className={styles.teOutputEditor}>
                             {outputView}
@@ -416,170 +424,173 @@ class TemplateScreen extends Component {
                 <div>
                     <div>
                         <h1>
-                            {this.state.templateData.name ?
-                                this.state.templateData.name :
-                                'Create New Template'}
+                            {this.state.editable ?
+                                'Create New Template' :
+                                this.state.templateData.name}
                         </h1>
                     </div>
                     <div>
-                        {this.state.templateData.name ? (
-                            <input
-                                readOnly
-                                type="text"
-                                value={this.state.templateData.name}
-                            />
-                        ) : (
+                        {this.state.editable ? (
                             <input
                                 type="text"
                                 id="tmp_name"
                                 placeholder="Add template name"
                             />
+                        ) : (
+                            <input
+                                readOnly
+                                type="text"
+                                value={this.state.templateData.name}
+                            />
                         )}
                         <br />
-                        {this.state.templateData.name &&
-                        this.state.templateData.version ? (
-                                <div>
-                                    <label>Version : </label>
-                                    <select
-                                        id="type"
-                                        className={styles.teButtons}
-                                        value={this.state.templateData.version}
-                                        onChange={e =>
-                                            this.openTemplateVersion(e.target.value)
-                                        }
-                                    >
-                                        {' '}
-                                        {chooseVersion}{' '}
-                                    </select>
-                                    {this.state.templateData.default ?
-                                        'default' :
-                                        'not_default'}
-                                </div>
+                        <div>
+                            <label>Version : </label>
+                            {!this.state.editable ? (
+                                <select
+                                    id="type"
+                                    className={styles.teButtons}
+                                    value={this.state.templateData.version}
+                                    onChange={e =>
+                                        this.openTemplateVersion(e.target.value)
+                                    }
+                                >
+                                    {' '}
+                                    {chooseVersion}{' '}
+                                </select>
                             ) : (
-                                ''
+                                <select
+                                    id="type"
+                                    className={styles.teButtons}
+                                    value={0.1}
+                                />
                             )}
+                            {!this.state.editable &&
+                            this.state.templateData.default ?
+                                'default' :
+                                'not_default'}
+                        </div>
+
                         <br />
                     </div>
                 </div>
                 <div>
-                    {this.state.templateData.name &&
-                    this.state.templateData.version ? (
-                            ''
-                        ) : (
-                            <div>
-                                <label> Type : </label>
-                                <select
-                                    className={styles.teButtons}
-                                    onChange={e =>
-                                        this.getTypesConfig(e.target.value)
-                                    }
-                                >
-                                    <option value=""> None </option>
-                                    <option value="email" selected>
-                                        {' '}
+                    {this.state.editable ? (
+                        <div>
+                            <label> Type : </label>
+                            <select
+                                className={styles.teButtons}
+                                onChange={e =>
+                                    this.getTypesConfig(e.target.value)
+                                }
+                            >
+                                <option value="email" selected>
+                                    {' '}
                                     Email{' '}
-                                    </option>
-                                    <option value="sms"> Sms </option>
-                                </select>
-                            </div>
-                        )}
+                                </option>
+                                <option value="sms"> Sms </option>
+                            </select>
+                        </div>
+                    ) : (
+                        ''
+                    )}
                 </div>
                 <div className={styles.teScreenTable}>{editors}</div>
                 <div>
-                    {!this.state.templateData.name &&
-                    !this.state.templateData.version &&
-                    this.state.type ? (
-                            <div className={styles.teRowBlock}>
-                                <div className={styles.teSubTemplateBlock}>
-                                    <div className={styles.teContextEditor}>
-                                        <div>
-                                            <h3>Sample Context Data</h3>
-                                        </div>
-                                        <AceEditor
-                                            name="template-editor"
-                                            placeholder="Write sample_context_data here..."
-                                            theme={this.aceconfig.theme}
-                                            mode="json"
-                                            fontSize={this.aceconfig.fontSize}
-                                            height={this.aceconfig.height}
-                                            width={this.aceconfig.width}
-                                            value={this.state.contextData}
-                                            onChange={n => {
-                                                this.onContextChange(n);
-                                            }}
-                                        />
+                    {
+                        <div className={styles.teRowBlock}>
+                            <div className={styles.teSubTemplateBlock}>
+                                <div className={styles.teContextEditor}>
+                                    <div>
+                                        <h3>Sample Context Data</h3>
                                     </div>
-                                    <div className={styles.teContextEditor}>
-                                        <div>
-                                            <h3> Attributes </h3>
-                                        </div>
-                                        <AceEditor
-                                            name="template-editor"
-                                            placeholder="Write attributes here..."
-                                            theme={this.aceconfig.theme}
-                                            mode="json"
-                                            fontSize={this.aceconfig.fontSize}
-                                            height={this.aceconfig.height}
-                                            width={this.aceconfig.width}
-                                            value={this.state.attributes}
-                                            onChange={n => {
-                                                this.onAttributesChange(n);
-                                            }}
-                                        />
+                                    <AceEditor
+                                        name="template-editor"
+                                        placeholder="Write sample_context_data here..."
+                                        theme={this.aceconfig.theme}
+                                        mode="json"
+                                        fontSize={this.aceconfig.fontSize}
+                                        height={this.aceconfig.height}
+                                        width={this.aceconfig.width}
+                                        value={JSON.stringify(
+                                            this.state.contextData
+                                        )}
+                                        onChange={n => {
+                                            this.onContextChange(JSON.parse(n));
+                                        }}
+                                    />
+                                </div>
+                                <div className={styles.teContextEditor}>
+                                    <div>
+                                        <h3> Attributes </h3>
                                     </div>
+                                    <AceEditor
+                                        name="template-editor"
+                                        placeholder="Write attributes here..."
+                                        theme={this.aceconfig.theme}
+                                        mode="json"
+                                        fontSize={this.aceconfig.fontSize}
+                                        height={this.aceconfig.height}
+                                        width={this.aceconfig.width}
+                                        value={JSON.stringify(
+                                            this.state.attributes
+                                        )}
+                                        onChange={n => {
+                                            this.onAttributesChange(
+                                                JSON.parse(n)
+                                            );
+                                        }}
+                                        readOnly={!this.state.editable}
+                                    />
                                 </div>
                             </div>
-                        ) : (
-                            ''
-                        )}
+                        </div>
+                    }
                 </div>
                 <div>
-                    {this.state.templateData.name &&
-                    this.state.templateData.version ? (
-                            <SearchBox
-                                onChange={this.onSearchTextChange.bind(this)}
-                            />
-                        ) : (
-                            ''
-                        )}
+                    {this.state.editable ? (
+                        ''
+                    ) : (
+                        <SearchBox
+                            onChange={this.onSearchTextChange.bind(this)}
+                        />
+                    )}
                 </div>
                 <div>
-                    {this.state.templateData.name &&
-                    this.state.templateData.version ? (
-                            <table
-                                className={
-                                    'table table-striped table-responsive-md btn-table ' +
+                    {this.state.editable ? (
+                        ''
+                    ) : (
+                        <table
+                            className={
+                                'table table-striped table-responsive-md btn-table ' +
                                 styles.tsTable
-                                }
-                            >
-                                <thead>
-                                    <tr>{tableHeaders}</tr>
-                                </thead>
-                                <tbody>{this.getTableRowsJSX()}</tbody>
-                            </table>
-                        ) : (
-                            ''
-                        )}
+                            }
+                        >
+                            <thead>
+                                <tr>{tableHeaders}</tr>
+                            </thead>
+                            <tbody>{this.getTableRowsJSX()}</tbody>
+                        </table>
+                    )}
                 </div>
                 <div>
-                    {this.state.templateData.name &&
-                    this.state.templateData.version ? (
-                            ''
-                        ) : (
-                            <button
-                                className={styles.teButtons}
-                                onClick={() => {
-                                    this.postTemplate(
-                                        document.getElementById('tmp_name').value,
-                                        this.state.type,
-                                        this.state.contextData,
-                                        this.state.attributes
-                                    );
-                                }}
-                            >
+                    {this.state.editable ? (
+                        <button
+                            className={styles.teButtons}
+                            onClick={() => {
+                                this.postTemplate(
+                                    document.getElementById('tmp_name').value,
+                                    this.state.type,
+                                    this.state.contextData,
+                                    this.state.attributes
+                                );
+                            }}
+                        >
                             Create
-                            </button>
-                        )}
+                        </button>
+                    ) : (
+                        ''
+                    )}
                 </div>
             </div>
         );
