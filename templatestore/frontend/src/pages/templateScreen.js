@@ -8,7 +8,7 @@ import {
     getDateInSimpleFormat
 } from './../utils.js';
 import styles from './../style/templateScreen.less';
-import SearchBox from './../components/searchBox';
+import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/theme-monokai';
@@ -580,7 +580,7 @@ class TemplateScreen extends Component {
                         </div>
                     }
                 </div>
-                <div>
+                <div className={styles.teSearchWrapper}>
                     {this.state.editable ? (
                         ''
                     ) : (
