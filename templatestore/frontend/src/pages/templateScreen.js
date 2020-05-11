@@ -28,6 +28,8 @@ class TemplateScreen extends Component {
                 version: this.props.match.params.version
             },
             searchText: '',
+            contextData: '',
+            attributes: '',
             versions: [{ version: this.props.match.params.version }],
             subTemplatesData: {},
             editable: this.props.editable
@@ -230,6 +232,10 @@ class TemplateScreen extends Component {
             handler: 'jinja2',
             output: renderMode
         };
+        console.log("Meow", data);
+        console.log("a", this.state.contextData);
+        console.log("b", JSON.stringify(this.state.contextData));
+        console.log("c", JSON.parse(JSON.stringify(this.state.contextData)));
         axios
             .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
             .then(response => {
@@ -420,21 +426,6 @@ class TemplateScreen extends Component {
                         </div>
                     </div>
                     <div className={styles.teVersionWrapper}>
-                        <label className={styles.teLabel}>Render Mode :</label>
-                        <select
-                            readOnly
-                            className={styles.teButtons}
-                            value={this.state.subTemplatesData[t].renderMode}
-                        >
-                            <option value="text" disabled>
-                                {' '}
-                                Text{' '}
-                            </option>
-                            <option value="html" disabled>
-                                {' '}
-                                HTML{' '}
-                            </option>
-                        </select>
                         <button
                             className={styles.teButtons}
                             onClick={() => {
