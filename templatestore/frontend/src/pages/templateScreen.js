@@ -142,7 +142,7 @@ class TemplateScreen extends Component {
             });
     }
 
-    onSearchTextChange(searchValue) {
+    onTextChange(searchValue) {
         this.setState({
             searchText: searchValue
         });
@@ -387,7 +387,7 @@ class TemplateScreen extends Component {
                 </div>
                 <div className={styles.teScreenTable}>{editors}</div>
                 <div>
-                    <SearchBox onChange={this.onSearchTextChange.bind(this)} />
+                    <SearchBox onChange={this.onTextChange.bind(this)} />
                 </div>
                 <div className={styles.teTableWrapper}>
                     <table

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
 import styles from './../style/home.less';
-import { backendSettings } from './../utils.js';
+import { backendSettings, getDateInSimpleFormat } from './../utils.js';
 import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
 
@@ -15,11 +15,14 @@ class Home extends Component {
         };
         this.tableHeaderList = [
             'template_name',
+            'type',
             'default_version',
+            'created_on',
             ...this.props.fixedAttributeKeys
         ];
         this.getTableRowsJSX = this.getTableRowsJSX.bind(this);
         this.openTemplateScreenPage = this.openTemplateScreenPage.bind(this);
+        this.openNewTemplatePage = this.openNewTemplatePage.bind(this);
     }
 
     componentDidMount() {
@@ -28,9 +31,11 @@ class Home extends Component {
                 templatesData: response.data.map(t => ({
                     ...{
                         template_name: t.name,
-                        default_version: t.default ? t.version : '-'
+                        default_version: t.default ? t.version : '-',
+                        type: t.type,
+                        created_on: getDateInSimpleFormat(t.created_on)
                     },
-                    ...this.tableHeaderList.slice(2).reduce((result, k) => {
+                    ...this.tableHeaderList.slice(4).reduce((result, k) => {
                         result[k] = t.attributes[k];
                         return result;
                     }, {})
@@ -47,6 +52,10 @@ class Home extends Component {
                 '/' +
                 (version === '-' ? '0.1' : version)
         );
+    }
+
+    openNewTemplatePage() {
+        this.props.history.push(backendSettings.TE_BASEPATH + '/a/add');
     }
 
     getTableRowsJSX() {
@@ -89,16 +98,13 @@ class Home extends Component {
                             type="button"
                             onClick={() =>
                                 this.openTemplateScreenPage(
-                                    this.state.templatesData[i][
-                                        'template_name'
-                                    ],
-                                    this.state.templatesData[i][
-                                        'default_version'
-                                    ] === '-' ?
-                                        this.state.templatesData[i][
+                                    filteredTemplates[i]['template_name'],
+                                    filteredTemplates[i]['default_version'] ===
+                                        '-' ?
+                                        '0.1' :
+                                        filteredTemplates[i][
                                             'default_version'
-                                        ] :
-                                        '0.1'
+                                        ]
                                 )
                             }
                         >
@@ -136,6 +142,14 @@ class Home extends Component {
                         </thead>
                         <tbody className={styles.tableBody}>{this.getTableRowsJSX()}</tbody>
                     </table>
+                </div>
+                <div className={styles.tsAddTemplateBtn}>
+                    <button
+                        type="button"
+                        onClick={() => this.openNewTemplatePage()}
+                    >
+                        Add New Template
+                    </button>
                 </div>
             </div>
         );
