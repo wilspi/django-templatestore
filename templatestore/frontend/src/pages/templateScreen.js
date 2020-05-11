@@ -226,7 +226,7 @@ class TemplateScreen extends Component {
     getRenderedTemplate(subType, templateData, contextData, renderMode) {
         let data = {
             template: encode(templateData),
-            context: contextData,
+            context: JSON.parse(contextData),
             handler: 'jinja2',
             output: renderMode
         };
@@ -340,8 +340,8 @@ class TemplateScreen extends Component {
             name: name,
             type: type,
             sub_templates: subTemplates,
-            sample_context_data: contextData,
-            attributes: attributes
+            sample_context_data: JSON.parse(contextData),
+            attributes: JSON.parse(attributes)
         };
         axios
             .post(backendSettings.TE_BASEPATH + '/api/v1/template', data)
