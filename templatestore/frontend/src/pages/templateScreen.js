@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router';
-import { encode, decode, backendSettings, getDateInSimpleFormat } from './../utils.js';
+import {
+    encode,
+    decode,
+    backendSettings,
+    getDateInSimpleFormat
+} from './../utils.js';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox.js';
 import Highlight from './../components/highlight.js';
@@ -97,9 +102,7 @@ class TemplateScreen extends Component {
                         versions: response.data.map(t => ({
                             version: t.version,
                             default: t.default,
-                            created_on: getDateInSimpleFormat(
-                                t.created_on
-                            )
+                            created_on: getDateInSimpleFormat(t.created_on)
                         }))
                     });
                 })
@@ -160,12 +163,9 @@ class TemplateScreen extends Component {
                     Object.keys(version).reduce((res, t) => {
                         res =
                             res ||
-                            (
-                                version[t]
-                                    .toString()
-                                    .indexOf(
-                                        this.state.searchText
-                                    ) !== -1);
+                            version[t]
+                                .toString()
+                                .indexOf(this.state.searchText) !== -1;
                         return res;
                     }, false)
                 ) {
@@ -188,20 +188,35 @@ class TemplateScreen extends Component {
                     </Highlight>
                 </td>
                 <td>
-                    {
-                        k.version === this.state.templateData.version ?
-                            <button type="button" disabled> Opened </button> :
-                            <button type="button" onClick={() => this.openTemplateVersion(k.version)}> Open </button>
-                    }
+                    {k.version === this.state.templateData.version ? (
+                        <button type="button" disabled>
+                            {' '}
+                            Opened{' '}
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => this.openTemplateVersion(k.version)}
+                        >
+                            {' '}
+                            Open{' '}
+                        </button>
+                    )}
                 </td>
                 <td>
-                    {
-                        k.default ?
-                            <button type="button" disabled> Defaulted </button> :
-                            <button type="button" onClick={() => this.setDefaultVersion(k.version)}>
-                                Set Default Version
-                            </button>
-                    }
+                    {k.default ? (
+                        <button type="button" disabled>
+                            {' '}
+                            Defaulted{' '}
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => this.setDefaultVersion(k.version)}
+                        >
+                            Set Default Version
+                        </button>
+                    )}
                 </td>
             </tr>
         ));
@@ -216,9 +231,7 @@ class TemplateScreen extends Component {
             output: renderMode
         };
         axios
-            .post(
-                backendSettings.TE_BASEPATH + '/api/v1/render', data
-            )
+            .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
             .then(response => {
                 this.setState({
                     subTemplatesData: Object.keys(
@@ -407,16 +420,20 @@ class TemplateScreen extends Component {
                         </div>
                     </div>
                     <div>
-                        <label className={styles.teLabel}>
-                            Render Mode :
-                        </label>
+                        <label className={styles.teLabel}>Render Mode :</label>
                         <select
                             readOnly
                             className={styles.teButtons}
                             value={this.state.subTemplatesData[t].renderMode}
                         >
-                            <option value="text" disabled> Text </option>
-                            <option value="html" disabled> HTML </option>
+                            <option value="text" disabled>
+                                {' '}
+                                Text{' '}
+                            </option>
+                            <option value="html" disabled>
+                                {' '}
+                                HTML{' '}
+                            </option>
                         </select>
                         <button
                             className={styles.teButtons}

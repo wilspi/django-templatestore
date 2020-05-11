@@ -98,12 +98,9 @@ class Home extends Component {
                             type="button"
                             onClick={() =>
                                 this.openTemplateScreenPage(
-                                    filteredTemplates[i][
-                                        'template_name'
-                                    ],
-                                    filteredTemplates[i][
-                                        'default_version'
-                                    ] === '-' ?
+                                    filteredTemplates[i]['template_name'],
+                                    filteredTemplates[i]['default_version'] ===
+                                        '-' ?
                                         '0.1' :
                                         filteredTemplates[i][
                                             'default_version'
