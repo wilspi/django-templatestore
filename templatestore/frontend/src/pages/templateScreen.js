@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router';
-import { encode, decode, backendSettings } from './../utils.js';
+import { encode, decode, backendSettings, getDateInSimpleFormat } from './../utils.js';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox.js';
 import Highlight from './../components/highlight.js';
@@ -36,7 +36,6 @@ class TemplateScreen extends Component {
         this.getTableRowsJSX = this.getTableRowsJSX.bind(this);
         this.openTemplateVersion = this.openTemplateVersion.bind(this);
         this.setDefaultVersion = this.setDefaultVersion.bind(this);
-        this.getDateInSimpleFormat = this.getDateInSimpleFormat.bind(this);
         this.getRenderedTemplate = this.getRenderedTemplate.bind(this);
         this.onTemplateChange = this.onTemplateChange.bind(this);
         this.onContextChange = this.onContextChange.bind(this);
@@ -86,7 +85,6 @@ class TemplateScreen extends Component {
                         );
                     }
                 });
-
             axios
                 .get(
                     backendSettings.TE_BASEPATH +
@@ -99,7 +97,7 @@ class TemplateScreen extends Component {
                         versions: response.data.map(t => ({
                             version: t.version,
                             default: t.default,
-                            created_on: this.getDateInSimpleFormat(
+                            created_on: getDateInSimpleFormat(
                                 t.created_on
                             )
                         }))
@@ -111,11 +109,6 @@ class TemplateScreen extends Component {
         } else {
             this.getTypesConfig('email');
         }
-    }
-
-    getDateInSimpleFormat(datestr) {
-        let d = new Date(datestr);
-        return d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
     }
 
     openTemplateVersion(version) {

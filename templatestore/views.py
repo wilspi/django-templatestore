@@ -94,6 +94,7 @@ def get_templates_view(request):
                     "default": True if t.default_version_id else False,
                     "type": t.type,
                     "attributes": t.attributes,
+                    "created_on": t.created_on,
                 }
                 for t in templates
             ]
