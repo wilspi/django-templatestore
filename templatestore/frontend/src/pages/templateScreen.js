@@ -77,8 +77,8 @@ class TemplateScreen extends Component {
                             version: this.props.match.params.version,
                             default: response.data.default
                         },
-                        contextData: JSON.stringify(response.data.sample_context_data),
-                        attributes: JSON.stringify(response.data.attributes),
+                        contextData: JSON.stringify(response.data.sample_context_data, null, 2),
+                        attributes: JSON.stringify(response.data.attributes, null, 2),
                         type: response.data.type
                     });
                 })
