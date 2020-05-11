@@ -32,25 +32,47 @@ def render_via_jinja(template, context):
 @csrf_exempt
 def render_template_view(request):
     # log requests
-    if request.method != "GET":
+    if request.method != "POST":
         return HttpResponseBadRequest("invalid request method: " + request.method)
-    template = request.GET.get("template", "")
-    context = json.loads(request.GET.get("context", "{}"))
-    handler = request.GET.get("handler", "")
+
     try:
+        data = json.loads(request.body)
+        required_fields = {"template", "context", "handler"}
+        missing_fields = required_fields.difference(set(data.keys()))
+
+        if len(missing_fields):
+            raise (
+                Exception("Validation: missing fields `" + str(missing_fields) + "`")
+            )
+
+        template = data["template"]
+        context = data["context"]
+        handler = data["handler"]
+
+        if not re.match(
+            "(^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$)", template
+        ):
+            raise (Exception("Validation: Template data is not base64 encoded"))
+
         if handler == "jinja2":
             rendered_template = render_via_jinja(template, context)
             data = {
                 "rendered_template": rendered_template,
                 "rendered_on": datetime.now(),
             }
+            return JsonResponse(data, safe=False)
+
         else:
-            raise Exception("Invalid Template Handler: %s", handler)  # TOTEST
+            raise Exception("Invalid Template Handler: %s", handler)
+
     except Exception as e:
         logger.exception(e)
-        raise e
 
-    return JsonResponse(data, safe=False)
+        return HttpResponse(
+            json.dumps({"message": str(e)}),
+            content_type="application/json",
+            status=400,
+        )
 
 
 @csrf_exempt
@@ -72,6 +94,7 @@ def get_templates_view(request):
                     "default": True if t.default_version_id else False,
                     "type": t.type,
                     "attributes": t.attributes,
+                    "created_on": t.created_on,
                 }
                 for t in templates
             ]

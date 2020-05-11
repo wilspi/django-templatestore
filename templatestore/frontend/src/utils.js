@@ -10,6 +10,11 @@ export function decode(str) {
     return decodedString;
 }
 
+export function getDateInSimpleFormat(datestr) {
+    let d = new Date(datestr);
+    return d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
+}
+
 export const backendSettings = JSON.parse(
     document.getElementById('settings-data').textContent.replace(/&quot;/g, '"')
 );
