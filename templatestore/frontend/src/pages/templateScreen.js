@@ -504,11 +504,9 @@ class TemplateScreen extends Component {
                                 'default' :
                                 'not_default'}
                         </div>
-
-                        <br />
                     </div>
                 </div>
-                <div>
+                <div className={styles.teVersionWrapper}>
                     {this.state.editable ? (
                         <div>
                             <label> Type : </label>
