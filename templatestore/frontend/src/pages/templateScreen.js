@@ -441,6 +441,13 @@ class TemplateScreen extends Component {
                 </div>
             );
         });
+
+        let types = Object.keys(this.state.config).map(t => {
+            return (
+                <option value={t}> {t} </option>
+            );
+        });
+
         return (
             <div className="container ">
                 <div className={styles.teDetailPage}>
@@ -507,11 +514,7 @@ class TemplateScreen extends Component {
                                 }
                             >
                                 <option value="" selected disabled hidden>Choose here</option>
-                                <option value="email">
-                                    {' '}
-                                    Email{' '}
-                                </option>
-                                <option value="sms"> Sms </option>
+                                { types }
                             </select>
                         </div>
                     ) : (
