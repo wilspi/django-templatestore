@@ -364,6 +364,10 @@ class TemplateScreen extends Component {
     }
 
     render() {
+        if (Object.keys(this.state.config).length && !this.state.type && this.state.editable) {
+            this.getTypesConfig(Object.keys(this.state.config)[0]);
+        }
+
         let chooseVersion = this.state.versions.map(versions => {
             return (
                 <option value={versions.version}> {versions.version} </option>
@@ -513,7 +517,6 @@ class TemplateScreen extends Component {
                                     this.getTypesConfig(e.target.value)
                                 }
                             >
-                                <option value="" selected disabled hidden>Choose here</option>
                                 { types }
                             </select>
                         </div>
