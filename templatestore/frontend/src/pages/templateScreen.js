@@ -30,6 +30,7 @@ class TemplateScreen extends Component {
             searchText: '',
             versions: [{ version: this.props.match.params.version }],
             subTemplatesData: {},
+            config: {},
             editable: this.props.editable
         };
         this.aceconfig = {
@@ -110,7 +111,16 @@ class TemplateScreen extends Component {
                     console.log(error);
                 });
         } else {
-            this.getTypesConfig('email');
+            axios
+                .get(backendSettings.TE_BASEPATH + '/api/v1/config')
+                .then(response => {
+                    this.setState({
+                        config: response.data
+                    });
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
         }
     }
 
@@ -304,28 +314,21 @@ class TemplateScreen extends Component {
     }
 
     getTypesConfig(type) {
-        axios
-            .get(backendSettings.TE_BASEPATH + '/api/v1/config')
-            .then(response => {
-                this.setState({
-                    subTemplatesData: response.data[type].sub_type.reduce(
-                        (result, k) => {
-                            result[k.type] = {
-                                subType: k.type,
-                                renderMode: k.render_mode,
-                                data: '',
-                                output: ''
-                            };
-                            return result;
-                        },
-                        {}
-                    ),
-                    type: type
-                });
-            })
-            .catch(function(error) {
-                console.log(error);
-            });
+        this.setState({
+            subTemplatesData: this.state.config[type].sub_type.reduce(
+                (result, k) => {
+                    result[k.type] = {
+                        subType: k.type,
+                        renderMode: k.render_mode,
+                        data: '',
+                        output: ''
+                    };
+                    return result;
+                },
+                {}
+            ),
+            type: type
+        });
     }
 
     postTemplate(name, type, contextData, attributes) {
@@ -503,7 +506,8 @@ class TemplateScreen extends Component {
                                     this.getTypesConfig(e.target.value)
                                 }
                             >
-                                <option value="email" selected>
+                                <option value="" selected disabled hidden>Choose here</option>
+                                <option value="email">
                                     {' '}
                                     Email{' '}
                                 </option>
