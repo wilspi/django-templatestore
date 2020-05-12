@@ -32,8 +32,8 @@ class Home extends Component {
                 templatesData: response.data.map(t => ({
                     ...{
                         template_name: t.name,
-                        default_version: t.default ? t.version : '-',
                         type: t.type,
+                        default_version: t.default ? t.version : '-',
                         created_on: getDateInSimpleFormat(t.created_on),
                         updated_on: getDateInSimpleFormat(t.modified_on),
                     },
