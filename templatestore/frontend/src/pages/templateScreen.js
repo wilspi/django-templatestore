@@ -421,21 +421,6 @@ class TemplateScreen extends Component {
                         </div>
                     </div>
                     <div className={styles.teVersionWrapper}>
-                        <label className={styles.teLabel}>Render Mode :</label>
-                        <select
-                            readOnly
-                            className={styles.teButtons}
-                            value={this.state.subTemplatesData[t].renderMode}
-                        >
-                            <option value="text" disabled>
-                                {' '}
-                                Text{' '}
-                            </option>
-                            <option value="html" disabled>
-                                {' '}
-                                HTML{' '}
-                            </option>
-                        </select>
                         <button
                             className={styles.teButtons}
                             onClick={() => {
@@ -497,7 +482,9 @@ class TemplateScreen extends Component {
                                     id="type"
                                     className={styles.teButtons}
                                     value={0.1}
-                                />
+                                >
+                                    <option disabled>0.1</option>
+                                </select>
                             )}
                             {!this.state.editable &&
                             this.state.templateData.default ?
