@@ -95,6 +95,7 @@ def get_templates_view(request):
                     "type": t.type,
                     "attributes": t.attributes,
                     "created_on": t.created_on,
+                    "modified_on": t.modified_on
                 }
                 for t in templates
             ]
