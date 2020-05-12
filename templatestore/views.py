@@ -82,7 +82,9 @@ def get_templates_view(request):
             offset = int(request.GET.get("offset", 0))
             limit = int(request.GET.get("limit", ts_settings.TE_ROWLIMIT))
 
-            templates = Template.objects.all().order_by("-modified_on")[offset : offset + limit]
+            templates = Template.objects.all().order_by("-modified_on")[
+                offset : offset + limit
+            ]
             template_list = [
                 {
                     "name": t.name,
@@ -95,7 +97,7 @@ def get_templates_view(request):
                     "type": t.type,
                     "attributes": t.attributes,
                     "created_on": t.created_on,
-                    "modified_on": t.modified_on
+                    "modified_on": t.modified_on,
                 }
                 for t in templates
             ]
