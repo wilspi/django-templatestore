@@ -566,6 +566,23 @@ class TemplateScreen extends Component {
                         </div>
                     }
                 </div>
+                <div>
+                    <button
+                        className={styles.teButtons}
+                        onClick={() => {
+                            if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
+                                this.postTemplate(
+                                    this.state.templateData.name,
+                                    this.state.type,
+                                    this.state.contextData,
+                                    this.state.attributes
+                                );
+                            }
+                        }}
+                    >
+                         Save
+                    </button>
+                </div>
                 <div className={styles.teSearchWrapper}>
                     {this.state.editable ? (
                         ''
