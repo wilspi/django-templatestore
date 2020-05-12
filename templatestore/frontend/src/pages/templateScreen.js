@@ -319,7 +319,8 @@ class TemplateScreen extends Component {
                             return result;
                         },
                         {}
-                    )
+                    ),
+                    type: type
                 });
             })
             .catch(function(error) {
@@ -509,7 +510,9 @@ class TemplateScreen extends Component {
                                     id="type"
                                     className={styles.teButtons}
                                     value={0.1}
-                                />
+                                >
+                                    <option disabled>0.1</option>
+                                </select>
                             )}
                             <label>Default : </label>
                             {!this.state.editable &&
@@ -517,11 +520,9 @@ class TemplateScreen extends Component {
                                 <i className="fa fa-check-circle-o" aria-hidden="true" /> :
                                 <i className="fa fa-times-circle" aria-hidden="true" /> }
                         </div>
-
-                        <br />
                     </div>
                 </div>
-                <div>
+                <div className={styles.teVersionWrapper}>
                     {this.state.editable ? (
                         <div>
                             <label> Type : </label>
