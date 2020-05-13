@@ -78,8 +78,8 @@ class TemplateScreen extends Component {
                             version: this.props.match.params.version,
                             default: response.data.default
                         },
-                        contextData: response.data.sample_context_data,
-                        attributes: response.data.attributes,
+                        contextData: JSON.stringify(response.data.sample_context_data, null, 2),
+                        attributes: JSON.stringify(response.data.attributes, null, 2),
                         type: response.data.type
                     });
                 })
@@ -236,7 +236,7 @@ class TemplateScreen extends Component {
     getRenderedTemplate(subType, templateData, contextData, renderMode) {
         let data = {
             template: encode(templateData),
-            context: contextData,
+            context: JSON.parse(contextData),
             handler: 'jinja2',
             output: renderMode
         };
@@ -277,13 +277,13 @@ class TemplateScreen extends Component {
         });
     }
 
-    onContextChange(newValue) {
+    onContextChange(newValue, event) {
         this.setState({
             contextData: newValue
         });
     }
 
-    onAttributesChange(newValue) {
+    onAttributesChange(newValue, event) {
         this.setState({
             attributes: newValue
         });
@@ -344,8 +344,8 @@ class TemplateScreen extends Component {
             name: name,
             type: type,
             sub_templates: subTemplates,
-            sample_context_data: contextData,
-            attributes: attributes
+            sample_context_data: JSON.parse(contextData),
+            attributes: JSON.parse(attributes)
         };
         axios
             .post(backendSettings.TE_BASEPATH + '/api/v1/template', data)
@@ -541,12 +541,8 @@ class TemplateScreen extends Component {
                                         fontSize={this.aceconfig.fontSize}
                                         height={this.aceconfig.height}
                                         width={this.aceconfig.width}
-                                        value={JSON.stringify(
-                                            this.state.contextData
-                                        )}
-                                        onChange={n => {
-                                            this.onContextChange(JSON.parse(n));
-                                        }}
+                                        value={this.state.contextData}
+                                        onChange={this.onContextChange}
                                     />
                                 </div>
                                 <div className={styles.teContextEditor}>
@@ -561,20 +557,31 @@ class TemplateScreen extends Component {
                                         fontSize={this.aceconfig.fontSize}
                                         height={this.aceconfig.height}
                                         width={this.aceconfig.width}
-                                        value={JSON.stringify(
-                                            this.state.attributes
-                                        )}
-                                        onChange={n => {
-                                            this.onAttributesChange(
-                                                JSON.parse(n)
-                                            );
-                                        }}
+                                        value={this.state.attributes}
+                                        onChange={this.onAttributesChange}
                                         readOnly={!this.state.editable}
                                     />
                                 </div>
                             </div>
                         </div>
                     }
+                </div>
+                <div>
+                    <button
+                        className={styles.teButtons}
+                        onClick={() => {
+                            if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
+                                this.postTemplate(
+                                    this.state.templateData.name,
+                                    this.state.type,
+                                    this.state.contextData,
+                                    this.state.attributes
+                                );
+                            }
+                        }}
+                    >
+                         Save
+                    </button>
                 </div>
                 <div className={styles.teSearchWrapper}>
                     {this.state.editable ? (
