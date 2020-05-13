@@ -446,7 +446,7 @@ class TemplateScreen extends Component {
             );
         });
 
-        let types = Object.keys(this.state.config).map(t => {
+        let templateTypes = Object.keys(this.state.config).map(t => {
             return (
                 <option value={t}> {t} </option>
             );
@@ -517,7 +517,7 @@ class TemplateScreen extends Component {
                                     this.getTypesConfig(e.target.value)
                                 }
                             >
-                                { types }
+                                { templateTypes }
                             </select>
                         </div>
                     ) : (
