@@ -161,6 +161,14 @@
                                     "attributes":{
                                         "type":"object",
                                         "additionalProperties":true
+                                    },
+                                    "created_on": {
+                                        "type":"string",
+                                        "format":"date-time"
+                                    },
+                                    "modified_on": {
+                                        "type":"string",
+                                        "format":"date-time"
                                     }
                                 }
                             }
