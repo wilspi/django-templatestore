@@ -361,6 +361,7 @@ class TemplateScreen extends Component {
     }
 
     render() {
+        console.log('state : ', this.state.subTemplatesData);
         let chooseVersion = this.state.versions.map(versions => {
             return (
                 <option value={versions.version}> {versions.version} </option>
@@ -459,6 +460,16 @@ class TemplateScreen extends Component {
                                     >
                                         Render
                                     </button>
+                                    {
+                                        t === 'htmlpart' ?
+                                            <button
+                                                className={styles.tePreviewButton}
+                                                data-toggle="modal"
+                                                data-target="#myModal"
+                                            >
+                                                Preview
+                                            </button> : ''
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -545,6 +556,8 @@ class TemplateScreen extends Component {
                 </div>
                 <div className="accordion md-accordion" id="accordionEx" role="tablist" aria-multiselectable="true">
                     <div className={styles.teScreenTable}>{editors}</div>
+                </div>
+                <div className="accordion md-accordion" id="accordionEx" role="tablist" aria-multiselectable="true">
                     <div>
                         {
                             <div className="card">
@@ -664,6 +677,25 @@ class TemplateScreen extends Component {
                     ) : (
                         ''
                     )}
+                </div>
+                <div className="modal fade" id="myModal">
+                    <div className="modal-dialog modal-xl">
+                        <div className="modal-content">
+                            {/* <div className="modal-header" style={{ height: '5vh' }}>
+                                <button type="button" className="close" data-dismiss="modal" style={{ padding: '10px' }}>×</button>
+                            </div> */}
+                            <div className="modal-body" style={{ height: '90vh', padding: '0' }}>
+                                {
+                                    this.state.subTemplatesData && Object.keys(this.state.subTemplatesData).length !== 0 ?
+                                        <iframe
+                                            height="100%"
+                                            width="100%"
+                                            srcDoc={this.state.subTemplatesData['htmlpart'].output}
+                                        /> : ''
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
