@@ -663,6 +663,39 @@ class TemplateScreen extends Component {
                         }
                     </div>
                 </div>
+                <div className={styles.teSaveContainer}>
+                    {this.state.editable ? (
+                        <button
+                            className={styles.teButtons}
+                            onClick={() => {
+                                this.postTemplate(
+                                    document.getElementById('tmp_name').value,
+                                    this.state.type,
+                                    this.state.contextData,
+                                    this.state.attributes
+                                );
+                            }}
+                        >
+                            Create
+                        </button>
+                    ) : (
+                        <button
+                            className={styles.teButtons}
+                            onClick={() => {
+                                if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
+                                    this.postTemplate(
+                                        this.state.templateData.name,
+                                        this.state.type,
+                                        this.state.contextData,
+                                        this.state.attributes
+                                    );
+                                }
+                            }}
+                        >
+                            Save
+                        </button>
+                    )}
+                </div>
                 <div className={styles.teMarginTop20}>
                     <label>Attributes : </label>
                 </div>
@@ -719,27 +752,6 @@ class TemplateScreen extends Component {
                         }
                     </div>
                 </div>
-                <div className={styles.teSaveContainer}>
-                    {this.state.editable ? (
-                        ''
-                    ) : (
-                        <button
-                            className={styles.teButtons}
-                            onClick={() => {
-                                if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
-                                    this.postTemplate(
-                                        this.state.templateData.name,
-                                        this.state.type,
-                                        this.state.contextData,
-                                        this.state.attributes
-                                    );
-                                }
-                            }}
-                        >
-                            Save
-                        </button>
-                    )}
-                </div>
                 {this.state.editable ? (
                     ''
                 ) : (
@@ -771,25 +783,6 @@ class TemplateScreen extends Component {
                         </div>
                     </div>
                 )}
-                <div>
-                    {this.state.editable ? (
-                        <button
-                            className={styles.teButtons}
-                            onClick={() => {
-                                this.postTemplate(
-                                    document.getElementById('tmp_name').value,
-                                    this.state.type,
-                                    this.state.contextData,
-                                    this.state.attributes
-                                );
-                            }}
-                        >
-                            Create
-                        </button>
-                    ) : (
-                        ''
-                    )}
-                </div>
                 <div className="modal fade" id="myModal">
                     <div className="modal-dialog modal-xl">
                         <div className="modal-content">
