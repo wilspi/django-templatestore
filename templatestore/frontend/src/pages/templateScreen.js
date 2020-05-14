@@ -31,6 +31,8 @@ class TemplateScreen extends Component {
             versions: [{ version: this.props.match.params.version }],
             subTemplatesData: {},
             config: {},
+            contextData: '',
+            attributes: '',
             editable: this.props.editable
         };
         this.aceconfig = {
@@ -129,6 +131,19 @@ class TemplateScreen extends Component {
                 .catch(function(error) {
                     console.log(error);
                 });
+
+            this.setState({
+                attributes: JSON.stringify(
+                    backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
+                        (result, attribute) => {
+                            result[attribute] = "";
+                            return result;
+                        },
+                        {}
+                    ),
+                    null, 2
+                )
+            });
         }
     }
 
