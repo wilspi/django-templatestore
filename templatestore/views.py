@@ -546,3 +546,19 @@ def get_config_view(request):
             content_type="application/json",
             status=404,
         )
+
+
+@csrf_exempt
+def patch_attributes_view(request, name):
+    if request.method == "PATCH":
+        data = json.loads(request.body)
+        Template.objects.filter(name=name).update(attributes=data["attributes"])
+        template = Template.objects.get(name=name)
+        data = {"name": name, "attributes": template.attributes}
+        return JsonResponse(data, status=200)
+    else:
+        return HttpResponse(
+            json.dumps({"message": "no method found"}),
+            content_type="application/json",
+            status=404,
+        )
