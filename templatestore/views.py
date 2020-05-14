@@ -551,11 +551,32 @@ def get_config_view(request):
 @csrf_exempt
 def patch_attributes_view(request, name):
     if request.method == "PATCH":
-        data = json.loads(request.body)
-        Template.objects.filter(name=name).update(attributes=data["attributes"])
-        template = Template.objects.get(name=name)
-        data = {"name": name, "attributes": template.attributes}
-        return JsonResponse(data, status=200)
+        try:
+            data = json.loads(request.body)
+            if "attributes" not in data:
+                raise (
+                    Exception(
+                        "Validation: Attributes are not provided"
+                    )
+                )
+            template = Template.objects.filter(name=name)
+            if len(template) == 0:
+                raise (
+                    Exception(
+                        "Validation: Template with given name does not exist"
+                    )
+                )
+            template.update(attributes=data["attributes"])
+            template = Template.objects.get(name=name)
+            data = {"name": name, "attributes": template.attributes}
+            return JsonResponse(data, status=200)
+        except Exception as e:
+            logger.exception(e)
+            return HttpResponse(
+                json.dumps({"message": str(e)}),
+                content_type="application/json",
+                status=400,
+            )
     else:
         return HttpResponse(
             json.dumps({"message": "no method found"}),
