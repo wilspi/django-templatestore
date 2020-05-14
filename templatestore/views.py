@@ -563,7 +563,7 @@ def patch_attributes_view(request, name):
 
             missing_attributes = set(
                 ts_settings.TE_TEMPLATE_ATTRIBUTES_KEYS
-            ).difference(set(data.keys()))
+            ).difference(set(data["attributes"].keys()))
             if len(missing_attributes):
                 raise (
                     Exception(
