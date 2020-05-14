@@ -568,7 +568,7 @@ class TemplateScreen extends Component {
                             {!this.state.editable &&
                             this.state.templateData.default ? (
                                     <i
-                                        className="fa fa-check-circle-o"
+                                        className="fa fa-check-circle"
                                         aria-hidden="true"
                                     />
                                 ) : (
