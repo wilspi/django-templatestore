@@ -622,19 +622,25 @@ class TemplateScreen extends Component {
                     </div>
                 </div>
                 <div className={styles.teSaveContainer}>
-                    <button
-                        className={styles.teButtons}
-                        onClick={() => {
-                            if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
-                                this.postTemplate(
-                                    this.state.templateData.name,
-                                    this.state.type,
-                                    this.state.contextData,
-                                    this.state.attributes
-                                );
-                            }
-                        }}
-                    >Save</button>
+                    {this.state.editable ? (
+                        ''
+                    ) : (
+                        <button
+                            className={styles.teButtons}
+                            onClick={() => {
+                                if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
+                                    this.postTemplate(
+                                        this.state.templateData.name,
+                                        this.state.type,
+                                        this.state.contextData,
+                                        this.state.attributes
+                                    );
+                                }
+                            }}
+                        >
+                             Save
+                        </button>
+                    )}
                 </div>
                 <div className={styles.teMarginTop20}>
                     <label>Versions : </label>
