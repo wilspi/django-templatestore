@@ -573,6 +573,14 @@ def patch_attributes_view(request, name):
                     )
                 )
 
+            for key in data["attributes"]:
+                if not isinstance(data["attributes"][key],str):
+                    raise (
+                        Exception(
+                            "Validation: Attributes must be a key value pair and value must be a string"
+                        )
+                    )
+
             template.update(attributes=data["attributes"])
             template = Template.objects.get(name=name)
             data = {"name": name, "attributes": template.attributes}
