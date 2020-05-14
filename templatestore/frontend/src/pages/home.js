@@ -35,7 +35,7 @@ class Home extends Component {
                         type: t.type,
                         default_version: t.default ? t.version : '-',
                         created_on: getDateInSimpleFormat(t.created_on),
-                        updated_on: getDateInSimpleFormat(t.modified_on),
+                        updated_on: getDateInSimpleFormat(t.modified_on)
                     },
                     ...this.tableHeaderList.slice(5).reduce((result, k) => {
                         result[k] = t.attributes[k];
@@ -155,7 +155,9 @@ class Home extends Component {
                         <thead>
                             <tr>{tableHeaders}</tr>
                         </thead>
-                        <tbody className={styles.tableBody}>{this.getTableRowsJSX()}</tbody>
+                        <tbody className={styles.tableBody}>
+                            {this.getTableRowsJSX()}
+                        </tbody>
                     </table>
                 </div>
             </div>

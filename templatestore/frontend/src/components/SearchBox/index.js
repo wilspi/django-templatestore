@@ -12,7 +12,14 @@ class SearchBox extends React.Component {
     }
 
     render() {
-        return <input type="text" className={styles.searchBox} onChange={this.onChange.bind(this)} placeholder="search" />;
+        return (
+            <input
+                type="text"
+                className={styles.searchBox}
+                onChange={this.onChange.bind(this)}
+                placeholder="search"
+            />
+        );
     }
 }
 

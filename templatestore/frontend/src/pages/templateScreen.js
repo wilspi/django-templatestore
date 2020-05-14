@@ -78,8 +78,16 @@ class TemplateScreen extends Component {
                             version: this.props.match.params.version,
                             default: response.data.default
                         },
-                        contextData: JSON.stringify(response.data.sample_context_data, null, 2),
-                        attributes: JSON.stringify(response.data.attributes, null, 2),
+                        contextData: JSON.stringify(
+                            response.data.sample_context_data,
+                            null,
+                            2
+                        ),
+                        attributes: JSON.stringify(
+                            response.data.attributes,
+                            null,
+                            2
+                        ),
                         type: response.data.type
                     });
                 })
@@ -364,7 +372,11 @@ class TemplateScreen extends Component {
     }
 
     render() {
-        if (Object.keys(this.state.config).length && !this.state.type && this.state.editable) {
+        if (
+            Object.keys(this.state.config).length &&
+            !this.state.type &&
+            this.state.editable
+        ) {
             this.getTypesConfig(Object.keys(this.state.config)[0]);
         }
 
@@ -382,102 +394,126 @@ class TemplateScreen extends Component {
             <th>{k}</th>
         ));
 
-        let editors = Object.keys(this.state.subTemplatesData).map((t, index) => {
-            let outputView =
-                this.state.subTemplatesData[t].renderMode === 'html' ? (
-                    <iframe
-                        height={this.aceconfig.height}
-                        width={this.aceconfig.width}
-                        srcDoc={this.state.subTemplatesData[t].output}
-                    />
-                ) : (
+        let editors = Object.keys(this.state.subTemplatesData).map(
+            (t, index) => {
+                let outputView =
+                    this.state.subTemplatesData[t].renderMode === 'html' ? (
+                        <iframe
+                            height={this.aceconfig.height}
+                            width={this.aceconfig.width}
+                            srcDoc={this.state.subTemplatesData[t].output}
+                        />
+                    ) : (
+                        <AceEditor
+                            name="output-editor"
+                            placeholder='Press "Render" to see the output here!'
+                            theme="github"
+                            mode="html"
+                            readOnly="true"
+                            fontSize={this.aceconfig.fontSize}
+                            height={this.aceconfig.height}
+                            width={this.aceconfig.width}
+                            value={this.state.subTemplatesData[t].output}
+                            highlightActiveLine="false"
+                        />
+                    );
+                let inputView = (
                     <AceEditor
-                        name="output-editor"
-                        placeholder='Press "Render" to see the output here!'
-                        theme="github"
-                        mode="html"
-                        readOnly="true"
+                        name="template-editor"
+                        placeholder="Write your template file here..."
+                        theme={this.aceconfig.theme}
+                        mode="handlebars"
                         fontSize={this.aceconfig.fontSize}
                         height={this.aceconfig.height}
                         width={this.aceconfig.width}
-                        value={this.state.subTemplatesData[t].output}
-                        highlightActiveLine="false"
+                        value={this.state.subTemplatesData[t].data}
+                        onChange={n => {
+                            this.onTemplateChange(t, n);
+                        }}
                     />
                 );
-            let inputView = (
-                <AceEditor
-                    name="template-editor"
-                    placeholder="Write your template file here..."
-                    theme={this.aceconfig.theme}
-                    mode="handlebars"
-                    fontSize={this.aceconfig.fontSize}
-                    height={this.aceconfig.height}
-                    width={this.aceconfig.width}
-                    value={this.state.subTemplatesData[t].data}
-                    onChange={n => {
-                        this.onTemplateChange(t, n);
-                    }}
-                />
-            );
-            return (
-                <div className={styles.teRowBlock}>
-                    <div className={styles.teCard + " card"}>
-                        <div className="card-header" role="tab" id={`Heading${index}`}>
-                            <a data-toggle="collapse" data-parent="#accordionEx" href={`#collapse${index}`} aria-expanded="true"
-                                aria-controls={`collapse${index}`} >
-                                <h5 className="mb-0">
-                                    {t} <i className="fas fa-angle-down rotate-icon" />
-                                </h5>
-                            </a>
-                        </div>
-                        <div id={`collapse${index}`} className="collapse" role="tabpanel" aria-labelledby={`Heading${index}`}
-                            data-parent="#accordionEx">
-                            <div className="card-body">
-                                <div className={styles.teSubTemplateBlock}>
-                                    <div className={styles.teTemplateEditor}>
-                                        {inputView}
+                return (
+                    <div className={styles.teRowBlock}>
+                        <div className={styles.teCard + ' card'}>
+                            <div
+                                className="card-header"
+                                role="tab"
+                                id={`Heading${index}`}
+                            >
+                                <a
+                                    data-toggle="collapse"
+                                    data-parent="#accordionEx"
+                                    href={`#collapse${index}`}
+                                    aria-expanded="true"
+                                    aria-controls={`collapse${index}`}
+                                >
+                                    <h5 className="mb-0">
+                                        {t}{' '}
+                                        <i className="fas fa-angle-down rotate-icon" />
+                                    </h5>
+                                </a>
+                            </div>
+                            <div
+                                id={`collapse${index}`}
+                                className="collapse"
+                                role="tabpanel"
+                                aria-labelledby={`Heading${index}`}
+                                data-parent="#accordionEx"
+                            >
+                                <div className="card-body">
+                                    <div className={styles.teSubTemplateBlock}>
+                                        <div
+                                            className={styles.teTemplateEditor}
+                                        >
+                                            {inputView}
+                                        </div>
+                                        <div className={styles.teOutputEditor}>
+                                            {outputView}
+                                        </div>
                                     </div>
-                                    <div className={styles.teOutputEditor}>
-                                        {outputView}
-                                    </div>
-                                </div>
 
-                                <div className={styles.teVersionWrapper}>
-                                    <button
-                                        className={styles.teButtons}
-                                        onClick={() => {
-                                            this.getRenderedTemplate(
-                                                t,
-                                                this.state.subTemplatesData[t].data,
-                                                this.state.contextData,
-                                                this.state.subTemplatesData[t].renderMode
-                                            );
-                                        }}
-                                    >
-                                        Render
-                                    </button>
-                                    {
-                                        t === 'htmlpart' ?
+                                    <div className={styles.teVersionWrapper}>
+                                        <button
+                                            className={styles.teButtons}
+                                            onClick={() => {
+                                                this.getRenderedTemplate(
+                                                    t,
+                                                    this.state.subTemplatesData[
+                                                        t
+                                                    ].data,
+                                                    this.state.contextData,
+                                                    this.state.subTemplatesData[
+                                                        t
+                                                    ].renderMode
+                                                );
+                                            }}
+                                        >
+                                            Render
+                                        </button>
+                                        {t === 'htmlpart' ? (
                                             <button
-                                                className={styles.tePreviewButton}
+                                                className={
+                                                    styles.tePreviewButton
+                                                }
                                                 data-toggle="modal"
                                                 data-target="#myModal"
                                             >
                                                 Preview
-                                            </button> : ''
-                                    }
+                                            </button>
+                                        ) : (
+                                            ''
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            );
-        });
+                );
+            }
+        );
 
         let templateTypes = Object.keys(this.state.config).map(t => {
-            return (
-                <option value={t}> {t} </option>
-            );
+            return <option value={t}> {t} </option>;
         });
 
         return (
@@ -530,9 +566,17 @@ class TemplateScreen extends Component {
                             )}
                             <label>Default : </label>
                             {!this.state.editable &&
-                            this.state.templateData.default ?
-                                <i className="fa fa-check-circle-o" aria-hidden="true" /> :
-                                <i className="fa fa-times-circle" aria-hidden="true" /> }
+                            this.state.templateData.default ? (
+                                    <i
+                                        className="fa fa-check-circle-o"
+                                        aria-hidden="true"
+                                    />
+                                ) : (
+                                    <i
+                                        className="fa fa-times-circle"
+                                        aria-hidden="true"
+                                    />
+                                )}
                         </div>
                     </div>
                 </div>
@@ -546,30 +590,55 @@ class TemplateScreen extends Component {
                                     this.getTypesConfig(e.target.value)
                                 }
                             >
-                                { templateTypes }
+                                {templateTypes}
                             </select>
                         </div>
                     ) : (
                         ''
                     )}
                 </div>
-                <div className= {styles.teAccordian + " accordion md-accordion"} id="accordionEx" role="tablist" aria-multiselectable="true">
+                <div
+                    className={styles.teAccordian + ' accordion md-accordion'}
+                    id="accordionEx"
+                    role="tablist"
+                    aria-multiselectable="true"
+                >
                     <div className={styles.teScreenTable}>{editors}</div>
                 </div>
-                <div className={styles.teAccordian + " accordion md-accordion"} id="accordionEx" role="tablist" aria-multiselectable="true">
+                <div
+                    className={styles.teAccordian + ' accordion md-accordion'}
+                    id="accordionEx"
+                    role="tablist"
+                    aria-multiselectable="true"
+                >
                     <div>
                         {
-                            <div className={styles.teCard + " card"}>
-                                <div className="card-header" role="tab" id="headingOne1">
-                                    <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseOne1" aria-expanded="true"
-                                        aria-controls="collapseOne1">
+                            <div className={styles.teCard + ' card'}>
+                                <div
+                                    className="card-header"
+                                    role="tab"
+                                    id="headingOne1"
+                                >
+                                    <a
+                                        data-toggle="collapse"
+                                        data-parent="#accordionEx"
+                                        href="#collapseOne1"
+                                        aria-expanded="true"
+                                        aria-controls="collapseOne1"
+                                    >
                                         <h5 className="mb-0">
-                                        Sample Context Data <i className="fas fa-angle-down rotate-icon" />
+                                            Sample Context Data{' '}
+                                            <i className="fas fa-angle-down rotate-icon" />
                                         </h5>
                                     </a>
                                 </div>
-                                <div id="collapseOne1" className="collapse" role="tabpanel" aria-labelledby="headingOne1"
-                                    data-parent="#accordionEx">
+                                <div
+                                    id="collapseOne1"
+                                    className="collapse"
+                                    role="tabpanel"
+                                    aria-labelledby="headingOne1"
+                                    data-parent="#accordionEx"
+                                >
                                     <div className="card-body">
                                         <AceEditor
                                             name="template-editor"
@@ -588,20 +657,40 @@ class TemplateScreen extends Component {
                         }
                     </div>
                 </div>
-                <div className={styles.teAccordian + " accordion md-accordion"} id="accordionEx" role="tablist" aria-multiselectable="true">
+                <div
+                    className={styles.teAccordian + ' accordion md-accordion'}
+                    id="accordionEx"
+                    role="tablist"
+                    aria-multiselectable="true"
+                >
                     <div>
                         {
-                            <div className={styles.teCard + " card"}>
-                                <div className="card-header" role="tab" id="headingTwo2">
-                                    <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseTwo2" aria-expanded="true"
-                                        aria-controls="collapseTwo2">
+                            <div className={styles.teCard + ' card'}>
+                                <div
+                                    className="card-header"
+                                    role="tab"
+                                    id="headingTwo2"
+                                >
+                                    <a
+                                        data-toggle="collapse"
+                                        data-parent="#accordionEx"
+                                        href="#collapseTwo2"
+                                        aria-expanded="true"
+                                        aria-controls="collapseTwo2"
+                                    >
                                         <h5 className="mb-0">
-                                            Attributes <i className="fas fa-angle-down rotate-icon" />
+                                            Attributes{' '}
+                                            <i className="fas fa-angle-down rotate-icon" />
                                         </h5>
                                     </a>
                                 </div>
-                                <div id="collapseTwo2" className="collapse" role="tabpanel" aria-labelledby="headingTwo2"
-                                    data-parent="#accordionEx">
+                                <div
+                                    id="collapseTwo2"
+                                    className="collapse"
+                                    role="tabpanel"
+                                    aria-labelledby="headingTwo2"
+                                    data-parent="#accordionEx"
+                                >
                                     <div className="card-body">
                                         <AceEditor
                                             name="template-editor"
@@ -638,7 +727,7 @@ class TemplateScreen extends Component {
                                 }
                             }}
                         >
-                             Save
+                            Save
                         </button>
                     )}
                 </div>
@@ -696,15 +785,25 @@ class TemplateScreen extends Component {
                             {/* <div className="modal-header" style={{ height: '5vh' }}>
                                 <button type="button" className="close" data-dismiss="modal" style={{ padding: '10px' }}>×</button>
                             </div> */}
-                            <div className="modal-body" style={{ height: '90vh', padding: '0' }}>
-                                {
-                                    this.state.subTemplatesData && Object.keys(this.state.subTemplatesData).length !== 0 ?
+                            <div
+                                className="modal-body"
+                                style={{ height: '90vh', padding: '0' }}
+                            >
+                                {this.state.subTemplatesData &&
+                                Object.keys(this.state.subTemplatesData)
+                                    .length !== 0 ? (
                                         <iframe
                                             height="100%"
                                             width="100%"
-                                            srcDoc={this.state.subTemplatesData['htmlpart'].output}
-                                        /> : ''
-                                }
+                                            srcDoc={
+                                                this.state.subTemplatesData[
+                                                    'htmlpart'
+                                                ].output
+                                            }
+                                        />
+                                    ) : (
+                                        ''
+                                    )}
                             </div>
                         </div>
                     </div>
