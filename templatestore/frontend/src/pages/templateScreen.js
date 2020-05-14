@@ -297,30 +297,6 @@ class TemplateScreen extends Component {
         });
     }
 
-    getTemplateOutput() {
-        axios
-            .get(backendSettings.TE_BASEPATH + '/api/v1/render', {
-                params: {
-                    template: encode(this.state.valueTemplate),
-                    context: this.state.valueContext,
-                    handler: 'jinja2',
-                    output: 'text' // get renderMode
-                }
-            })
-            .then(response => {
-                this.setState({
-                    valueOutput: decode(response.data.rendered_template)
-                });
-            })
-            .catch(function(error) {
-                console.log(error);
-            })
-            .then(function() {
-                // always executed
-            });
-        return this.state.valueTemplate;
-    }
-
     getTypesConfig(type) {
         this.setState({
             subTemplatesData: this.state.config[type].sub_type.reduce(
