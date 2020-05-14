@@ -361,12 +361,16 @@ class TemplateScreen extends Component {
     }
 
     render() {
-        console.log('state : ', this.state.subTemplatesData);
         let chooseVersion = this.state.versions.map(versions => {
             return (
                 <option value={versions.version}> {versions.version} </option>
             );
         });
+
+        // Todo : Add comment section after getting data from backend as it will not display the column underneath the comment
+        // let tableHeaders = ['version', 'created_on', ' - ', ' - ', 'comment'].map(k => (
+        //     <th>{k}</th>
+        // ));
         let tableHeaders = ['version', 'created_on', ' - ', ' - '].map(k => (
             <th>{k}</th>
         ));
@@ -410,7 +414,7 @@ class TemplateScreen extends Component {
             );
             return (
                 <div className={styles.teRowBlock}>
-                    <div className="card">
+                    <div className={styles.teCard + " card"}>
                         <div className="card-header" role="tab" id={`Heading${index}`}>
                             <a data-toggle="collapse" data-parent="#accordionEx" href={`#collapse${index}`} aria-expanded="true"
                                 aria-controls={`collapse${index}`} >
@@ -432,21 +436,6 @@ class TemplateScreen extends Component {
                                 </div>
 
                                 <div className={styles.teVersionWrapper}>
-                                    <label className={styles.teLabel}>Render Mode :</label>
-                                    <select
-                                        readOnly
-                                        className={styles.teButtons}
-                                        value={this.state.subTemplatesData[t].renderMode}
-                                    >
-                                        <option value="text" disabled>
-                                            {' '}
-                                            Text{' '}
-                                        </option>
-                                        <option value="html" disabled>
-                                            {' '}
-                                            HTML{' '}
-                                        </option>
-                                    </select>
                                     <button
                                         className={styles.teButtons}
                                         onClick={() => {
@@ -554,13 +543,13 @@ class TemplateScreen extends Component {
                         ''
                     )}
                 </div>
-                <div className="accordion md-accordion" id="accordionEx" role="tablist" aria-multiselectable="true">
+                <div className= {styles.teAccordian + " accordion md-accordion"} id="accordionEx" role="tablist" aria-multiselectable="true">
                     <div className={styles.teScreenTable}>{editors}</div>
                 </div>
-                <div className="accordion md-accordion" id="accordionEx" role="tablist" aria-multiselectable="true">
+                <div className={styles.teAccordian + " accordion md-accordion"} id="accordionEx" role="tablist" aria-multiselectable="true">
                     <div>
                         {
-                            <div className="card">
+                            <div className={styles.teCard + " card"}>
                                 <div className="card-header" role="tab" id="headingOne1">
                                     <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseOne1" aria-expanded="true"
                                         aria-controls="collapseOne1">
@@ -580,21 +569,19 @@ class TemplateScreen extends Component {
                                             fontSize={this.aceconfig.fontSize}
                                             height={this.aceconfig.height}
                                             width={this.aceconfig.width}
-                                            value={JSON.stringify(
-                                                this.state.contextData
-                                            )}
-                                            onChange={n => {
-                                                this.onContextChange(JSON.parse(n));
-                                            }}
+                                            value={this.state.contextData}
+                                            onChange={this.onContextChange}
                                         />
                                     </div>
                                 </div>
                             </div>
                         }
                     </div>
+                </div>
+                <div className={styles.teAccordian + " accordion md-accordion"} id="accordionEx" role="tablist" aria-multiselectable="true">
                     <div>
                         {
-                            <div className="card">
+                            <div className={styles.teCard + " card"}>
                                 <div className="card-header" role="tab" id="headingTwo2">
                                     <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseTwo2" aria-expanded="true"
                                         aria-controls="collapseTwo2">
@@ -614,14 +601,8 @@ class TemplateScreen extends Component {
                                             fontSize={this.aceconfig.fontSize}
                                             height={this.aceconfig.height}
                                             width={this.aceconfig.width}
-                                            value={JSON.stringify(
-                                                this.state.attributes
-                                            )}
-                                            onChange={n => {
-                                                this.onAttributesChange(
-                                                    JSON.parse(n)
-                                                );
-                                            }}
+                                            value={this.state.attributes}
+                                            onChange={this.onAttributesChange}
                                             readOnly={!this.state.editable}
                                         />
                                     </div>
@@ -630,10 +611,7 @@ class TemplateScreen extends Component {
                         }
                     </div>
                 </div>
-                <div className={styles.teMarginTop20}>
-                    <label>Versions : </label>
-                </div>
-                <div>
+                <div className={styles.teSaveContainer}>
                     <button
                         className={styles.teButtons}
                         onClick={() => {
@@ -646,9 +624,10 @@ class TemplateScreen extends Component {
                                 );
                             }
                         }}
-                    >
-                         Save
-                    </button>
+                    >Save</button>
+                </div>
+                <div className={styles.teMarginTop20}>
+                    <label>Versions : </label>
                 </div>
                 <div className={styles.teSearchWrapper}>
                     {this.state.editable ? (
@@ -665,7 +644,7 @@ class TemplateScreen extends Component {
                     ) : (
                         <table
                             className={
-                                'table table-striped table-responsive-md btn-table ' +
+                                'table table-striped table-bordered' +
                                 styles.tsTable
                             }
                         >
