@@ -497,6 +497,18 @@ class TemplateScreen extends Component {
                                                 }
                                                 data-toggle="modal"
                                                 data-target="#myModal"
+                                                onClick={() => {
+                                                    this.getRenderedTemplate(
+                                                        t,
+                                                        this.state.subTemplatesData[
+                                                            t
+                                                        ].data,
+                                                        this.state.contextData,
+                                                        this.state.subTemplatesData[
+                                                            t
+                                                        ].renderMode
+                                                    );
+                                                }}
                                             >
                                                 Preview
                                             </button>
