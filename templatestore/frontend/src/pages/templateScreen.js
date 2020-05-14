@@ -800,9 +800,8 @@ class TemplateScreen extends Component {
                                 className="modal-body"
                                 style={{ height: '90vh', padding: '0' }}
                             >
-                                {this.state.subTemplatesData &&
-                                Object.keys(this.state.subTemplatesData)
-                                    .length !== 0 ? (
+                                {
+                                    this.state.subTemplatesData.hasOwnProperty('htmlpart') ? (
                                         <iframe
                                             height="100%"
                                             width="100%"
