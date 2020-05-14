@@ -142,7 +142,8 @@ class TemplateScreen extends Component {
                         {}
                     ),
                     null, 2
-                )
+                ),
+                contextData: JSON.stringify({ name: "abc" }, null, 2)
             });
         }
     }
