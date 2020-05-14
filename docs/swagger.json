@@ -638,7 +638,78 @@
                     }
                 }
             }
+        },
+        "/template/{name}/attributes":{
+            "patch":{
+                "tags":[
+                    "Update the attributes of the template"
+                ],
+                "summary":"Update the attributes of the template",
+                "description":"",
+                "operationId":"update_attributes",
+                "produces":[
+                    "application/json"
+                ],
+                "parameters":[
+                    {
+                        "name":"name",
+                        "in":"path",
+                        "description":"name of the template",
+                        "required":true,
+                        "type":"string"
+                    },
+                    {
+                        "in":"body",
+                        "name":"body",
+                        "description":"new attributes dictionary",
+                        "required":true,
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "attributes":{
+                                    "type":"object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Ok",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "name":{
+                                    "type":"string",
+                                    "maxLength":1000
+                                },
+                                "attributes":{
+                                    "type":"object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400":{
+                        "description":"Bad Request",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "message":{
+                                    "type":"string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
+
     },
     "definitions":{
         "Template":{
