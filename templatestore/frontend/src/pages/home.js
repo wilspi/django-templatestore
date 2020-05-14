@@ -134,8 +134,16 @@ class Home extends Component {
                 <div>
                     <h1>Template Store</h1>
                 </div>
-                <div>
+                <div className="d-flex justify-content-between">
                     <SearchBox onChange={this.onSearchTextChange.bind(this)} />
+                    <div className={styles.tsAddTemplateBtn}>
+                        <button
+                            type="button"
+                            onClick={() => this.openNewTemplatePage()}
+                        >
+                            Add New Template
+                        </button>
+                    </div>
                 </div>
                 <div className={styles.tableWrapper}>
                     <table
@@ -149,14 +157,6 @@ class Home extends Component {
                         </thead>
                         <tbody className={styles.tableBody}>{this.getTableRowsJSX()}</tbody>
                     </table>
-                </div>
-                <div className={styles.tsAddTemplateBtn}>
-                    <button
-                        type="button"
-                        onClick={() => this.openNewTemplatePage()}
-                    >
-                        Add New Template
-                    </button>
                 </div>
             </div>
         );
