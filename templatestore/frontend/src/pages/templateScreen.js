@@ -597,6 +597,9 @@ class TemplateScreen extends Component {
                         ''
                     )}
                 </div>
+                <div className={styles.teMarginTop20}>
+                    <label>Sub Templates : </label>
+                </div>
                 <div
                     className={styles.teAccordian + ' accordion md-accordion'}
                     id="accordionEx"
@@ -604,6 +607,9 @@ class TemplateScreen extends Component {
                     aria-multiselectable="true"
                 >
                     <div className={styles.teScreenTable}>{editors}</div>
+                </div>
+                <div className={styles.teMarginTop20}>
+                    <label>Sample Context Data : </label>
                 </div>
                 <div
                     className={styles.teAccordian + ' accordion md-accordion'}
@@ -656,6 +662,9 @@ class TemplateScreen extends Component {
                             </div>
                         }
                     </div>
+                </div>
+                <div className={styles.teMarginTop20}>
+                    <label>Attributes : </label>
                 </div>
                 <div
                     className={styles.teAccordian + ' accordion md-accordion'}
@@ -731,35 +740,37 @@ class TemplateScreen extends Component {
                         </button>
                     )}
                 </div>
-                <div className={styles.teMarginTop20}>
-                    <label>Versions : </label>
-                </div>
-                <div className={styles.teSearchWrapper}>
-                    {this.state.editable ? (
-                        ''
-                    ) : (
-                        <SearchBox
-                            onChange={this.onSearchTextChange.bind(this)}
-                        />
-                    )}
-                </div>
-                <div className={styles.teTableWrapper}>
-                    {this.state.editable ? (
-                        ''
-                    ) : (
-                        <table
-                            className={
-                                'table table-striped table-bordered' +
-                                styles.tsTable
-                            }
-                        >
-                            <thead>
-                                <tr>{tableHeaders}</tr>
-                            </thead>
-                            <tbody>{this.getTableRowsJSX()}</tbody>
-                        </table>
-                    )}
-                </div>
+                {this.state.editable ? (
+                    ''
+                ) : (
+                    <div>
+                        <div className={styles.teMarginTop20}>
+                            <label>Versions : </label>
+                        </div>
+                        <div className={styles.teVersionTable}>
+                            <div className={styles.teSearchWrapper}>
+                                <SearchBox
+                                    onChange={this.onSearchTextChange.bind(
+                                        this
+                                    )}
+                                />
+                            </div>
+                            <div className={styles.teTableWrapper}>
+                                <table
+                                    className={
+                                        'table table-striped table-bordered' +
+                                        styles.tsTable
+                                    }
+                                >
+                                    <thead>
+                                        <tr>{tableHeaders}</tr>
+                                    </thead>
+                                    <tbody>{this.getTableRowsJSX()}</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 <div>
                     {this.state.editable ? (
                         <button
