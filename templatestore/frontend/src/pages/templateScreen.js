@@ -284,6 +284,11 @@ class TemplateScreen extends Component {
             .catch(function(error) {
                 console.log(error);
             });
+        if (renderMode === 'html') {
+            this.setState({
+                previewSubType: subType
+            });
+        }
     }
 
     onTemplateChange(subType, templateData) {
@@ -483,20 +488,31 @@ class TemplateScreen extends Component {
                                         >
                                             Render
                                         </button>
-                                        {this.state.subTemplatesData[t]
-                                            .renderMode === 'html' ? (
-                                                <button
-                                                    className={
-                                                        styles.tePreviewButton
-                                                    }
-                                                    data-toggle="modal"
-                                                    data-target="#myModal"
-                                                >
+                                        {this.state.subTemplatesData[t].renderMode === 'html' ? (
+                                            <button
+                                                className={
+                                                    styles.tePreviewButton
+                                                }
+                                                data-toggle="modal"
+                                                data-target="#myModal"
+                                                onClick={() => {
+                                                    this.getRenderedTemplate(
+                                                        t,
+                                                        this.state.subTemplatesData[
+                                                            t
+                                                        ].data,
+                                                        this.state.contextData,
+                                                        this.state.subTemplatesData[
+                                                            t
+                                                        ].renderMode
+                                                    );
+                                                }}
+                                            >
                                                 Preview
-                                                </button>
-                                            ) : (
-                                                ''
-                                            )}
+                                            </button>
+                                        ) : (
+                                            ''
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -787,21 +803,22 @@ class TemplateScreen extends Component {
                                 className="modal-body"
                                 style={{ height: '90vh', padding: '0' }}
                             >
-                                {this.state.subTemplatesData &&
-                                Object.keys(this.state.subTemplatesData)
-                                    .length !== 0 ? (
-                                        <iframe
-                                            height="100%"
-                                            width="100%"
-                                            srcDoc={
-                                                this.state.subTemplatesData[
-                                                    'htmlpart'
-                                                ].output
-                                            }
-                                        />
-                                    ) : (
-                                        ''
-                                    )}
+                                {
+                                    this.state.previewSubType &&
+                                    this.state.subTemplatesData.hasOwnProperty(this.state.previewSubType) ? (
+                                            <iframe
+                                                height="100%"
+                                                width="100%"
+                                                srcDoc={
+                                                    this.state.subTemplatesData[
+                                                        this.state.previewSubType
+                                                    ].output
+                                                }
+                                            />
+                                        ) : (
+                                            ''
+                                        )
+                                }
                             </div>
                         </div>
                     </div>
