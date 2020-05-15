@@ -31,6 +31,8 @@ class TemplateScreen extends Component {
             versions: [{ version: this.props.match.params.version }],
             subTemplatesData: {},
             config: {},
+            contextData: '',
+            attributes: '',
             editable: this.props.editable
         };
         this.aceconfig = {
@@ -129,6 +131,20 @@ class TemplateScreen extends Component {
                 .catch(function(error) {
                     console.log(error);
                 });
+
+            this.setState({
+                attributes: JSON.stringify(
+                    backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
+                        (result, attribute) => {
+                            result[attribute] = "";
+                            return result;
+                        },
+                        {}
+                    ),
+                    null, 2
+                ),
+                contextData: JSON.stringify({ name: "abc" }, null, 2)
+            });
         }
     }
 
@@ -295,30 +311,6 @@ class TemplateScreen extends Component {
         this.setState({
             attributes: newValue
         });
-    }
-
-    getTemplateOutput() {
-        axios
-            .get(backendSettings.TE_BASEPATH + '/api/v1/render', {
-                params: {
-                    template: encode(this.state.valueTemplate),
-                    context: this.state.valueContext,
-                    handler: 'jinja2',
-                    output: 'text' // get renderMode
-                }
-            })
-            .then(response => {
-                this.setState({
-                    valueOutput: decode(response.data.rendered_template)
-                });
-            })
-            .catch(function(error) {
-                console.log(error);
-            })
-            .then(function() {
-                // always executed
-            });
-        return this.state.valueTemplate;
     }
 
     getTypesConfig(type) {
@@ -663,6 +655,39 @@ class TemplateScreen extends Component {
                         }
                     </div>
                 </div>
+                <div className={styles.teSaveContainer}>
+                    {this.state.editable ? (
+                        <button
+                            className={styles.teButtons}
+                            onClick={() => {
+                                this.postTemplate(
+                                    document.getElementById('tmp_name').value,
+                                    this.state.type,
+                                    this.state.contextData,
+                                    this.state.attributes
+                                );
+                            }}
+                        >
+                            Create
+                        </button>
+                    ) : (
+                        <button
+                            className={styles.teButtons}
+                            onClick={() => {
+                                if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
+                                    this.postTemplate(
+                                        this.state.templateData.name,
+                                        this.state.type,
+                                        this.state.contextData,
+                                        this.state.attributes
+                                    );
+                                }
+                            }}
+                        >
+                            Save
+                        </button>
+                    )}
+                </div>
                 <div className={styles.teMarginTop20}>
                     <label>Attributes : </label>
                 </div>
@@ -719,27 +744,6 @@ class TemplateScreen extends Component {
                         }
                     </div>
                 </div>
-                <div className={styles.teSaveContainer}>
-                    {this.state.editable ? (
-                        ''
-                    ) : (
-                        <button
-                            className={styles.teButtons}
-                            onClick={() => {
-                                if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
-                                    this.postTemplate(
-                                        this.state.templateData.name,
-                                        this.state.type,
-                                        this.state.contextData,
-                                        this.state.attributes
-                                    );
-                                }
-                            }}
-                        >
-                            Save
-                        </button>
-                    )}
-                </div>
                 {this.state.editable ? (
                     ''
                 ) : (
@@ -771,25 +775,6 @@ class TemplateScreen extends Component {
                         </div>
                     </div>
                 )}
-                <div>
-                    {this.state.editable ? (
-                        <button
-                            className={styles.teButtons}
-                            onClick={() => {
-                                this.postTemplate(
-                                    document.getElementById('tmp_name').value,
-                                    this.state.type,
-                                    this.state.contextData,
-                                    this.state.attributes
-                                );
-                            }}
-                        >
-                            Create
-                        </button>
-                    ) : (
-                        ''
-                    )}
-                </div>
                 <div className="modal fade" id="myModal">
                     <div className="modal-dialog modal-xl">
                         <div className="modal-content">
