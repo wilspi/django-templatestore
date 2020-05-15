@@ -529,7 +529,7 @@ class TemplateScreen extends Component {
         return (
             <div className="container ">
                 <div className={styles.teDetailPage}>
-                    <div>
+                    <div className={styles.teHeader}>
                         <h1>
                             {this.state.editable ?
                                 'Create New Template' :
