@@ -509,10 +509,10 @@ class TemplateScreen extends Component {
                                                 }}
                                             >
                                                 Preview
-                                                </button>
-                                            ) : (
-                                                ''
-                                            )}
+                                            </button>
+                                        ) : (
+                                            ''
+                                        )}
                                     </div>
                                 </div>
                             </div>
