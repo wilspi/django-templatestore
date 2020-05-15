@@ -4,11 +4,11 @@
   "description": "Interface to add, and update templates",
   "main": "./src/index.js",
   "scripts": {
-    "start": "webpack-dev-server --mode development",
+    "start": "webpack-dev-server --open --config webpack.dev.js",
     "format": "prettier --write \"src/**/*.js\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "eslint-fix": "eslint --fix \"src/**/*.js\"",
-    "build": "webpack --mode production"
+    "build": "webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
@@ -35,7 +35,8 @@
     "react-ace": "^8.0.0",
     "react-ace-builds": "^7.3.0",
     "react-dom": "^16.12.0",
-    "react-router-dom": "^5.1.2"
+    "react-router-dom": "^5.1.2",
+    "webpack-merge": "^4.2.2"
   },
   "devDependencies": {
     "@babel/core": "^7.8.3",
