@@ -136,7 +136,7 @@ class TemplateScreen extends Component {
                 attributes: JSON.stringify(
                     backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
                         (result, attribute) => {
-                            result[attribute] = "";
+                            result[attribute] = '';
                             return result;
                         },
                         {}
@@ -144,7 +144,7 @@ class TemplateScreen extends Component {
                     null,
                     2
                 ),
-                contextData: JSON.stringify({ name: "abc" }, null, 2)
+                contextData: JSON.stringify({ name: 'abc' }, null, 2)
             });
         }
     }
@@ -509,10 +509,10 @@ class TemplateScreen extends Component {
                                                 }}
                                             >
                                                 Preview
-                                            </button>
-                                        ) : (
-                                            ''
-                                        )}
+                                                </button>
+                                            ) : (
+                                                ''
+                                            )}
                                     </div>
                                 </div>
                             </div>
