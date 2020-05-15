@@ -286,7 +286,7 @@ class TemplateScreen extends Component {
             });
         if (renderMode === 'html') {
             this.setState({
-                previewSubType: subType
+                previewType: subType
             });
         }
     }
@@ -804,13 +804,13 @@ class TemplateScreen extends Component {
                                 style={{ height: '90vh', padding: '0' }}
                             >
                                 {
-                                    this.state.previewSubType ? (
+                                    this.state.previewType ? (
                                         <iframe
                                             height="100%"
                                             width="100%"
                                             srcDoc={
                                                 this.state.subTemplatesData[
-                                                    this.state.previewSubType
+                                                    this.state.previewType
                                                 ].output
                                             }
                                         />
