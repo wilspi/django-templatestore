@@ -141,7 +141,8 @@ class TemplateScreen extends Component {
                         },
                         {}
                     ),
-                    null, 2
+                    null,
+                    2
                 ),
                 contextData: JSON.stringify({ name: "abc" }, null, 2)
             });
@@ -283,7 +284,7 @@ class TemplateScreen extends Component {
             .catch(function(error) {
                 console.log(error);
             });
-        if (this.state.subTemplatesData[subType].renderMode === 'html') {
+        if (renderMode === 'html') {
             this.setState({
                 previewType: subType
             });
