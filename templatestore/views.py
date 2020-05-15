@@ -595,8 +595,7 @@ def patch_attributes_view(request, name):
                     )
 
             template.update(attributes=data["attributes"])
-            template = Template.objects.get(name=name)
-            data = {"name": name, "attributes": template.attributes}
+            data = {"name": name, "attributes": data["attributes"]}
             return JsonResponse(data, status=200)
         except Exception as e:
             logger.exception(e)
