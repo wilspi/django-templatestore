@@ -283,6 +283,11 @@ class TemplateScreen extends Component {
             .catch(function(error) {
                 console.log(error);
             });
+        if (this.state.subTemplatesData[subType].renderMode === 'html') {
+            this.setState({
+                previewType: subType
+            });
+        }
     }
 
     onTemplateChange(subType, templateData) {
@@ -798,19 +803,20 @@ class TemplateScreen extends Component {
                                 style={{ height: '90vh', padding: '0' }}
                             >
                                 {
-                                    this.state.subTemplatesData.hasOwnProperty('htmlpart') ? (
+                                    this.state.previewType ? (
                                         <iframe
                                             height="100%"
                                             width="100%"
                                             srcDoc={
                                                 this.state.subTemplatesData[
-                                                    'htmlpart'
+                                                    this.state.previewType
                                                 ].output
                                             }
                                         />
                                     ) : (
                                         ''
-                                    )}
+                                    )
+                                }
                             </div>
                         </div>
                     </div>
