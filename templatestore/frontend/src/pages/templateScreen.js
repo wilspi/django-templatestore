@@ -482,7 +482,7 @@ class TemplateScreen extends Component {
                                         >
                                             Render
                                         </button>
-                                        {t === 'htmlpart' ? (
+                                        {this.state.subTemplatesData[t].renderMode === 'html' ? (
                                             <button
                                                 className={
                                                     styles.tePreviewButton
