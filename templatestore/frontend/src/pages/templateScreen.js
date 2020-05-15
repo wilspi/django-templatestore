@@ -338,35 +338,51 @@ class TemplateScreen extends Component {
     }
 
     postTemplate(name, type, contextData, attributes) {
-        let subTemplates = [];
-        Object.keys(this.state.subTemplatesData).map(t => {
-            let subTemplate = {
-                sub_type: this.state.subTemplatesData[t].subType,
-                data: encode(this.state.subTemplatesData[t].data)
-            };
-            subTemplates.push(subTemplate);
-        });
-        let data = {
-            name: name,
-            type: type,
-            sub_templates: subTemplates,
-            sample_context_data: JSON.parse(contextData),
-            attributes: JSON.parse(attributes)
-        };
-        axios
-            .post(backendSettings.TE_BASEPATH + '/api/v1/template', data)
-            .then(response => {
-                this.props.history.push(
-                    backendSettings.TE_BASEPATH +
-                        '/t/' +
-                        response.data.name +
-                        '/' +
-                        response.data.version
-                );
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        try {
+            let subTemplates = [];
+            try {
+                Object.keys(this.state.subTemplatesData).map(t => {
+                    let subTemplate = {
+                        sub_type: this.state.subTemplatesData[t].subType,
+                        data: encode(this.state.subTemplatesData[t].data)
+                    };
+                    subTemplates.push(subTemplate);
+                });
+            } catch (error) {
+                throw new Error("Template Data contains invalid characters");
+            }
+            let data = {};
+            try {
+                data = {
+                    name: name,
+                    type: type,
+                    sub_templates: subTemplates,
+                    sample_context_data: JSON.parse(contextData),
+                    attributes: JSON.parse(attributes)
+                };
+            } catch (error) {
+                throw new Error("Sample_Context_Data and Attributes must be a JSON");
+            }
+
+            axios
+                .post(backendSettings.TE_BASEPATH + '/api/v1/template', data)
+                .then(response => {
+                    this.props.history.push(
+                        backendSettings.TE_BASEPATH +
+                            '/t/' +
+                            response.data.name +
+                            '/' +
+                            response.data.version
+                    );
+                })
+                .catch(error => {
+                    console.log(error);
+                    window.alert(error.response.data.message); // eslint-disable-line no-alert
+                });
+        } catch (error) {
+            console.log(error);
+            window.alert(error); // eslint-disable-line no-alert
+        }
     }
 
     render() {
