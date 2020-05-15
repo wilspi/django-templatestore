@@ -259,35 +259,50 @@ class TemplateScreen extends Component {
     }
 
     getRenderedTemplate(subType, templateData, contextData, renderMode) {
-        let data = {
-            template: encode(templateData),
-            context: JSON.parse(contextData),
-            handler: 'jinja2',
-            output: renderMode
-        };
-        axios
-            .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
-            .then(response => {
-                this.setState({
-                    subTemplatesData: Object.keys(
-                        this.state.subTemplatesData
-                    ).reduce((result, k) => {
-                        result[k] = this.state.subTemplatesData[k];
-                        result[k].output =
-                            k === subType ?
-                                decode(response.data.rendered_template) :
-                                this.state.subTemplatesData[k].output;
-                        return result;
-                    }, {})
+        try {
+            try {
+                contextData = JSON.parse(contextData);
+            } catch (error) {
+                throw new Error("Sample_Context_Data must be a JSON");
+            }
+            try {
+                templateData = encode(templateData);
+            } catch (error) {
+                throw new Error("Template Data contains invalid characters");
+            }
+            let data = {
+                template: templateData,
+                context: contextData,
+                handler: 'jinja2',
+                output: renderMode
+            };
+            axios
+                .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
+                .then(response => {
+                    this.setState({
+                        subTemplatesData: Object.keys(
+                            this.state.subTemplatesData
+                        ).reduce((result, k) => {
+                            result[k] = this.state.subTemplatesData[k];
+                            result[k].output =
+                                k === subType ?
+                                    decode(response.data.rendered_template) :
+                                    this.state.subTemplatesData[k].output;
+                            return result;
+                        }, {})
+                    });
+                })
+                .catch(function(error) {
+                    console.log(error);
+                    window.alert(error.response.data.message); // eslint-disable-line no-alert
                 });
-            })
-            .catch(function(error) {
-                console.log(error);
-            });
-        if (renderMode === 'html') {
-            this.setState({
-                previewSubType: subType
-            });
+            if (renderMode === 'html') {
+                this.setState({
+                    previewSubType: subType
+                });
+            }
+        } catch (error) {
+            window.alert(error); // eslint-disable-line no-alert
         }
     }
 
