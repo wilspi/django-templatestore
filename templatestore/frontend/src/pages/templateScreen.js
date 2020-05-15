@@ -544,11 +544,7 @@ class TemplateScreen extends Component {
                                 placeholder="Add template name"
                             />
                         ) : (
-                            <input
-                                readOnly
-                                type="text"
-                                value={this.state.templateData.name}
-                            />
+                            ''
                         )}
                         <br />
                         <div className={styles.teVersionWrapper}>
