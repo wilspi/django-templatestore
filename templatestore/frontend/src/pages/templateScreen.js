@@ -490,19 +490,20 @@ class TemplateScreen extends Component {
                                         >
                                             Render
                                         </button>
-                                        {t === 'htmlpart' ? (
-                                            <button
-                                                className={
-                                                    styles.tePreviewButton
-                                                }
-                                                data-toggle="modal"
-                                                data-target="#myModal"
-                                            >
+                                        {this.state.subTemplatesData[t]
+                                            .renderMode === 'html' ? (
+                                                <button
+                                                    className={
+                                                        styles.tePreviewButton
+                                                    }
+                                                    data-toggle="modal"
+                                                    data-target="#myModal"
+                                                >
                                                 Preview
-                                            </button>
-                                        ) : (
-                                            ''
-                                        )}
+                                                </button>
+                                            ) : (
+                                                ''
+                                            )}
                                     </div>
                                 </div>
                             </div>
