@@ -804,19 +804,20 @@ class TemplateScreen extends Component {
                                 style={{ height: '90vh', padding: '0' }}
                             >
                                 {
-                                    this.state.previewSubType ? (
-                                        <iframe
-                                            height="100%"
-                                            width="100%"
-                                            srcDoc={
-                                                this.state.subTemplatesData[
-                                                    this.state.previewSubType
-                                                ].output
-                                            }
-                                        />
-                                    ) : (
-                                        ''
-                                    )
+                                    this.state.previewSubType &&
+                                    this.state.subTemplatesData.hasOwnProperty(this.state.previewSubType) ? (
+                                            <iframe
+                                                height="100%"
+                                                width="100%"
+                                                srcDoc={
+                                                    this.state.subTemplatesData[
+                                                        this.state.previewSubType
+                                                    ].output
+                                                }
+                                            />
+                                        ) : (
+                                            ''
+                                        )
                                 }
                             </div>
                         </div>
