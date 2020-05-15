@@ -152,6 +152,7 @@ def post_template_view(request):
                 )
 
             invalid_data = set()
+            empty_data = set()
 
             for sub_template in data["sub_templates"]:
                 if not re.match(
@@ -159,6 +160,9 @@ def post_template_view(request):
                     sub_template["data"],
                 ):
                     invalid_data.add(sub_template["sub_type"])
+
+                if not sub_template["data"]:
+                    empty_data.add(sub_template["sub_type"])
 
             if len(invalid_data):
                 raise (
@@ -176,6 +180,15 @@ def post_template_view(request):
                 )
 
             sub_types = {cfg.sub_type: cfg for cfg in cfgs}
+
+            if len(empty_data) == len(sub_types):
+                raise (
+                    Exception(
+                        "Validation: Atleast one of the sub_types `"
+                        + str(empty_data)
+                        + "` must be non empty"
+                    )
+                )
 
             invalid_subtypes = set(
                 [s["sub_type"] for s in data["sub_templates"]]
