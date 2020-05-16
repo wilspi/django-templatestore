@@ -265,13 +265,9 @@ class TemplateScreen extends Component {
             } catch (error) {
                 throw new Error("Sample_Context_Data must be a JSON");
             }
-            try {
-                templateData = encode(templateData);
-            } catch (error) {
-                throw new Error("Template Data contains invalid characters");
-            }
+
             let data = {
-                template: templateData,
+                template: encode(templateData),
                 context: contextData,
                 handler: 'jinja2',
                 output: renderMode
@@ -355,17 +351,13 @@ class TemplateScreen extends Component {
     postTemplate(name, type, contextData, attributes) {
         try {
             let subTemplates = [];
-            try {
-                Object.keys(this.state.subTemplatesData).map(t => {
-                    let subTemplate = {
-                        sub_type: this.state.subTemplatesData[t].subType,
-                        data: encode(this.state.subTemplatesData[t].data)
-                    };
-                    subTemplates.push(subTemplate);
-                });
-            } catch (error) {
-                throw new Error("Template Data contains invalid characters");
-            }
+            Object.keys(this.state.subTemplatesData).map(t => {
+                let subTemplate = {
+                    sub_type: this.state.subTemplatesData[t].subType,
+                    data: encode(this.state.subTemplatesData[t].data)
+                };
+                subTemplates.push(subTemplate);
+            });
             let data = {};
             try {
                 data = {
