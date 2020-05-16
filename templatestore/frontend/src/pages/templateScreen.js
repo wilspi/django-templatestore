@@ -95,6 +95,7 @@ class TemplateScreen extends Component {
                 })
                 .catch(error => {
                     console.log(error);
+                    window.alert(error.response.data); // eslint-disable-line no-alert
                     if (error.response.status === 400) {
                         this.props.history.push(
                             backendSettings.TE_BASEPATH + '/404'
@@ -119,6 +120,7 @@ class TemplateScreen extends Component {
                 })
                 .catch(error => {
                     console.log(error);
+                    window.alert(error.response.data); // eslint-disable-line no-alert
                 });
         } else {
             axios
@@ -130,6 +132,7 @@ class TemplateScreen extends Component {
                 })
                 .catch(function(error) {
                     console.log(error);
+                    window.alert(error.response.data); // eslint-disable-line no-alert
                 });
 
             this.setState({
@@ -182,6 +185,7 @@ class TemplateScreen extends Component {
             })
             .catch(error => {
                 console.log(error);
+                window.alert(error.response.data); // eslint-disable-line no-alert
             });
     }
 
