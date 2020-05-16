@@ -1,18 +1,30 @@
 import React from 'react';
 
 export function encode(str) {
-    var encodedString = btoa(str);
-    return encodedString;
+    try {
+        var encodedString = btoa(str);
+        return encodedString;
+    } catch (error) {
+        throw new Error(error);
+    }
 }
 
 export function decode(str) {
-    var decodedString = atob(str);
-    return decodedString;
+    try {
+        var decodedString = atob(str);
+        return decodedString;
+    } catch (error) {
+        throw new Error(error);
+    }
 }
 
 export function getDateInSimpleFormat(datestr) {
-    let d = new Date(datestr);
-    return d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
+    try {
+        let d = new Date(datestr);
+        return d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
+    } catch (error) {
+        throw new Error(error);
+    }
 }
 
 export const backendSettings = JSON.parse(
