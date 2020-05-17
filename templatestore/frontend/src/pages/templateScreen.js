@@ -52,103 +52,106 @@ class TemplateScreen extends Component {
         this.postTemplate = this.postTemplate.bind(this);
     }
     componentDidMount() {
-        if (!this.state.editable) {
-            axios
-                .get(
-                    backendSettings.TE_BASEPATH +
-                        '/api/v1/template/' +
-                        this.state.templateData.name +
-                        '/' +
-                        this.state.templateData.version
-                )
-                .then(response => {
-                    this.setState({
-                        subTemplatesData: response.data.sub_templates.reduce(
-                            (result, k) => {
-                                result[k.sub_type] = {
-                                    data: decode(k.data),
-                                    subType: k.sub_type,
-                                    renderMode: k.render_mode,
-                                    output: ''
-                                };
+        try {
+            if (!this.state.editable) {
+                axios
+                    .get(
+                        backendSettings.TE_BASEPATH +
+                            '/api/v1/template/' +
+                            this.state.templateData.name +
+                            '/' +
+                            this.state.templateData.version
+                    )
+                    .then(response => {
+                        this.setState({
+                            subTemplatesData: response.data.sub_templates.reduce(
+                                (result, k) => {
+                                    result[k.sub_type] = {
+                                        data: decode(k.data),
+                                        subType: k.sub_type,
+                                        renderMode: k.render_mode,
+                                        output: ''
+                                    };
+                                    return result;
+                                },
+                                {}
+                            ),
+                            templateData: {
+                                name: this.props.match.params.name,
+                                version: this.props.match.params.version,
+                                default: response.data.default
+                            },
+                            contextData: JSON.stringify(
+                                response.data.sample_context_data,
+                                null,
+                                2
+                            ),
+                            attributes: JSON.stringify(
+                                response.data.attributes,
+                                null,
+                                2
+                            ),
+                            type: response.data.type
+                        });
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        window.alert(error.response.data.message); // eslint-disable-line no-alert
+                        if (error.response.status === 400) {
+                            this.props.history.push(
+                                backendSettings.TE_BASEPATH + '/404'
+                            );
+                        }
+                    });
+                axios
+                    .get(
+                        backendSettings.TE_BASEPATH +
+                            '/api/v1/template/' +
+                            this.state.templateData.name +
+                            '/versions'
+                    )
+                    .then(response => {
+                        this.setState({
+                            versions: response.data.map(t => ({
+                                version: t.version,
+                                default: t.default,
+                                created_on: getDateInSimpleFormat(t.created_on)
+                            }))
+                        });
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+            } else {
+                axios
+                    .get(backendSettings.TE_BASEPATH + '/api/v1/config')
+                    .then(response => {
+                        this.setState({
+                            config: response.data
+                        });
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                        window.alert(error.response.data); // eslint-disable-line no-alert
+                    });
+
+                this.setState({
+                    attributes: JSON.stringify(
+                        backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
+                            (result, attribute) => {
+                                result[attribute] = '';
                                 return result;
                             },
                             {}
                         ),
-                        templateData: {
-                            name: this.props.match.params.name,
-                            version: this.props.match.params.version,
-                            default: response.data.default
-                        },
-                        contextData: JSON.stringify(
-                            response.data.sample_context_data,
-                            null,
-                            2
-                        ),
-                        attributes: JSON.stringify(
-                            response.data.attributes,
-                            null,
-                            2
-                        ),
-                        type: response.data.type
-                    });
-                })
-                .catch(error => {
-                    console.log(error);
-                    window.alert(error.response.data); // eslint-disable-line no-alert
-                    if (error.response.status === 400) {
-                        this.props.history.push(
-                            backendSettings.TE_BASEPATH + '/404'
-                        );
-                    }
-                });
-            axios
-                .get(
-                    backendSettings.TE_BASEPATH +
-                        '/api/v1/template/' +
-                        this.state.templateData.name +
-                        '/versions'
-                )
-                .then(response => {
-                    this.setState({
-                        versions: response.data.map(t => ({
-                            version: t.version,
-                            default: t.default,
-                            created_on: getDateInSimpleFormat(t.created_on)
-                        }))
-                    });
-                })
-                .catch(error => {
-                    console.log(error);
-                    window.alert(error.response.data); // eslint-disable-line no-alert
-                });
-        } else {
-            axios
-                .get(backendSettings.TE_BASEPATH + '/api/v1/config')
-                .then(response => {
-                    this.setState({
-                        config: response.data
-                    });
-                })
-                .catch(function(error) {
-                    console.log(error);
-                    window.alert(error.response.data); // eslint-disable-line no-alert
-                });
-
-            this.setState({
-                attributes: JSON.stringify(
-                    backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
-                        (result, attribute) => {
-                            result[attribute] = '';
-                            return result;
-                        },
-                        {}
+                        null,
+                        2
                     ),
-                    null,
-                    2
-                ),
-                contextData: JSON.stringify({ name: 'abc' }, null, 2)
-            });
+                    contextData: JSON.stringify({ name: 'abc' }, null, 2)
+                });
+            }
+        } catch (error) {
+            window.alert(error.response.data); // eslint-disable-line no-alert
         }
     }
 
