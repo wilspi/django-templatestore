@@ -365,18 +365,26 @@ class TemplateScreen extends Component {
                 };
                 subTemplates.push(subTemplate);
             });
-            let data = {};
+
             try {
-                data = {
-                    name: name,
-                    type: type,
-                    sub_templates: subTemplates,
-                    sample_context_data: JSON.parse(contextData),
-                    attributes: JSON.parse(attributes)
-                };
+                contextData = JSON.parse(contextData);
             } catch (error) {
-                throw new Error("Sample_Context_Data and Attributes must be a JSON");
+                throw new Error("Sample_Context_Data must be a JSON");
             }
+
+            try {
+                attributes = JSON.parse(attributes);
+            } catch (error) {
+                throw new Error("Attributes must be a JSON");
+            }
+
+            let data = {
+                name: name,
+                type: type,
+                sub_templates: subTemplates,
+                sample_context_data: contextData,
+                attributes: attributes
+            };
 
             axios
                 .post(backendSettings.TE_BASEPATH + '/api/v1/template', data)
