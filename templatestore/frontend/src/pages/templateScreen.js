@@ -529,7 +529,7 @@ class TemplateScreen extends Component {
         return (
             <div className="container ">
                 <div className={styles.teDetailPage}>
-                    <div>
+                    <div className={styles.teTemplateHeader}>
                         <h1>
                             {this.state.editable ?
                                 'Create New Template' :
@@ -544,11 +544,7 @@ class TemplateScreen extends Component {
                                 placeholder="Add template name"
                             />
                         ) : (
-                            <input
-                                readOnly
-                                type="text"
-                                value={this.state.templateData.name}
-                            />
+                            ''
                         )}
                         <br />
                         <div className={styles.teVersionWrapper}>

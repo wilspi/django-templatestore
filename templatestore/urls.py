@@ -22,6 +22,10 @@ urlpatterns = [
         "api/v1/template/(?P<name>[a-zA-Z]+[a-zA-Z0-9_]*)/(?P<version>\d+\.\d+)/render",
         views.get_render_template_view,
     ),
+    re_path(
+        "api/v1/template/(?P<name>[a-zA-Z]+[a-zA-Z0-9_]*)/attributes",
+        views.patch_attributes_view,
+    ),
     path("api/v1/config", views.get_config_view),
     # frontend
     re_path(r"^(?:.*)/?$", views.index, name="index"),
