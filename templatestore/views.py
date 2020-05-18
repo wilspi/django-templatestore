@@ -559,3 +559,54 @@ def get_config_view(request):
             content_type="application/json",
             status=404,
         )
+
+
+@csrf_exempt
+def patch_attributes_view(request, name):
+    if request.method == "PATCH":
+        try:
+            data = json.loads(request.body)
+
+            if "attributes" not in data:
+                raise (Exception("Validation: Attributes are not provided"))
+
+            template = Template.objects.filter(name=name)
+            if not len(template):
+                raise (Exception("Validation: Template with given name does not exist"))
+
+            missing_attributes = set(
+                ts_settings.TE_TEMPLATE_ATTRIBUTES_KEYS
+            ).difference(set(data["attributes"].keys()))
+            if len(missing_attributes):
+                raise (
+                    Exception(
+                        "Validation: missing mandatory attributes `"
+                        + str(missing_attributes)
+                        + "`"
+                    )
+                )
+
+            for key in data["attributes"]:
+                if not isinstance(data["attributes"][key], str):
+                    raise (
+                        Exception(
+                            "Validation: Attributes must be a key value pair and value must be a string"
+                        )
+                    )
+
+            template.update(attributes=data["attributes"])
+            data = {"name": name, "attributes": data["attributes"]}
+            return JsonResponse(data, status=200)
+        except Exception as e:
+            logger.exception(e)
+            return HttpResponse(
+                json.dumps({"message": str(e)}),
+                content_type="application/json",
+                status=400,
+            )
+    else:
+        return HttpResponse(
+            json.dumps({"message": "no method found"}),
+            content_type="application/json",
+            status=404,
+        )
