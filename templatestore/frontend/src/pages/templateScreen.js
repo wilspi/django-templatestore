@@ -10,6 +10,8 @@ import {
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
+import 'ace-builds';
+import 'ace-builds/webpack-resolver';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/theme-github';
@@ -415,6 +417,7 @@ class TemplateScreen extends Component {
                             width={this.aceconfig.width}
                             value={this.state.subTemplatesData[t].output}
                             highlightActiveLine="false"
+                            setOptions={{ useWorker: false }}
                         />
                     );
                 let inputView = (
@@ -430,6 +433,7 @@ class TemplateScreen extends Component {
                         onChange={n => {
                             this.onTemplateChange(t, n);
                         }}
+                        setOptions={{ useWorker: false }}
                     />
                 );
                 return (
@@ -656,6 +660,7 @@ class TemplateScreen extends Component {
                                             width={this.aceconfig.width}
                                             value={this.state.contextData}
                                             onChange={this.onContextChange}
+                                            setOptions={{ useWorker: false }}
                                         />
                                     </div>
                                 </div>
@@ -712,6 +717,7 @@ class TemplateScreen extends Component {
                                             value={this.state.attributes}
                                             onChange={this.onAttributesChange}
                                             readOnly={!this.state.editable}
+                                            setOptions={{ useWorker: false }}
                                         />
                                     </div>
                                 </div>
