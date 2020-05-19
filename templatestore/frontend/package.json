@@ -37,7 +37,6 @@
     "react-ace-builds": "^7.3.0",
     "react-dom": "^16.12.0",
     "react-router-dom": "^5.1.2",
-    "terser-webpack-plugin": "^3.0.1",
     "webpack-merge": "^4.2.2"
   },
   "devDependencies": {
