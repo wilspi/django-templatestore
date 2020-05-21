@@ -354,18 +354,32 @@ class TemplateScreen extends Component {
             attributes: JSON.parse(attributes)
         };
         axios
-            .post(backendSettings.TE_BASEPATH + '/api/v1/template', data)
+            .get(
+                backendSettings.TE_BASEPATH +
+                '/api/v1/template/' +
+                name +
+                '/versions'
+            )
             .then(response => {
-                this.props.history.push(
-                    backendSettings.TE_BASEPATH +
-                        '/t/' +
-                        response.data.name +
-                        '/' +
-                        response.data.version
-                );
+                console.log("Template with this name already exists"); //Add Alert here
             })
             .catch(error => {
-                console.log(error);
+                axios
+                    .post(
+                        backendSettings.TE_BASEPATH + '/api/v1/template', data
+                    )
+                    .then(response => {
+                        this.props.history.push(
+                            backendSettings.TE_BASEPATH +
+                                '/t/' +
+                                response.data.name +
+                                '/' +
+                                response.data.version
+                        );
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
             });
     }
 
