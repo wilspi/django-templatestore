@@ -237,6 +237,17 @@ def post_template_view(request):
                 template = tmp
 
             else:
+                if data["type"] != templates[0].type:
+                    raise (
+                        Exception(
+                            "Validation: Template with name `"
+                            + data["name"]
+                            + "` already exists with type `"
+                            + templates[0].type
+                            + "`"
+                        )
+                    )
+
                 template = templates[0]  # only one template should exist
                 max_version = TemplateVersion.objects.filter(
                     template_id=template
