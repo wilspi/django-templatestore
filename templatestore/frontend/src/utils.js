@@ -1,12 +1,15 @@
 import React from 'react';
 
-
 export function encode(str) {
     try {
-        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
-            function toSolidBytes(match, p1) {
-                return String.fromCharCode('0x' + p1);
-            }));
+        return btoa(
+            encodeURIComponent(str).replace(
+                /%([0-9A-F]{2})/g,
+                function toSolidBytes(match, p1) {
+                    return String.fromCharCode('0x' + p1);
+                }
+            )
+        );
     } catch (error) {
         throw new Error(error);
     }
@@ -14,9 +17,16 @@ export function encode(str) {
 
 export function decode(str) {
     try {
-        return decodeURIComponent(atob(str).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
+        return decodeURIComponent(
+            atob(str)
+                .split('')
+                .map(function(c) {
+                    return (
+                        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                    );
+                })
+                .join('')
+        );
     } catch (error) {
         throw new Error(error);
     }

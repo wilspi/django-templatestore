@@ -10,6 +10,8 @@ import {
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
+import 'ace-builds';
+import 'ace-builds/webpack-resolver';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/theme-github';
@@ -356,17 +358,18 @@ class TemplateScreen extends Component {
         axios
             .get(
                 backendSettings.TE_BASEPATH +
-                '/api/v1/template/' +
-                name +
-                '/versions'
+                    '/api/v1/template/' +
+                    name +
+                    '/versions'
             )
             .then(response => {
-                console.log("Template with this name already exists"); //Add Alert here
+                console.log('Template with this name already exists'); //Add Alert here
             })
             .catch(error => {
                 axios
                     .post(
-                        backendSettings.TE_BASEPATH + '/api/v1/template', data
+                        backendSettings.TE_BASEPATH + '/api/v1/template',
+                        data
                     )
                     .then(response => {
                         this.props.history.push(
@@ -427,6 +430,7 @@ class TemplateScreen extends Component {
                             width={this.aceconfig.width}
                             value={this.state.subTemplatesData[t].output}
                             highlightActiveLine="false"
+                            setOptions={{ useWorker: false }}
                         />
                     );
                 let inputView = (
@@ -442,6 +446,7 @@ class TemplateScreen extends Component {
                         onChange={n => {
                             this.onTemplateChange(t, n);
                         }}
+                        setOptions={{ useWorker: false }}
                     />
                 );
                 return (
@@ -502,31 +507,32 @@ class TemplateScreen extends Component {
                                         >
                                             Render
                                         </button>
-                                        {this.state.subTemplatesData[t].renderMode === 'html' ? (
-                                            <button
-                                                className={
-                                                    styles.tePreviewButton
-                                                }
-                                                data-toggle="modal"
-                                                data-target="#myModal"
-                                                onClick={() => {
-                                                    this.getRenderedTemplate(
-                                                        t,
-                                                        this.state.subTemplatesData[
-                                                            t
-                                                        ].data,
-                                                        this.state.contextData,
-                                                        this.state.subTemplatesData[
-                                                            t
-                                                        ].renderMode
-                                                    );
-                                                }}
-                                            >
+                                        {this.state.subTemplatesData[t]
+                                            .renderMode === 'html' ? (
+                                                <button
+                                                    className={
+                                                        styles.tePreviewButton
+                                                    }
+                                                    data-toggle="modal"
+                                                    data-target="#myModal"
+                                                    onClick={() => {
+                                                        this.getRenderedTemplate(
+                                                            t,
+                                                            this.state
+                                                                .subTemplatesData[t]
+                                                                .data,
+                                                            this.state.contextData,
+                                                            this.state
+                                                                .subTemplatesData[t]
+                                                                .renderMode
+                                                        );
+                                                    }}
+                                                >
                                                 Preview
-                                            </button>
-                                        ) : (
-                                            ''
-                                        )}
+                                                </button>
+                                            ) : (
+                                                ''
+                                            )}
                                     </div>
                                 </div>
                             </div>
@@ -676,6 +682,7 @@ class TemplateScreen extends Component {
                                             width={this.aceconfig.width}
                                             value={this.state.contextData}
                                             onChange={this.onContextChange}
+                                            setOptions={{ useWorker: false }}
                                         />
                                     </div>
                                 </div>
@@ -765,6 +772,7 @@ class TemplateScreen extends Component {
                                             value={this.state.attributes}
                                             onChange={this.onAttributesChange}
                                             readOnly={!this.state.editable}
+                                            setOptions={{ useWorker: false }}
                                         />
                                     </div>
                                 </div>
@@ -813,22 +821,22 @@ class TemplateScreen extends Component {
                                 className="modal-body"
                                 style={{ height: '90vh', padding: '0' }}
                             >
-                                {
-                                    this.state.previewSubType &&
-                                    this.state.subTemplatesData.hasOwnProperty(this.state.previewSubType) ? (
-                                            <iframe
-                                                height="100%"
-                                                width="100%"
-                                                srcDoc={
-                                                    this.state.subTemplatesData[
-                                                        this.state.previewSubType
-                                                    ].output
-                                                }
-                                            />
-                                        ) : (
-                                            ''
-                                        )
-                                }
+                                {this.state.previewSubType &&
+                                this.state.subTemplatesData.hasOwnProperty(
+                                    this.state.previewSubType
+                                ) ? (
+                                        <iframe
+                                            height="100%"
+                                            width="100%"
+                                            srcDoc={
+                                                this.state.subTemplatesData[
+                                                    this.state.previewSubType
+                                                ].output
+                                            }
+                                        />
+                                    ) : (
+                                        ''
+                                    )}
                             </div>
                         </div>
                     </div>
