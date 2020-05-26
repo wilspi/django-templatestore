@@ -1,6 +1,6 @@
 {
   "name": "django-templatestore",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Interface to add, and update templates",
   "main": "./src/index.js",
   "scripts": {
