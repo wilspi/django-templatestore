@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class SearchBox extends React.Component {
     constructor(props) {
@@ -13,5 +14,8 @@ class SearchBox extends React.Component {
         return <input type="text" onChange={this.onChange.bind(this)} />;
     }
 }
+SearchBox.propTypes = {
+    onChange: PropTypes.func
+};
 
 export default SearchBox;

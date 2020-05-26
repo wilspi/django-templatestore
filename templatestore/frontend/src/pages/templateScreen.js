@@ -7,6 +7,7 @@ import {
     backendSettings,
     getDateInSimpleFormat
 } from './../utils.js';
+import PropTypes from 'prop-types';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
@@ -845,5 +846,18 @@ class TemplateScreen extends Component {
         );
     }
 }
+
+TemplateScreen.propTypes = {
+    match: PropTypes.shape({
+        params: PropTypes.shape({
+            name: PropTypes.string,
+            version: PropTypes.string
+        })
+    }),
+    history: PropTypes.shape({
+        push: PropTypes.func
+    }),
+    editable: PropTypes.bool
+};
 
 export default withRouter(TemplateScreen);
