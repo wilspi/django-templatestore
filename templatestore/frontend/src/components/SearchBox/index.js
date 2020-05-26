@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+
 import styles from './searchBox.less';
 
 class SearchBox extends React.Component {
@@ -22,7 +22,5 @@ class SearchBox extends React.Component {
         );
     }
 }
-SearchBox.propTypes = {
-    onChange: PropTypes.func
-};
+
 export default SearchBox;
