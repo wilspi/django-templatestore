@@ -2,6 +2,7 @@
 All notable changes to this project are documented in this file.
 
 ## [Unreleased]
+To be added
 
 
 ## [0.1.5](https://github.com/wilspi/django-templatestore/releases/tag/v0.1.5) - 2020-05-30
@@ -9,6 +10,7 @@ All notable changes to this project are documented in this file.
 -  UI: List templates page and add/edit template page
 -  Validation/Bugfixes in APIs (many updates here, see gitlog)
 -  API: Update attributes
+-  Documentation: [here](https://github.com/wilspi/django-templatestore/blob/master/docs/README.md)
 
 
 ## [0.1.2](https://github.com/wilspi/django-templatestore/releases/tag/v0.1.2) - 2020-03-05
