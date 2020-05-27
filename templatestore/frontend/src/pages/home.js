@@ -85,15 +85,15 @@ class Home extends Component {
         );
 
         for (let i = 0; i < filteredTemplates.length; i++) {
-            let columnData = Object.values(filteredTemplates[i]).map(k => (
-                <td>
+            let columnData = Object.values(filteredTemplates[i]).map((k, index) => (
+                <td key={(i, index)}>
                     <Highlight search={this.state.searchText}>
                         {k !== '' ? k : '-'}
                     </Highlight>
                 </td>
             ));
             tableRows.push(
-                <tr>
+                <tr key={i}>
                     {columnData}
                     <td>
                         <button
@@ -126,8 +126,8 @@ class Home extends Component {
     }
 
     render() {
-        var tableHeaders = [...this.tableHeaderList, ...[' - ']].map(k => (
-            <th>{k}</th>
+        var tableHeaders = [...this.tableHeaderList, ...[' - ']].map((k, index) => (
+            <th key={index}>{k}</th>
         ));
         return (
             <div className={styles.tsPage + ' container'}>
