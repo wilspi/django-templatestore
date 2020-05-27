@@ -137,17 +137,6 @@ class TemplateScreen extends Component {
                 });
 
             this.setState({
-                attributes: JSON.stringify(
-                    backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
-                        (result, attribute) => {
-                            result[attribute] = '';
-                            return result;
-                        },
-                        {}
-                    ),
-                    null,
-                    2
-                ),
                 contextData: JSON.stringify({ name: 'abc' }, null, 2)
             });
         }
@@ -324,7 +313,13 @@ class TemplateScreen extends Component {
     }
 
     getMandatoryAttributes(type) {
-        let generalAttributes = JSON.parse(this.state.attributes);
+        let generalAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
+            (result, attribute) => {
+                result[attribute] = '';
+                return result;
+            },
+            {}
+        );
         let mandatoryAttributes = this.state.config[type]["attributes"];
         let allAttributes = Object.assign(generalAttributes, mandatoryAttributes);
         this.setState({
