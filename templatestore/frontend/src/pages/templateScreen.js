@@ -586,6 +586,7 @@ class TemplateScreen extends Component {
                                     id="type"
                                     className={styles.teButtons}
                                     value={0.1}
+                                    readOnly
                                 >
                                     <option disabled>0.1</option>
                                 </select>
