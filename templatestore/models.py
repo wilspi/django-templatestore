@@ -78,6 +78,7 @@ class TemplateConfig(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     deleted_on = models.DateTimeField(null=True, blank=True)
+    attributes = models.CharField(default='{}', max_length=1000)
 
     class Meta:
         db_table = "templatestore_template_config"
