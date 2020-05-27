@@ -312,7 +312,7 @@ class TemplateScreen extends Component {
         });
     }
 
-    getMandatoryAttributes(type) {
+    getAttributes(type) {
         let generalAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
             (result, attribute) => {
                 result[attribute] = '';
@@ -343,7 +343,7 @@ class TemplateScreen extends Component {
             ),
             type: type
         });
-        this.getMandatoryAttributes(type);
+        this.getAttributes(type);
     }
 
     saveTemplate(data) {
