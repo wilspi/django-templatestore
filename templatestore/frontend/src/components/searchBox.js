@@ -14,6 +14,7 @@ class SearchBox extends React.Component {
         return <input type="text" onChange={this.onChange.bind(this)} />;
     }
 }
+
 SearchBox.propTypes = {
     onChange: PropTypes.func
 };

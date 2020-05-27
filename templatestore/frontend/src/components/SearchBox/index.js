@@ -22,7 +22,9 @@ class SearchBox extends React.Component {
         );
     }
 }
+
 SearchBox.propTypes = {
     onChange: PropTypes.func
 };
+
 export default SearchBox;
