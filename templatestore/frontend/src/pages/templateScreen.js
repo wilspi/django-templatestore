@@ -7,6 +7,7 @@ import {
     backendSettings,
     getDateInSimpleFormat
 } from './../utils.js';
+import PropTypes from 'prop-types';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
@@ -52,6 +53,7 @@ class TemplateScreen extends Component {
         this.onAttributesChange = this.onAttributesChange.bind(this);
         this.getTypesConfig = this.getTypesConfig.bind(this);
         this.postTemplate = this.postTemplate.bind(this);
+        this.saveTemplate = this.saveTemplate.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -339,6 +341,26 @@ class TemplateScreen extends Component {
         });
     }
 
+    saveTemplate(data) {
+        axios
+            .post(
+                backendSettings.TE_BASEPATH + '/api/v1/template',
+                data
+            )
+            .then(response => {
+                this.props.history.push(
+                    backendSettings.TE_BASEPATH +
+                        '/t/' +
+                        response.data.name +
+                        '/' +
+                        response.data.version
+                );
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     postTemplate(name, type, contextData, attributes) {
         let subTemplates = [];
         Object.keys(this.state.subTemplatesData).map(t => {
@@ -355,35 +377,23 @@ class TemplateScreen extends Component {
             sample_context_data: JSON.parse(contextData),
             attributes: JSON.parse(attributes)
         };
-        axios
-            .get(
-                backendSettings.TE_BASEPATH +
-                    '/api/v1/template/' +
-                    name +
-                    '/versions'
-            )
-            .then(response => {
-                console.log('Template with this name already exists'); //Add Alert here
-            })
-            .catch(error => {
-                axios
-                    .post(
-                        backendSettings.TE_BASEPATH + '/api/v1/template',
-                        data
-                    )
-                    .then(response => {
-                        this.props.history.push(
-                            backendSettings.TE_BASEPATH +
-                                '/t/' +
-                                response.data.name +
-                                '/' +
-                                response.data.version
-                        );
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    });
-            });
+        if (this.state.editable) {
+            axios
+                .get(
+                    backendSettings.TE_BASEPATH +
+                        '/api/v1/template/' +
+                        name +
+                        '/versions'
+                )
+                .then(response => {
+                    console.log('Template with this name already exists'); //Add Alert here
+                })
+                .catch(error => {
+                    this.saveTemplate(data);
+                });
+        } else {
+            this.saveTemplate(data);
+        }
     }
 
     render() {
@@ -845,5 +855,18 @@ class TemplateScreen extends Component {
         );
     }
 }
+
+TemplateScreen.propTypes = {
+    match: PropTypes.shape({
+        params: PropTypes.shape({
+            name: PropTypes.string,
+            version: PropTypes.string
+        })
+    }),
+    history: PropTypes.shape({
+        push: PropTypes.func
+    }),
+    editable: PropTypes.bool
+};
 
 export default withRouter(TemplateScreen);
