@@ -553,6 +553,7 @@ def get_config_view(request):
                     tes[t.type] = {
                         "sub_type": [{"type": t.sub_type, "render_mode": t.render_mode}]
                     }
+                    tes[t.type]["attributes"] = json.loads(t.attributes)
 
             return JsonResponse(tes, safe=False)
 
