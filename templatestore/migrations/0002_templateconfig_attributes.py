@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('templatestore', '0001_initial'),
+        ("templatestore", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='templateconfig',
-            name='attributes',
-            field=models.CharField(default='{}', max_length=1000),
+            model_name="templateconfig",
+            name="attributes",
+            field=models.CharField(default="{}", max_length=1000),
         ),
     ]
