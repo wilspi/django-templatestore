@@ -424,7 +424,7 @@ class TemplateScreen extends Component {
                             placeholder='Press "Render" to see the output here!'
                             theme="github"
                             mode="html"
-                            readOnly="true"
+                            readOnly
                             fontSize={this.aceconfig.fontSize}
                             height={this.aceconfig.height}
                             width={this.aceconfig.width}
