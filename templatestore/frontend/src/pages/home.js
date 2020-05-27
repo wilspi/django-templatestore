@@ -5,6 +5,7 @@ import styles from './../style/home.less';
 import { backendSettings, getDateInSimpleFormat } from './../utils.js';
 import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
+import PropTypes from 'prop-types';
 
 class Home extends Component {
     constructor(props) {
@@ -164,5 +165,12 @@ class Home extends Component {
         );
     }
 }
+
+Home.propTypes = {
+    history: PropTypes.shape({
+        push: PropTypes.func
+    }),
+    fixedAttributeKeys: PropTypes.arrayOf(PropTypes.string)
+};
 
 export default withRouter(Home);
