@@ -212,8 +212,8 @@ class TemplateScreen extends Component {
             },
             []
         );
-        let tableRows = Object.values(filteredVersionList).map(k => (
-            <tr>
+        let tableRows = Object.values(filteredVersionList).map((k, index) => (
+            <tr key={index}>
                 <td>
                     <Highlight search={this.state.searchText}>
                         {k.version}
@@ -397,7 +397,7 @@ class TemplateScreen extends Component {
 
         let chooseVersion = this.state.versions.map(versions => {
             return (
-                <option value={versions.version}> {versions.version} </option>
+                <option value={versions.version} key={versions.version}> {versions.version} </option>
             );
         });
 
@@ -405,8 +405,8 @@ class TemplateScreen extends Component {
         // let tableHeaders = ['version', 'created_on', ' - ', ' - ', 'comment'].map(k => (
         //     <th>{k}</th>
         // ));
-        let tableHeaders = ['version', 'created_on', ' - ', ' - '].map(k => (
-            <th>{k}</th>
+        let tableHeaders = ['version', 'created_on', ' - ', ' - '].map((k, index) => (
+            <th key={index}>{k}</th>
         ));
 
         let editors = Object.keys(this.state.subTemplatesData).map(
@@ -450,7 +450,7 @@ class TemplateScreen extends Component {
                     />
                 );
                 return (
-                    <div className={styles.teRowBlock}>
+                    <div className={styles.teRowBlock} key={index}>
                         <div className={styles.teCard + ' card'}>
                             <div
                                 className="card-header"
@@ -543,7 +543,7 @@ class TemplateScreen extends Component {
         );
 
         let templateTypes = Object.keys(this.state.config).map(t => {
-            return <option value={t}> {t} </option>;
+            return <option value={t} key={t}> {t} </option>;
         });
 
         return (
@@ -588,7 +588,7 @@ class TemplateScreen extends Component {
                                     value={0.1}
                                     readOnly
                                 >
-                                    <option disabled>0.1</option>
+                                    <option disabled key={0.1}>0.1</option>
                                 </select>
                             )}
                             <label>Default : </label>
