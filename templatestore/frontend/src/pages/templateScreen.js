@@ -429,7 +429,7 @@ class TemplateScreen extends Component {
                             height={this.aceconfig.height}
                             width={this.aceconfig.width}
                             value={this.state.subTemplatesData[t].output}
-                            highlightActiveLine="false"
+                            highlightActiveLine={false}
                             setOptions={{ useWorker: false }}
                         />
                     );
