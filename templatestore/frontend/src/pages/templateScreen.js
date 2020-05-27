@@ -323,6 +323,15 @@ class TemplateScreen extends Component {
         });
     }
 
+    getMandatoryAttributes(type) {
+        let generalAttributes = JSON.parse(this.state.attributes);
+        let mandatoryAttributes = this.state.config[type]["attributes"];
+        let allAttributes = Object.assign(generalAttributes, mandatoryAttributes);
+        this.setState({
+            attributes: JSON.stringify(allAttributes, null, 2)
+        });
+    }
+
     getTypesConfig(type) {
         this.setState({
             subTemplatesData: this.state.config[type].sub_type.reduce(
@@ -339,6 +348,7 @@ class TemplateScreen extends Component {
             ),
             type: type
         });
+        this.getMandatoryAttributes(type);
     }
 
     saveTemplate(data) {
