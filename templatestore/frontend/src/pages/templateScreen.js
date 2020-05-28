@@ -54,6 +54,7 @@ class TemplateScreen extends Component {
         this.getTypesConfig = this.getTypesConfig.bind(this);
         this.postTemplate = this.postTemplate.bind(this);
         this.saveTemplate = this.saveTemplate.bind(this);
+        this.setMandatoryAttributes = this.setMandatoryAttributes.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -312,7 +313,7 @@ class TemplateScreen extends Component {
         });
     }
 
-    getAttributes(type) {
+    setMandatoryAttributes(type) {
         let generalAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
             (result, attribute) => {
                 result[attribute] = '';
@@ -343,7 +344,7 @@ class TemplateScreen extends Component {
             ),
             type: type
         });
-        this.getAttributes(type);
+        this.setMandatoryAttributes(type);
     }
 
     saveTemplate(data) {
