@@ -322,9 +322,8 @@ class TemplateScreen extends Component {
             {}
         );
         let mandatoryAttributes = this.state.config[type]["attributes"];
-        let allAttributes = Object.assign(generalAttributes, mandatoryAttributes);
         this.setState({
-            attributes: JSON.stringify(allAttributes, null, 2)
+            attributes: JSON.stringify(Object.assign(generalAttributes, mandatoryAttributes), null, 2)
         });
     }
 
