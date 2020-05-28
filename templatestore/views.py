@@ -551,9 +551,9 @@ def get_config_view(request):
                     )
                 else:
                     tes[t.type] = {
-                        "sub_type": [{"type": t.sub_type, "render_mode": t.render_mode}]
+                        "sub_type": [{"type": t.sub_type, "render_mode": t.render_mode}],
+                        "attributes": json.loads(t.attributes)
                     }
-                    tes[t.type]["attributes"] = json.loads(t.attributes)
 
             return JsonResponse(tes, safe=False)
 
