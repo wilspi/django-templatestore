@@ -35,7 +35,7 @@ export function decode(str) {
 export function getDateInSimpleFormat(datestr) {
     try {
         let d = new Date(datestr);
-        return d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
+        return d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
     } catch (error) {
         throw new Error(error);
     }
