@@ -38,11 +38,14 @@ Currently following templating libraries are supported:
  - [ ] [`handlebarsjs`](https://handlebarsjs.com/guide/)
 
 
-### Share your screenshot
-* [send_me_a_mail]()
+### Screenshots
 
-[templateditor.herokuapp.com](https://templateditor.herokuapp.com)
 ![templateditor.herokuapp.com](https://i.imgur.com/ixPn47L.jpg)
+
+### Example
+
+* [Demo App](send_me_a_mail)
+* [Version 0.1.1](https://templateditor.herokuapp.com)
 
 
 ### Development
