@@ -128,9 +128,11 @@ class TemplateScreen extends Component {
             axios
                 .get(backendSettings.TE_BASEPATH + '/api/v1/config')
                 .then(response => {
+                    let defaultType = Object.keys(response.data)[0];
                     this.setState({
                         config: response.data
                     });
+                    this.getTypesConfig(response.data, defaultType);
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -323,9 +325,9 @@ class TemplateScreen extends Component {
         });
     }
 
-    getTypesConfig(type) {
+    getTypesConfig(config, type) {
         this.setState({
-            subTemplatesData: this.state.config[type].sub_type.reduce(
+            subTemplatesData: config[type].sub_type.reduce(
                 (result, k) => {
                     result[k.type] = {
                         subType: k.type,
@@ -397,14 +399,6 @@ class TemplateScreen extends Component {
     }
 
     render() {
-        if (
-            Object.keys(this.state.config).length &&
-            !this.state.type &&
-            this.state.editable
-        ) {
-            this.getTypesConfig(Object.keys(this.state.config)[0]);
-        }
-
         let chooseVersion = this.state.versions.map(versions => {
             return (
                 <option value={versions.version} key={versions.version}> {versions.version} </option>
@@ -624,7 +618,7 @@ class TemplateScreen extends Component {
                             <select
                                 className={styles.teButtons}
                                 onChange={e =>
-                                    this.getTypesConfig(e.target.value)
+                                    this.getTypesConfig(this.state.config, e.target.value)
                                 }
                             >
                                 {templateTypes}
