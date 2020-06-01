@@ -87,7 +87,7 @@ class Home extends Component {
 
         for (let i = 0; i < filteredTemplates.length; i++) {
             let columnData = Object.values(filteredTemplates[i]).map((k, index) => (
-                <td key={(i, index)}>
+                <td key={index}>
                     <Highlight search={this.state.searchText}>
                         {k !== '' ? k : '-'}
                     </Highlight>
