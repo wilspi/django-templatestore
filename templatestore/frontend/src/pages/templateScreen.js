@@ -129,9 +129,11 @@ class TemplateScreen extends Component {
             axios
                 .get(backendSettings.TE_BASEPATH + '/api/v1/config')
                 .then(response => {
+                    let defaultType = Object.keys(response.data)[0];
                     this.setState({
                         config: response.data
                     });
+                    this.getTypesConfig(response.data, defaultType);
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -204,8 +206,8 @@ class TemplateScreen extends Component {
             },
             []
         );
-        let tableRows = Object.values(filteredVersionList).map(k => (
-            <tr>
+        let tableRows = Object.values(filteredVersionList).map((k, index) => (
+            <tr key={index}>
                 <td>
                     <Highlight search={this.state.searchText}>
                         {k.version}
@@ -327,9 +329,9 @@ class TemplateScreen extends Component {
         });
     }
 
-    getTypesConfig(type) {
+    getTypesConfig(config, type) {
         this.setState({
-            subTemplatesData: this.state.config[type].sub_type.reduce(
+            subTemplatesData: config[type].sub_type.reduce(
                 (result, k) => {
                     result[k.type] = {
                         subType: k.type,
@@ -402,17 +404,9 @@ class TemplateScreen extends Component {
     }
 
     render() {
-        if (
-            Object.keys(this.state.config).length &&
-            !this.state.type &&
-            this.state.editable
-        ) {
-            this.getTypesConfig(Object.keys(this.state.config)[0]);
-        }
-
         let chooseVersion = this.state.versions.map(versions => {
             return (
-                <option value={versions.version}> {versions.version} </option>
+                <option value={versions.version} key={versions.version}> {versions.version} </option>
             );
         });
 
@@ -420,8 +414,8 @@ class TemplateScreen extends Component {
         // let tableHeaders = ['version', 'created_on', ' - ', ' - ', 'comment'].map(k => (
         //     <th>{k}</th>
         // ));
-        let tableHeaders = ['version', 'created_on', ' - ', ' - '].map(k => (
-            <th>{k}</th>
+        let tableHeaders = ['version', 'created_on', ' - ', ' - '].map((k, index) => (
+            <th key={index}>{k}</th>
         ));
 
         let editors = Object.keys(this.state.subTemplatesData).map(
@@ -439,12 +433,12 @@ class TemplateScreen extends Component {
                             placeholder='Press "Render" to see the output here!'
                             theme="github"
                             mode="html"
-                            readOnly="true"
+                            readOnly
                             fontSize={this.aceconfig.fontSize}
                             height={this.aceconfig.height}
                             width={this.aceconfig.width}
                             value={this.state.subTemplatesData[t].output}
-                            highlightActiveLine="false"
+                            highlightActiveLine={false}
                             setOptions={{ useWorker: false }}
                         />
                     );
@@ -465,7 +459,7 @@ class TemplateScreen extends Component {
                     />
                 );
                 return (
-                    <div className={styles.teRowBlock}>
+                    <div className={styles.teRowBlock} key={index}>
                         <div className={styles.teCard + ' card'}>
                             <div
                                 className="card-header"
@@ -558,7 +552,7 @@ class TemplateScreen extends Component {
         );
 
         let templateTypes = Object.keys(this.state.config).map(t => {
-            return <option value={t}> {t} </option>;
+            return <option value={t} key={t}> {t} </option>;
         });
 
         return (
@@ -601,6 +595,7 @@ class TemplateScreen extends Component {
                                     id="type"
                                     className={styles.teButtons}
                                     value={0.1}
+                                    readOnly
                                 >
                                     <option disabled>0.1</option>
                                 </select>
@@ -628,7 +623,7 @@ class TemplateScreen extends Component {
                             <select
                                 className={styles.teButtons}
                                 onChange={e =>
-                                    this.getTypesConfig(e.target.value)
+                                    this.getTypesConfig(this.state.config, e.target.value)
                                 }
                             >
                                 {templateTypes}
