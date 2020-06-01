@@ -597,7 +597,7 @@ class TemplateScreen extends Component {
                                     value={0.1}
                                     readOnly
                                 >
-                                    <option disabled key={0.1}>0.1</option>
+                                    <option disabled>0.1</option>
                                 </select>
                             )}
                             <label>Default : </label>
