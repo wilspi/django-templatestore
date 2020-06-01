@@ -54,6 +54,7 @@ class TemplateScreen extends Component {
         this.getTypesConfig = this.getTypesConfig.bind(this);
         this.postTemplate = this.postTemplate.bind(this);
         this.saveTemplate = this.saveTemplate.bind(this);
+        this.setMandatoryAttributes = this.setMandatoryAttributes.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -139,17 +140,6 @@ class TemplateScreen extends Component {
                 });
 
             this.setState({
-                attributes: JSON.stringify(
-                    backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
-                        (result, attribute) => {
-                            result[attribute] = '';
-                            return result;
-                        },
-                        {}
-                    ),
-                    null,
-                    2
-                ),
                 contextData: JSON.stringify({ name: 'abc' }, null, 2)
             });
         }
@@ -325,6 +315,20 @@ class TemplateScreen extends Component {
         });
     }
 
+    setMandatoryAttributes(type) {
+        let generalAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
+            (result, attribute) => {
+                result[attribute] = '';
+                return result;
+            },
+            {}
+        );
+        let mandatoryAttributes = this.state.config[type]["attributes"];
+        this.setState({
+            attributes: JSON.stringify(Object.assign(generalAttributes, mandatoryAttributes), null, 2)
+        });
+    }
+
     getTypesConfig(config, type) {
         this.setState({
             subTemplatesData: config[type].sub_type.reduce(
@@ -341,6 +345,7 @@ class TemplateScreen extends Component {
             ),
             type: type
         });
+        this.setMandatoryAttributes(type);
     }
 
     saveTemplate(data) {
