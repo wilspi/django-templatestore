@@ -82,7 +82,9 @@ def get_templates_view(request):
             offset = int(request.GET.get("offset", 0))
             limit = int(request.GET.get("limit", ts_settings.TE_ROWLIMIT))
 
-            templates = Template.objects.all()[offset : offset + limit]
+            templates = Template.objects.all().order_by("-modified_on")[
+                offset : offset + limit
+            ]
             template_list = [
                 {
                     "name": t.name,
@@ -95,6 +97,7 @@ def get_templates_view(request):
                     "type": t.type,
                     "attributes": t.attributes,
                     "created_on": t.created_on,
+                    "modified_on": t.modified_on,
                 }
                 for t in templates
             ]
@@ -149,6 +152,7 @@ def post_template_view(request):
                 )
 
             invalid_data = set()
+            empty_data = set()
 
             for sub_template in data["sub_templates"]:
                 if not re.match(
@@ -156,6 +160,9 @@ def post_template_view(request):
                     sub_template["data"],
                 ):
                     invalid_data.add(sub_template["sub_type"])
+
+                if not sub_template["data"]:
+                    empty_data.add(sub_template["sub_type"])
 
             if len(invalid_data):
                 raise (
@@ -173,6 +180,15 @@ def post_template_view(request):
                 )
 
             sub_types = {cfg.sub_type: cfg for cfg in cfgs}
+
+            if len(empty_data) == len(sub_types):
+                raise (
+                    Exception(
+                        "Validation: Atleast one of the sub_types `"
+                        + str(empty_data)
+                        + "` must be non empty"
+                    )
+                )
 
             invalid_subtypes = set(
                 [s["sub_type"] for s in data["sub_templates"]]
@@ -210,6 +226,20 @@ def post_template_view(request):
                     Exception("Validation: sample_context_data field can not be empty")
                 )
 
+            missing_mandatory_attributes = set(cfgs[0].attributes.keys()).difference(
+                set(data["attributes"].keys())
+            )
+            if len(missing_mandatory_attributes):
+                raise (
+                    Exception(
+                        "Validation: missing mandatory attributes `"
+                        + str(missing_mandatory_attributes)
+                        + "` for type `"
+                        + data["type"]
+                        + "`"
+                    )
+                )
+
             templates = Template.objects.filter(name=data["name"])
             if not len(templates):
                 tmp = Template.objects.create(
@@ -221,6 +251,17 @@ def post_template_view(request):
                 template = tmp
 
             else:
+                if data["type"] != templates[0].type:
+                    raise (
+                        Exception(
+                            "Validation: Template with name `"
+                            + data["name"]
+                            + "` already exists with type `"
+                            + templates[0].type
+                            + "`"
+                        )
+                    )
+
                 template = templates[0]  # only one template should exist
                 max_version = TemplateVersion.objects.filter(
                     template_id=template
@@ -524,7 +565,10 @@ def get_config_view(request):
                     )
                 else:
                     tes[t.type] = {
-                        "sub_type": [{"type": t.sub_type, "render_mode": t.render_mode}]
+                        "sub_type": [
+                            {"type": t.sub_type, "render_mode": t.render_mode}
+                        ],
+                        "attributes": t.attributes,
                     }
 
             return JsonResponse(tes, safe=False)
@@ -537,6 +581,57 @@ def get_config_view(request):
                 status=404,
             )
 
+    else:
+        return HttpResponse(
+            json.dumps({"message": "no method found"}),
+            content_type="application/json",
+            status=404,
+        )
+
+
+@csrf_exempt
+def patch_attributes_view(request, name):
+    if request.method == "PATCH":
+        try:
+            data = json.loads(request.body)
+
+            if "attributes" not in data:
+                raise (Exception("Validation: Attributes are not provided"))
+
+            template = Template.objects.filter(name=name)
+            if not len(template):
+                raise (Exception("Validation: Template with given name does not exist"))
+
+            missing_attributes = set(
+                ts_settings.TE_TEMPLATE_ATTRIBUTES_KEYS
+            ).difference(set(data["attributes"].keys()))
+            if len(missing_attributes):
+                raise (
+                    Exception(
+                        "Validation: missing mandatory attributes `"
+                        + str(missing_attributes)
+                        + "`"
+                    )
+                )
+
+            for key in data["attributes"]:
+                if not isinstance(data["attributes"][key], str):
+                    raise (
+                        Exception(
+                            "Validation: Attributes must be a key value pair and value must be a string"
+                        )
+                    )
+
+            template.update(attributes=data["attributes"])
+            data = {"name": name, "attributes": data["attributes"]}
+            return JsonResponse(data, status=200)
+        except Exception as e:
+            logger.exception(e)
+            return HttpResponse(
+                json.dumps({"message": str(e)}),
+                content_type="application/json",
+                status=400,
+            )
     else:
         return HttpResponse(
             json.dumps({"message": "no method found"}),

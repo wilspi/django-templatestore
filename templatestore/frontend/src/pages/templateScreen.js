@@ -7,9 +7,12 @@ import {
     backendSettings,
     getDateInSimpleFormat
 } from './../utils.js';
+import PropTypes from 'prop-types';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
+import 'ace-builds';
+import 'ace-builds/webpack-resolver';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/theme-github';
@@ -30,12 +33,15 @@ class TemplateScreen extends Component {
             searchText: '',
             versions: [{ version: this.props.match.params.version }],
             subTemplatesData: {},
+            config: {},
+            contextData: '',
+            attributes: '',
             editable: this.props.editable
         };
         this.aceconfig = {
             theme: 'monokai',
             fontSize: 16,
-            width: 'auto',
+            width: '100%',
             height: '400px'
         };
         this.getTableRowsJSX = this.getTableRowsJSX.bind(this);
@@ -47,6 +53,8 @@ class TemplateScreen extends Component {
         this.onAttributesChange = this.onAttributesChange.bind(this);
         this.getTypesConfig = this.getTypesConfig.bind(this);
         this.postTemplate = this.postTemplate.bind(this);
+        this.saveTemplate = this.saveTemplate.bind(this);
+        this.setMandatoryAttributes = this.setMandatoryAttributes.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -77,8 +85,16 @@ class TemplateScreen extends Component {
                             version: this.props.match.params.version,
                             default: response.data.default
                         },
-                        contextData: response.data.sample_context_data,
-                        attributes: response.data.attributes,
+                        contextData: JSON.stringify(
+                            response.data.sample_context_data,
+                            null,
+                            2
+                        ),
+                        attributes: JSON.stringify(
+                            response.data.attributes,
+                            null,
+                            2
+                        ),
                         type: response.data.type
                     });
                 })
@@ -110,7 +126,20 @@ class TemplateScreen extends Component {
                     console.log(error);
                 });
         } else {
-            this.getTypesConfig('email');
+            axios
+                .get(backendSettings.TE_BASEPATH + '/api/v1/config')
+                .then(response => {
+                    this.setState({
+                        config: response.data
+                    });
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
+
+            this.setState({
+                contextData: JSON.stringify({ name: 'abc' }, null, 2)
+            });
         }
     }
 
@@ -226,7 +255,7 @@ class TemplateScreen extends Component {
     getRenderedTemplate(subType, templateData, contextData, renderMode) {
         let data = {
             template: encode(templateData),
-            context: contextData,
+            context: JSON.parse(contextData),
             handler: 'jinja2',
             output: renderMode
         };
@@ -249,6 +278,11 @@ class TemplateScreen extends Component {
             .catch(function(error) {
                 console.log(error);
             });
+        if (renderMode === 'html') {
+            this.setState({
+                previewSubType: subType
+            });
+        }
     }
 
     onTemplateChange(subType, templateData) {
@@ -267,63 +301,67 @@ class TemplateScreen extends Component {
         });
     }
 
-    onContextChange(newValue) {
+    onContextChange(newValue, event) {
         this.setState({
             contextData: newValue
         });
     }
 
-    onAttributesChange(newValue) {
+    onAttributesChange(newValue, event) {
         this.setState({
             attributes: newValue
         });
     }
 
-    getTemplateOutput() {
-        axios
-            .get(backendSettings.TE_BASEPATH + '/api/v1/render', {
-                params: {
-                    template: encode(this.state.valueTemplate),
-                    context: this.state.valueContext,
-                    handler: 'jinja2',
-                    output: 'text' // get renderMode
-                }
-            })
-            .then(response => {
-                this.setState({
-                    valueOutput: decode(response.data.rendered_template)
-                });
-            })
-            .catch(function(error) {
-                console.log(error);
-            })
-            .then(function() {
-                // always executed
-            });
-        return this.state.valueTemplate;
+    setMandatoryAttributes(type) {
+        let generalAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
+            (result, attribute) => {
+                result[attribute] = '';
+                return result;
+            },
+            {}
+        );
+        let mandatoryAttributes = this.state.config[type]["attributes"];
+        this.setState({
+            attributes: JSON.stringify(Object.assign(generalAttributes, mandatoryAttributes), null, 2)
+        });
     }
 
     getTypesConfig(type) {
+        this.setState({
+            subTemplatesData: this.state.config[type].sub_type.reduce(
+                (result, k) => {
+                    result[k.type] = {
+                        subType: k.type,
+                        renderMode: k.render_mode,
+                        data: '',
+                        output: ''
+                    };
+                    return result;
+                },
+                {}
+            ),
+            type: type
+        });
+        this.setMandatoryAttributes(type);
+    }
+
+    saveTemplate(data) {
         axios
-            .get(backendSettings.TE_BASEPATH + '/api/v1/config')
+            .post(
+                backendSettings.TE_BASEPATH + '/api/v1/template',
+                data
+            )
             .then(response => {
-                this.setState({
-                    subTemplatesData: response.data[type].sub_type.reduce(
-                        (result, k) => {
-                            result[k.type] = {
-                                subType: k.type,
-                                renderMode: k.render_mode,
-                                data: '',
-                                output: ''
-                            };
-                            return result;
-                        },
-                        {}
-                    ),
-                    type: type
-                });
+                this.props.history.push(
+                    backendSettings.TE_BASEPATH +
+                        '/t/' +
+                        response.data.name +
+                        '/' +
+                        response.data.version
+                );
             })
-            .catch(function(error) {
+            .catch(error => {
                 console.log(error);
             });
     }
@@ -341,107 +379,192 @@ class TemplateScreen extends Component {
             name: name,
             type: type,
             sub_templates: subTemplates,
-            sample_context_data: contextData,
-            attributes: attributes
+            sample_context_data: JSON.parse(contextData),
+            attributes: JSON.parse(attributes)
         };
-        axios
-            .post(backendSettings.TE_BASEPATH + '/api/v1/template', data)
-            .then(response => {
-                this.props.history.push(
+        if (this.state.editable) {
+            axios
+                .get(
                     backendSettings.TE_BASEPATH +
-                        '/t/' +
-                        response.data.name +
-                        '/' +
-                        response.data.version
-                );
-            })
-            .catch(error => {
-                console.log(error);
-            });
+                        '/api/v1/template/' +
+                        name +
+                        '/versions'
+                )
+                .then(response => {
+                    console.log('Template with this name already exists'); //Add Alert here
+                })
+                .catch(error => {
+                    this.saveTemplate(data);
+                });
+        } else {
+            this.saveTemplate(data);
+        }
     }
 
     render() {
+        if (
+            Object.keys(this.state.config).length &&
+            !this.state.type &&
+            this.state.editable
+        ) {
+            this.getTypesConfig(Object.keys(this.state.config)[0]);
+        }
+
         let chooseVersion = this.state.versions.map(versions => {
             return (
                 <option value={versions.version}> {versions.version} </option>
             );
         });
+
+        // Todo : Add comment section after getting data from backend as it will not display the column underneath the comment
+        // let tableHeaders = ['version', 'created_on', ' - ', ' - ', 'comment'].map(k => (
+        //     <th>{k}</th>
+        // ));
         let tableHeaders = ['version', 'created_on', ' - ', ' - '].map(k => (
             <th>{k}</th>
         ));
 
-        let editors = Object.keys(this.state.subTemplatesData).map(t => {
-            let outputView =
-                this.state.subTemplatesData[t].renderMode === 'html' ? (
-                    <iframe
-                        height={this.aceconfig.height}
-                        width={this.aceconfig.width}
-                        srcDoc={this.state.subTemplatesData[t].output}
-                    />
-                ) : (
+        let editors = Object.keys(this.state.subTemplatesData).map(
+            (t, index) => {
+                let outputView =
+                    this.state.subTemplatesData[t].renderMode === 'html' ? (
+                        <iframe
+                            height={this.aceconfig.height}
+                            width={this.aceconfig.width}
+                            srcDoc={this.state.subTemplatesData[t].output}
+                        />
+                    ) : (
+                        <AceEditor
+                            name="output-editor"
+                            placeholder='Press "Render" to see the output here!'
+                            theme="github"
+                            mode="html"
+                            readOnly="true"
+                            fontSize={this.aceconfig.fontSize}
+                            height={this.aceconfig.height}
+                            width={this.aceconfig.width}
+                            value={this.state.subTemplatesData[t].output}
+                            highlightActiveLine="false"
+                            setOptions={{ useWorker: false }}
+                        />
+                    );
+                let inputView = (
                     <AceEditor
-                        name="output-editor"
-                        placeholder='Press "Render" to see the output here!'
-                        theme="github"
-                        mode="html"
-                        readOnly="true"
+                        name="template-editor"
+                        placeholder="Write your template file here..."
+                        theme={this.aceconfig.theme}
+                        mode="handlebars"
                         fontSize={this.aceconfig.fontSize}
                         height={this.aceconfig.height}
                         width={this.aceconfig.width}
-                        value={this.state.subTemplatesData[t].output}
-                        highlightActiveLine="false"
+                        value={this.state.subTemplatesData[t].data}
+                        onChange={n => {
+                            this.onTemplateChange(t, n);
+                        }}
+                        setOptions={{ useWorker: false }}
                     />
                 );
-            let inputView = (
-                <AceEditor
-                    name="template-editor"
-                    placeholder="Write your template file here..."
-                    theme={this.aceconfig.theme}
-                    mode="handlebars"
-                    fontSize={this.aceconfig.fontSize}
-                    height={this.aceconfig.height}
-                    width={this.aceconfig.width}
-                    value={this.state.subTemplatesData[t].data}
-                    onChange={n => {
-                        this.onTemplateChange(t, n);
-                    }}
-                />
-            );
-            return (
-                <div className={styles.teRowBlock}>
-                    <div>
-                        <h3>{t}</h3>
-                    </div>
-                    <div className={styles.teSubTemplateBlock}>
-                        <div className={styles.teTemplateEditor}>
-                            {inputView}
+                return (
+                    <div className={styles.teRowBlock}>
+                        <div className={styles.teCard + ' card'}>
+                            <div
+                                className="card-header"
+                                role="tab"
+                                id={`Heading${index}`}
+                            >
+                                <a
+                                    data-toggle="collapse"
+                                    data-parent="#accordionEx"
+                                    href={`#collapse${index}`}
+                                    aria-expanded="true"
+                                    aria-controls={`collapse${index}`}
+                                >
+                                    <h5 className="mb-0">
+                                        {t}{' '}
+                                        <i className="fas fa-angle-down rotate-icon" />
+                                    </h5>
+                                </a>
+                            </div>
+                            <div
+                                id={`collapse${index}`}
+                                className="collapse"
+                                role="tabpanel"
+                                aria-labelledby={`Heading${index}`}
+                                data-parent="#accordionEx"
+                            >
+                                <div className="card-body">
+                                    <div className={styles.teSubTemplateBlock}>
+                                        <div
+                                            className={styles.teTemplateEditor}
+                                        >
+                                            {inputView}
+                                        </div>
+                                        <div className={styles.teOutputEditor}>
+                                            {outputView}
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.teVersionWrapper}>
+                                        <button
+                                            className={styles.teButtons}
+                                            onClick={() => {
+                                                this.getRenderedTemplate(
+                                                    t,
+                                                    this.state.subTemplatesData[
+                                                        t
+                                                    ].data,
+                                                    this.state.contextData,
+                                                    this.state.subTemplatesData[
+                                                        t
+                                                    ].renderMode
+                                                );
+                                            }}
+                                        >
+                                            Render
+                                        </button>
+                                        {this.state.subTemplatesData[t]
+                                            .renderMode === 'html' ? (
+                                                <button
+                                                    className={
+                                                        styles.tePreviewButton
+                                                    }
+                                                    data-toggle="modal"
+                                                    data-target="#myModal"
+                                                    onClick={() => {
+                                                        this.getRenderedTemplate(
+                                                            t,
+                                                            this.state
+                                                                .subTemplatesData[t]
+                                                                .data,
+                                                            this.state.contextData,
+                                                            this.state
+                                                                .subTemplatesData[t]
+                                                                .renderMode
+                                                        );
+                                                    }}
+                                                >
+                                                Preview
+                                                </button>
+                                            ) : (
+                                                ''
+                                            )}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className={styles.teOutputEditor}>
-                            {outputView}
-                        </div>
                     </div>
-                    <div className={styles.teVersionWrapper}>
-                        <button
-                            className={styles.teButtons}
-                            onClick={() => {
-                                this.getRenderedTemplate(
-                                    t,
-                                    this.state.subTemplatesData[t].data,
-                                    this.state.contextData,
-                                    this.state.subTemplatesData[t].renderMode
-                                );
-                            }}
-                        >
-                            Render
-                        </button>
-                    </div>
-                </div>
-            );
+                );
+            }
+        );
+
+        let templateTypes = Object.keys(this.state.config).map(t => {
+            return <option value={t}> {t} </option>;
         });
+
         return (
             <div className="container ">
                 <div className={styles.teDetailPage}>
-                    <div>
+                    <div className={styles.teTemplateHeader}>
                         <h1>
                             {this.state.editable ?
                                 'Create New Template' :
@@ -456,11 +579,7 @@ class TemplateScreen extends Component {
                                 placeholder="Add template name"
                             />
                         ) : (
-                            <input
-                                readOnly
-                                type="text"
-                                value={this.state.templateData.name}
-                            />
+                            ''
                         )}
                         <br />
                         <div className={styles.teVersionWrapper}>
@@ -486,10 +605,19 @@ class TemplateScreen extends Component {
                                     <option disabled>0.1</option>
                                 </select>
                             )}
+                            <label>Default : </label>
                             {!this.state.editable &&
-                            this.state.templateData.default ?
-                                'default' :
-                                'not_default'}
+                            this.state.templateData.default ? (
+                                    <i
+                                        className="fa fa-check-circle"
+                                        aria-hidden="true"
+                                    />
+                                ) : (
+                                    <i
+                                        className="fa fa-times-circle"
+                                        aria-hidden="true"
+                                    />
+                                )}
                         </div>
                     </div>
                 </div>
@@ -503,96 +631,81 @@ class TemplateScreen extends Component {
                                     this.getTypesConfig(e.target.value)
                                 }
                             >
-                                <option value="email" selected>
-                                    {' '}
-                                    Email{' '}
-                                </option>
-                                <option value="sms"> Sms </option>
+                                {templateTypes}
                             </select>
                         </div>
                     ) : (
                         ''
                     )}
                 </div>
-                <div className={styles.teScreenTable}>{editors}</div>
-                <div>
-                    {
-                        <div className={styles.teRowBlock}>
-                            <div className={styles.teSubTemplateBlock}>
-                                <div className={styles.teContextEditor}>
-                                    <div>
-                                        <h3>Sample Context Data</h3>
-                                    </div>
-                                    <AceEditor
-                                        name="template-editor"
-                                        placeholder="Write sample_context_data here..."
-                                        theme={this.aceconfig.theme}
-                                        mode="json"
-                                        fontSize={this.aceconfig.fontSize}
-                                        height={this.aceconfig.height}
-                                        width={this.aceconfig.width}
-                                        value={JSON.stringify(
-                                            this.state.contextData
-                                        )}
-                                        onChange={n => {
-                                            this.onContextChange(JSON.parse(n));
-                                        }}
-                                    />
+                <div className={styles.teMarginTop20}>
+                    <label>Sub Templates : </label>
+                </div>
+                <div
+                    className={styles.teAccordian + ' accordion md-accordion'}
+                    id="accordionEx"
+                    role="tablist"
+                    aria-multiselectable="true"
+                >
+                    <div className={styles.teScreenTable}>{editors}</div>
+                </div>
+                <div className={styles.teMarginTop20}>
+                    <label>Sample Context Data : </label>
+                </div>
+                <div
+                    className={styles.teAccordian + ' accordion md-accordion'}
+                    id="accordionEx"
+                    role="tablist"
+                    aria-multiselectable="true"
+                >
+                    <div>
+                        {
+                            <div className={styles.teCard + ' card'}>
+                                <div
+                                    className="card-header"
+                                    role="tab"
+                                    id="headingOne1"
+                                >
+                                    <a
+                                        data-toggle="collapse"
+                                        data-parent="#accordionEx"
+                                        href="#collapseOne1"
+                                        aria-expanded="true"
+                                        aria-controls="collapseOne1"
+                                    >
+                                        <h5 className="mb-0">
+                                            Sample Context Data{' '}
+                                            <i className="fas fa-angle-down rotate-icon" />
+                                        </h5>
+                                    </a>
                                 </div>
-                                <div className={styles.teContextEditor}>
-                                    <div>
-                                        <h3> Attributes </h3>
+                                <div
+                                    id="collapseOne1"
+                                    className="collapse"
+                                    role="tabpanel"
+                                    aria-labelledby="headingOne1"
+                                    data-parent="#accordionEx"
+                                >
+                                    <div className="card-body">
+                                        <AceEditor
+                                            name="template-editor"
+                                            placeholder="Write sample_context_data here..."
+                                            theme={this.aceconfig.theme}
+                                            mode="json"
+                                            fontSize={this.aceconfig.fontSize}
+                                            height={this.aceconfig.height}
+                                            width={this.aceconfig.width}
+                                            value={this.state.contextData}
+                                            onChange={this.onContextChange}
+                                            setOptions={{ useWorker: false }}
+                                        />
                                     </div>
-                                    <AceEditor
-                                        name="template-editor"
-                                        placeholder="Write attributes here..."
-                                        theme={this.aceconfig.theme}
-                                        mode="json"
-                                        fontSize={this.aceconfig.fontSize}
-                                        height={this.aceconfig.height}
-                                        width={this.aceconfig.width}
-                                        value={JSON.stringify(
-                                            this.state.attributes
-                                        )}
-                                        onChange={n => {
-                                            this.onAttributesChange(
-                                                JSON.parse(n)
-                                            );
-                                        }}
-                                        readOnly={!this.state.editable}
-                                    />
                                 </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
-                <div className={styles.teSearchWrapper}>
-                    {this.state.editable ? (
-                        ''
-                    ) : (
-                        <SearchBox
-                            onChange={this.onSearchTextChange.bind(this)}
-                        />
-                    )}
-                </div>
-                <div className={styles.teTableWrapper}>
-                    {this.state.editable ? (
-                        ''
-                    ) : (
-                        <table
-                            className={
-                                'table table-striped table-responsive-md btn-table ' +
-                                styles.tsTable
-                            }
-                        >
-                            <thead>
-                                <tr>{tableHeaders}</tr>
-                            </thead>
-                            <tbody>{this.getTableRowsJSX()}</tbody>
-                        </table>
-                    )}
-                </div>
-                <div>
+                <div className={styles.teSaveContainer}>
                     {this.state.editable ? (
                         <button
                             className={styles.teButtons}
@@ -608,12 +721,157 @@ class TemplateScreen extends Component {
                             Create
                         </button>
                     ) : (
-                        ''
+                        <button
+                            className={styles.teButtons}
+                            onClick={() => {
+                                if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
+                                    this.postTemplate(
+                                        this.state.templateData.name,
+                                        this.state.type,
+                                        this.state.contextData,
+                                        this.state.attributes
+                                    );
+                                }
+                            }}
+                        >
+                            Save
+                        </button>
                     )}
+                </div>
+                <div className={styles.teMarginTop20}>
+                    <label>Attributes : </label>
+                </div>
+                <div
+                    className={styles.teAccordian + ' accordion md-accordion'}
+                    id="accordionEx"
+                    role="tablist"
+                    aria-multiselectable="true"
+                >
+                    <div>
+                        {
+                            <div className={styles.teCard + ' card'}>
+                                <div
+                                    className="card-header"
+                                    role="tab"
+                                    id="headingTwo2"
+                                >
+                                    <a
+                                        data-toggle="collapse"
+                                        data-parent="#accordionEx"
+                                        href="#collapseTwo2"
+                                        aria-expanded="true"
+                                        aria-controls="collapseTwo2"
+                                    >
+                                        <h5 className="mb-0">
+                                            Attributes{' '}
+                                            <i className="fas fa-angle-down rotate-icon" />
+                                        </h5>
+                                    </a>
+                                </div>
+                                <div
+                                    id="collapseTwo2"
+                                    className="collapse"
+                                    role="tabpanel"
+                                    aria-labelledby="headingTwo2"
+                                    data-parent="#accordionEx"
+                                >
+                                    <div className="card-body">
+                                        <AceEditor
+                                            name="template-editor"
+                                            placeholder="Write attributes here..."
+                                            theme={this.aceconfig.theme}
+                                            mode="json"
+                                            fontSize={this.aceconfig.fontSize}
+                                            height={this.aceconfig.height}
+                                            width={this.aceconfig.width}
+                                            value={this.state.attributes}
+                                            onChange={this.onAttributesChange}
+                                            readOnly={!this.state.editable}
+                                            setOptions={{ useWorker: false }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                {this.state.editable ? (
+                    ''
+                ) : (
+                    <div>
+                        <div className={styles.teMarginTop20}>
+                            <label>Versions : </label>
+                        </div>
+                        <div className={styles.teVersionTable}>
+                            <div className={styles.teSearchWrapper}>
+                                <SearchBox
+                                    onChange={this.onSearchTextChange.bind(
+                                        this
+                                    )}
+                                />
+                            </div>
+                            <div className={styles.teTableWrapper}>
+                                <table
+                                    className={
+                                        'table table-striped table-bordered' +
+                                        styles.tsTable
+                                    }
+                                >
+                                    <thead>
+                                        <tr>{tableHeaders}</tr>
+                                    </thead>
+                                    <tbody>{this.getTableRowsJSX()}</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                <div className="modal fade" id="myModal">
+                    <div className="modal-dialog modal-xl">
+                        <div className="modal-content">
+                            {/* <div className="modal-header" style={{ height: '5vh' }}>
+                                <button type="button" className="close" data-dismiss="modal" style={{ padding: '10px' }}>×</button>
+                            </div> */}
+                            <div
+                                className="modal-body"
+                                style={{ height: '90vh', padding: '0' }}
+                            >
+                                {this.state.previewSubType &&
+                                this.state.subTemplatesData.hasOwnProperty(
+                                    this.state.previewSubType
+                                ) ? (
+                                        <iframe
+                                            height="100%"
+                                            width="100%"
+                                            srcDoc={
+                                                this.state.subTemplatesData[
+                                                    this.state.previewSubType
+                                                ].output
+                                            }
+                                        />
+                                    ) : (
+                                        ''
+                                    )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
     }
 }
+
+TemplateScreen.propTypes = {
+    match: PropTypes.shape({
+        params: PropTypes.shape({
+            name: PropTypes.string,
+            version: PropTypes.string
+        })
+    }),
+    history: PropTypes.shape({
+        push: PropTypes.func
+    }),
+    editable: PropTypes.bool
+};
 
 export default withRouter(TemplateScreen);
