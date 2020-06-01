@@ -628,6 +628,10 @@
                                                 }
                                             }
                                         }
+                                    },
+                                    "attributes": {
+                                        "type": "object",
+                                        "additionalProperties": false
                                     }
                                 }
                             }

@@ -226,6 +226,20 @@ def post_template_view(request):
                     Exception("Validation: sample_context_data field can not be empty")
                 )
 
+            missing_mandatory_attributes = set(cfgs[0].attributes.keys()).difference(
+                set(data["attributes"].keys())
+            )
+            if len(missing_mandatory_attributes):
+                raise (
+                    Exception(
+                        "Validation: missing mandatory attributes `"
+                        + str(missing_mandatory_attributes)
+                        + "` for type `"
+                        + data["type"]
+                        + "`"
+                    )
+                )
+
             templates = Template.objects.filter(name=data["name"])
             if not len(templates):
                 tmp = Template.objects.create(
@@ -551,7 +565,10 @@ def get_config_view(request):
                     )
                 else:
                     tes[t.type] = {
-                        "sub_type": [{"type": t.sub_type, "render_mode": t.render_mode}]
+                        "sub_type": [
+                            {"type": t.sub_type, "render_mode": t.render_mode}
+                        ],
+                        "attributes": t.attributes,
                     }
 
             return JsonResponse(tes, safe=False)
