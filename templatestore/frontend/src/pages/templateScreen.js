@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
+import AlertModal from './../components/alertModal/alertModal';
 import 'ace-builds';
 import 'ace-builds/webpack-resolver';
 import AceEditor from 'react-ace';
@@ -36,7 +37,9 @@ class TemplateScreen extends Component {
             config: {},
             contextData: '',
             attributes: '',
-            editable: this.props.editable
+            editable: this.props.editable,
+            showAlert: false,
+            alertMessage: ''
         };
         this.aceconfig = {
             theme: 'monokai',
@@ -255,34 +258,50 @@ class TemplateScreen extends Component {
     }
 
     getRenderedTemplate(subType, templateData, contextData, renderMode) {
-        let data = {
-            template: encode(templateData),
-            context: JSON.parse(contextData),
-            handler: 'jinja2',
-            output: renderMode
-        };
-        axios
-            .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
-            .then(response => {
-                this.setState({
-                    subTemplatesData: Object.keys(
-                        this.state.subTemplatesData
-                    ).reduce((result, k) => {
-                        result[k] = this.state.subTemplatesData[k];
-                        result[k].output =
-                            k === subType ?
-                                decode(response.data.rendered_template) :
-                                this.state.subTemplatesData[k].output;
-                        return result;
-                    }, {})
+        try {
+            try {
+                contextData = JSON.parse(contextData);
+            } catch (error) {
+                throw new Error("Sample_Context_Data must be a valid JSON");
+            }
+            let data = {
+                template: encode(templateData),
+                context: contextData,
+                handler: 'jinja2',
+                output: renderMode
+            };
+            axios
+                .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
+                .then(response => {
+                    this.setState({
+                        subTemplatesData: Object.keys(
+                            this.state.subTemplatesData
+                        ).reduce((result, k) => {
+                            result[k] = this.state.subTemplatesData[k];
+                            result[k].output =
+                                k === subType ?
+                                    decode(response.data.rendered_template) :
+                                    this.state.subTemplatesData[k].output;
+                            return result;
+                        }, {})
+                    });
+                })
+                .catch(function(error) {
+                    console.log(error);
+                    this.setState({
+                        showAlert: true,
+                        alertMessage: error.response.data.message
+                    });
                 });
-            })
-            .catch(function(error) {
-                console.log(error);
-            });
-        if (renderMode === 'html') {
+            if (renderMode === 'html') {
+                this.setState({
+                    previewSubType: subType
+                });
+            }
+        } catch (error) {
             this.setState({
-                previewSubType: subType
+                showAlert: true,
+                alertMessage: error.message
             });
         }
     }
@@ -364,42 +383,69 @@ class TemplateScreen extends Component {
                 );
             })
             .catch(error => {
+                this.setState({
+                    showAlert: true,
+                    alertMessage: error.response.data.message
+                });
                 console.log(error);
             });
     }
 
     postTemplate(name, type, contextData, attributes) {
-        let subTemplates = [];
-        Object.keys(this.state.subTemplatesData).map(t => {
-            let subTemplate = {
-                sub_type: this.state.subTemplatesData[t].subType,
-                data: encode(this.state.subTemplatesData[t].data)
+        try {
+            let subTemplates = [];
+            Object.keys(this.state.subTemplatesData).map(t => {
+                let subTemplate = {
+                    sub_type: this.state.subTemplatesData[t].subType,
+                    data: encode(this.state.subTemplatesData[t].data)
+                };
+                subTemplates.push(subTemplate);
+            });
+
+            try {
+                contextData = JSON.parse(contextData);
+            } catch (error) {
+                throw new Error("Sample_Context_Data must be a valid JSON");
+            }
+
+            try {
+                attributes = JSON.parse(attributes);
+            } catch (error) {
+                throw new Error("Attributes must be a valid JSON");
+            }
+
+            let data = {
+                name: name,
+                type: type,
+                sub_templates: subTemplates,
+                sample_context_data: contextData,
+                attributes: attributes
             };
-            subTemplates.push(subTemplate);
-        });
-        let data = {
-            name: name,
-            type: type,
-            sub_templates: subTemplates,
-            sample_context_data: JSON.parse(contextData),
-            attributes: JSON.parse(attributes)
-        };
-        if (this.state.editable) {
-            axios
-                .get(
-                    backendSettings.TE_BASEPATH +
-                        '/api/v1/template/' +
-                        name +
-                        '/versions'
-                )
-                .then(response => {
-                    console.log('Template with this name already exists'); //Add Alert here
-                })
-                .catch(error => {
-                    this.saveTemplate(data);
-                });
-        } else {
-            this.saveTemplate(data);
+            if (this.state.editable) {
+                axios
+                    .get(
+                        backendSettings.TE_BASEPATH +
+                            '/api/v1/template/' +
+                            name +
+                            '/versions'
+                    )
+                    .then(response => {
+                        this.setState({
+                            showAlert: true,
+                            alertMessage: "Template with this name already exists"
+                        });
+                    })
+                    .catch(error => {
+                        this.saveTemplate(data);
+                    });
+            } else {
+                this.saveTemplate(data);
+            }
+        } catch (error) {
+            this.setState({
+                showAlert: true,
+                alertMessage: error.message
+            });
         }
     }
 
@@ -851,6 +897,15 @@ class TemplateScreen extends Component {
                         </div>
                     </div>
                 </div>
+                <AlertModal
+                    isOpen={this.state.showAlert}
+                    errorMessage={this.state.alertMessage}
+                    onClose={(e) =>
+                        this.setState({
+                            showAlert: false
+                        })
+                    }
+                />
             </div>
         );
     }
