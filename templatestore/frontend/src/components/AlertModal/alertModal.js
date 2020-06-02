@@ -15,7 +15,6 @@ class AlertModal extends Component {
                     isOpen={this.props.isOpen}
                     className={styles.modal}
                     onRequestClose={this.props.onClose}
-                    appElement={document.getElementById('te-app')}
                 >
                     <span className={styles.close} onClick={this.props.onClose}>&times;</span>
                     <p>{this.props.errorMessage}</p>
@@ -24,6 +23,8 @@ class AlertModal extends Component {
         );
     }
 }
+
+Modal.setAppElement(document.getElementById('te-app'));
 
 AlertModal.propTypes = {
     isOpen: PropTypes.bool,
