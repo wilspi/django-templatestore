@@ -393,6 +393,11 @@ class TemplateScreen extends Component {
 
     postTemplate(name, type, contextData, attributes) {
         try {
+            var re = new RegExp("^[a-zA-Z]+[a-zA-Z0-9_]*$");
+            if (!re.test(name)) {
+                throw new Error("Validation: `" + name + "` is not a valid template name");
+            }
+
             let subTemplates = [];
             Object.keys(this.state.subTemplatesData).map(t => {
                 let subTemplate = {
