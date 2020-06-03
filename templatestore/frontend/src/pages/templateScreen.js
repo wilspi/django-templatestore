@@ -699,7 +699,7 @@ class TemplateScreen extends Component {
                     role="tablist"
                     aria-multiselectable="true"
                 >
-                    <div>
+                    <div className={styles.teScreenTable}>
                         {
                             <div className={styles.teCard + ' card'}>
                                 <div
@@ -788,7 +788,7 @@ class TemplateScreen extends Component {
                     role="tablist"
                     aria-multiselectable="true"
                 >
-                    <div>
+                    <div className={styles.teScreenTable}>
                         {
                             <div className={styles.teCard + ' card'}>
                                 <div
