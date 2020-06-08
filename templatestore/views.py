@@ -243,7 +243,10 @@ def post_template_view(request):
             templates = Template.objects.filter(name=data["name"])
             if not len(templates):
                 tmp = Template.objects.create(
-                    name=data["name"], attributes=data["attributes"], type=data["type"]
+                    name=data["name"],
+                    attributes=data["attributes"],
+                    type=data["type"],
+                    created_by=request.POST.get("user_id"),
                 )
                 tmp.save()
 
@@ -275,6 +278,7 @@ def post_template_view(request):
                 template_id=template,
                 version=version,
                 sample_context_data=data["sample_context_data"],
+                created_by=request.POST.get("user_id"),
             )
             tmp_ver.save()
 
