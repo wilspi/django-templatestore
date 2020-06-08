@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('templatestore', '0002_templateconfig_attributes'),
+        ("templatestore", "0002_templateconfig_attributes"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='template',
-            name='created_by',
+            model_name="template",
+            name="created_by",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='templateversion',
-            name='created_by',
+            model_name="templateversion",
+            name="created_by",
             field=models.IntegerField(blank=True, null=True),
         ),
     ]
