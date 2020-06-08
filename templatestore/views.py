@@ -341,6 +341,7 @@ def get_template_versions_view(request, name):
                     "version": tv.version,
                     "default": True if t.default_version_id == tv.id else False,
                     "created_on": tv.created_on,
+                    "created_by": tv.created_by,
                 }
                 for tv in tvs
             ]
