@@ -638,3 +638,9 @@ def patch_attributes_view(request, name):
             content_type="application/json",
             status=404,
         )
+
+
+@csrf_exempt
+def get_user(request):
+    data = {"id": request.GET.get("user_id")}
+    return JsonResponse(data, status=200)
