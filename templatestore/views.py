@@ -526,6 +526,7 @@ def get_template_details_view(request, name, version):
                 created_by=request.POST.get("user_id"),
             )
             tmp_ver_new.save()
+
             for st in sts:
                 SubTemplate.objects.create(
                     template_version_id=tmp_ver_new, config=st.config, data=st.data
