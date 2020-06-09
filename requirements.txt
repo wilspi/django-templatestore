@@ -1,4 +1,4 @@
-Django==3.0.3
+Django==3.0.7
 black==19.10b0
 Jinja2==2.11.1
 psycopg2==2.8.4
