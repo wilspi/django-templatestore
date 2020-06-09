@@ -523,6 +523,7 @@ def get_template_details_view(request, name, version):
                 template_id=tmp,
                 version=new_version,
                 sample_context_data=tmp_ver.sample_context_data,
+                created_by=request.POST.get("user_id")
             )
             tmp_ver_new.save()
             for st in sts:
