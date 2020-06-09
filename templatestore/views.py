@@ -531,7 +531,8 @@ def get_template_details_view(request, name, version):
                     template_version_id=tmp_ver_new, config=st.config, data=st.data
                 ).save()
             tmp.default_version_id = tmp_ver_new.id
-            tmp.save(update_fields=["default_version_id", "modified_on"])
+            tmp.created_by = tmp_ver_new.created_by
+            tmp.save(update_fields=["default_version_id", "modified_on", "created_by"])
 
             template_data = {
                 "name": tmp.name,
