@@ -17,7 +17,7 @@ class AlertModal extends Component {
                     onRequestClose={this.props.onClose}
                 >
                     <span className={styles.close} onClick={this.props.onClose}>&times;</span>
-                    <p>{this.props.errorMessage}</p>
+                    <p className={styles.modalContent}>{this.props.errorMessage}</p>
                 </Modal>
             </div>
         );

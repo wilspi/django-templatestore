@@ -1,15 +1,26 @@
 .modal {
-  background-color: white;
+  background-color: #E8E8E8;
   height: 10%;
-  width: 80%;
+  width: 40%;
   overflow: auto;
   z-index: 1000;
-  margin: 100px 100px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  outline: none;
+  border: 5px solid #808080;
+  border-radius: 30px;
+}
+
+.modalContent {
+  text-align: center;
+  color: #000000;
 }
 
 /* Close button */
 .close {
-   color: #aaaaaa;
+   color: #808080;
    float: right;
    font-size: 30px;
    font-weight: bold;
