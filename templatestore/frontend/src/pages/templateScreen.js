@@ -36,6 +36,7 @@ class TemplateScreen extends Component {
             config: {},
             contextData: '',
             attributes: '',
+            version_alias: '',
             editable: this.props.editable
         };
         this.aceconfig = {
@@ -55,6 +56,7 @@ class TemplateScreen extends Component {
         this.postTemplate = this.postTemplate.bind(this);
         this.saveTemplate = this.saveTemplate.bind(this);
         this.setMandatoryAttributes = this.setMandatoryAttributes.bind(this);
+        this.onVersionAliasChange = this.onVersionAliasChange.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -95,7 +97,8 @@ class TemplateScreen extends Component {
                             null,
                             2
                         ),
-                        type: response.data.type
+                        type: response.data.type,
+                        version_alias: response.data.version_alias
                     });
                 })
                 .catch(error => {
@@ -312,6 +315,12 @@ class TemplateScreen extends Component {
     onAttributesChange(newValue, event) {
         this.setState({
             attributes: newValue
+        });
+    }
+
+    onVersionAliasChange(newValue, event) {
+        this.setState({
+            version_alias: newValue
         });
     }
 
@@ -716,21 +725,32 @@ class TemplateScreen extends Component {
                             Create
                         </button>
                     ) : (
-                        <button
-                            className={styles.teButtons}
-                            onClick={() => {
-                                if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
-                                    this.postTemplate(
-                                        this.state.templateData.name,
-                                        this.state.type,
-                                        this.state.contextData,
-                                        this.state.attributes
-                                    );
-                                }
-                            }}
-                        >
-                            Save
-                        </button>
+                        <div>
+                            <input
+                                type="text"
+                                id="version_alias"
+                                value={this.state.version_alias}
+                                onChange={e => this.onVersionAliasChange(e.target.value)}
+                            />
+                            <sup>
+                                (Optional)
+                            </sup>
+                            <button
+                                className={styles.teButtons}
+                                onClick={() => {
+                                    if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
+                                        this.postTemplate(
+                                            this.state.templateData.name,
+                                            this.state.type,
+                                            this.state.contextData,
+                                            this.state.attributes
+                                        );
+                                    }
+                                }}
+                            >
+                                Save
+                            </button>
+                        </div>
                     )}
                 </div>
                 <div className={styles.teMarginTop20}>
