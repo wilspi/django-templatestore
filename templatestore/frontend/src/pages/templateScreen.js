@@ -742,9 +742,6 @@ class TemplateScreen extends Component {
                                 value={this.state.version_alias}
                                 onChange={e => this.onVersionAliasChange(e.target.value)}
                             />
-                            <sup>
-                                (Optional)
-                            </sup>
                             <button
                                 className={styles.teButtons}
                                 onClick={() => {
