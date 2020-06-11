@@ -122,7 +122,7 @@ class TemplateScreen extends Component {
                             version: t.version,
                             default: t.default,
                             created_on: getDateInSimpleFormat(t.created_on),
-                            version_alias: t.version_alias
+                            version_alias: t.version_alias ? t.version_alias : '-'
                         }))
                     });
                 })
@@ -200,7 +200,8 @@ class TemplateScreen extends Component {
                             res ||
                             version[t]
                                 .toString()
-                                .indexOf(this.state.searchText) !== -1;
+                                .toLowerCase()
+                                .indexOf(this.state.searchText.toLowerCase()) !== -1;
                         return res;
                     }, false)
                 ) {
