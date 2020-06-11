@@ -275,6 +275,7 @@ def post_template_view(request):
                 template_id=template,
                 version=version,
                 sample_context_data=data["sample_context_data"],
+                version_alias=data["version_alias"] if "version_alias" in data else "",
             )
             tmp_ver.save()
 
@@ -336,6 +337,7 @@ def get_template_versions_view(request, name):
                     "version": tv.version,
                     "default": True if t.default_version_id == tv.id else False,
                     "created_on": tv.created_on,
+                    "version_alias": tv.version_alias,
                 }
                 for tv in tvs
             ]
@@ -470,6 +472,7 @@ def get_template_details_view(request, name, version):
                 "default": True if t.default_version_id == tv.id else False,
                 "attributes": t.attributes,
                 "sample_context_data": tv.sample_context_data,
+                "version_alias": tv.version_alias,
             }
 
             return JsonResponse(res, safe=False)
@@ -517,6 +520,7 @@ def get_template_details_view(request, name, version):
                 template_id=tmp,
                 version=new_version,
                 sample_context_data=tmp_ver.sample_context_data,
+                version_alias=tmp_ver.version_alias,
             )
             tmp_ver_new.save()
             for st in sts:
