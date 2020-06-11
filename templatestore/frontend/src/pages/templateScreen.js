@@ -717,6 +717,7 @@ class TemplateScreen extends Component {
                         }
                     </div>
                 </div>
+                <br />
                 <div className={styles.teSaveContainer}>
                     {this.state.editable ? (
                         <button
@@ -737,6 +738,7 @@ class TemplateScreen extends Component {
                             <input
                                 type="text"
                                 id="version_alias"
+                                className={styles.teVersionAlias}
                                 value={this.state.version_alias}
                                 onChange={e => this.onVersionAliasChange(e.target.value)}
                             />
@@ -761,6 +763,7 @@ class TemplateScreen extends Component {
                         </div>
                     )}
                 </div>
+                <br />
                 <div className={styles.teMarginTop20}>
                     <label>Attributes : </label>
                 </div>
