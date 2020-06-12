@@ -65,6 +65,10 @@
                                 "sample_context_data":{
                                     "type":"object",
                                     "additionalProperties":true
+                                },
+                                "version_alias": {
+                                    "type": "string",
+                                    "maxLength": 250
                                 }
                             }
                         }
@@ -226,6 +230,10 @@
                                     "created_on":{
                                         "type":"string",
                                         "format":"date-time"
+                                    },
+                                    "version_alias": {
+                                        "type": "string",
+                                        "maxLength": 250
                                     }
                                 }
                             }
@@ -402,6 +410,10 @@
                                 "sample_context_data":{
                                     "type":"object",
                                     "additionalProperties":true
+                                },
+                                "version_alias": {
+                                    "type": "string",
+                                    "maxLength": 250
                                 }
                             }
                         }
@@ -789,6 +801,10 @@
                 "deleted_on":{
                     "type":"string",
                     "format":"date-time"
+                },
+                "version_alias": {
+                    "type": "string",
+                    "maxLength": 250
                 }
             }
         },
