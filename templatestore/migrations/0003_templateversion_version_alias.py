@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="templateversion",
             name="version_alias",
-            field=models.CharField(blank=True, max_length=250),
+            field=models.CharField(blank=True, max_length=100),
         ),
     ]
