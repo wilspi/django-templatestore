@@ -804,7 +804,7 @@
                 },
                 "version_alias": {
                     "type": "string",
-                    "maxLength": 250
+                    "maxLength": 100
                 }
             }
         },
