@@ -240,6 +240,13 @@ def post_template_view(request):
                     )
                 )
 
+            if not re.match("(^[a-zA-Z0-9 ]*$)", data.get("version_alias", "")):
+                raise (
+                    Exception(
+                        "Validation: version_alias must contain only alphanumeric and space characters"
+                    )
+                )
+
             templates = Template.objects.filter(name=data["name"])
             if not len(templates):
                 tmp = Template.objects.create(
