@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("templatestore", "0002_templateconfig_attributes"),
+        ("templatestore", "0003_auto_20200608_2208"),
     ]
 
     operations = [
