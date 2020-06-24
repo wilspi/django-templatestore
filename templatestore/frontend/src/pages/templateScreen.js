@@ -746,6 +746,7 @@ class TemplateScreen extends Component {
                                 id="version_alias"
                                 className={styles.teVersionAlias}
                                 value={this.state.version_alias}
+                                placeholder="version_alias"
                                 onChange={e => this.onVersionAliasChange(e.target.value)}
                             />
                             <button
