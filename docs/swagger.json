@@ -65,6 +65,10 @@
                                 "sample_context_data":{
                                     "type":"object",
                                     "additionalProperties":true
+                                },
+                                "version_alias": {
+                                    "type": "string",
+                                    "maxLength": 100
                                 }
                             }
                         }
@@ -169,6 +173,9 @@
                                     "modified_on": {
                                         "type":"string",
                                         "format":"date-time"
+                                    },
+                                    "created_by": {
+                                        "type": "integer"
                                     }
                                 }
                             }
@@ -226,6 +233,13 @@
                                     "created_on":{
                                         "type":"string",
                                         "format":"date-time"
+                                    },
+                                    "version_alias": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "created_by": {
+                                        "type": "integer"
                                     }
                                 }
                             }
@@ -402,6 +416,10 @@
                                 "sample_context_data":{
                                     "type":"object",
                                     "additionalProperties":true
+                                },
+                                "version_alias": {
+                                    "type": "string",
+                                    "maxLength": 100
                                 }
                             }
                         }
@@ -789,6 +807,13 @@
                 "deleted_on":{
                     "type":"string",
                     "format":"date-time"
+                },
+                "version_alias": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "created_by": {
+                    "type":"integer"
                 }
             }
         },

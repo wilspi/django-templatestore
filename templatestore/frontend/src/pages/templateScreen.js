@@ -36,6 +36,7 @@ class TemplateScreen extends Component {
             config: {},
             contextData: '',
             attributes: '',
+            version_alias: '',
             editable: this.props.editable
         };
         this.aceconfig = {
@@ -55,6 +56,7 @@ class TemplateScreen extends Component {
         this.postTemplate = this.postTemplate.bind(this);
         this.saveTemplate = this.saveTemplate.bind(this);
         this.setMandatoryAttributes = this.setMandatoryAttributes.bind(this);
+        this.onVersionAliasChange = this.onVersionAliasChange.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -95,7 +97,8 @@ class TemplateScreen extends Component {
                             null,
                             2
                         ),
-                        type: response.data.type
+                        type: response.data.type,
+                        version_alias: response.data.version_alias
                     });
                 })
                 .catch(error => {
@@ -119,6 +122,7 @@ class TemplateScreen extends Component {
                             version: t.version,
                             default: t.default,
                             created_on: getDateInSimpleFormat(t.created_on),
+                            version_alias: t.version_alias ? t.version_alias : '-',
                             created_by: t.created_by ? t.created_by.toString() : '-'
                         }))
                     });
@@ -197,7 +201,8 @@ class TemplateScreen extends Component {
                             res ||
                             version[t]
                                 .toString()
-                                .indexOf(this.state.searchText) !== -1;
+                                .toLowerCase()
+                                .indexOf(this.state.searchText.toLowerCase()) !== -1;
                         return res;
                     }, false)
                 ) {
@@ -217,6 +222,11 @@ class TemplateScreen extends Component {
                 <td>
                     <Highlight search={this.state.searchText}>
                         {k.created_on}
+                    </Highlight>
+                </td>
+                <td>
+                    <Highlight search={this.state.searchText}>
+                        {k.version_alias}
                     </Highlight>
                 </td>
                 <td>
@@ -321,6 +331,12 @@ class TemplateScreen extends Component {
         });
     }
 
+    onVersionAliasChange(newValue, event) {
+        this.setState({
+            version_alias: newValue
+        });
+    }
+
     setMandatoryAttributes(type) {
         let generalAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
             (result, attribute) => {
@@ -388,7 +404,8 @@ class TemplateScreen extends Component {
             type: type,
             sub_templates: subTemplates,
             sample_context_data: JSON.parse(contextData),
-            attributes: JSON.parse(attributes)
+            attributes: JSON.parse(attributes),
+            version_alias: this.state.version_alias
         };
         if (this.state.editable) {
             axios
@@ -420,7 +437,7 @@ class TemplateScreen extends Component {
         // let tableHeaders = ['version', 'created_on', ' - ', ' - ', 'comment'].map(k => (
         //     <th>{k}</th>
         // ));
-        let tableHeaders = ['version', 'created_on', 'created_by', ' - ', ' - '].map((k, index) => (
+        let tableHeaders = ['version', 'created_on', 'version_alias', 'created_by', ' - ', ' - '].map((k, index) => (
             <th key={index}>{k}</th>
         ));
 
@@ -706,6 +723,7 @@ class TemplateScreen extends Component {
                         }
                     </div>
                 </div>
+                <br />
                 <div className={styles.teSaveContainer}>
                     {this.state.editable ? (
                         <button
@@ -722,23 +740,34 @@ class TemplateScreen extends Component {
                             Create
                         </button>
                     ) : (
-                        <button
-                            className={styles.teButtons}
-                            onClick={() => {
-                                if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
-                                    this.postTemplate(
-                                        this.state.templateData.name,
-                                        this.state.type,
-                                        this.state.contextData,
-                                        this.state.attributes
-                                    );
-                                }
-                            }}
-                        >
-                            Save
-                        </button>
+                        <div>
+                            <input
+                                type="text"
+                                id="version_alias"
+                                className={styles.teVersionAlias}
+                                value={this.state.version_alias}
+                                placeholder="version_alias"
+                                onChange={e => this.onVersionAliasChange(e.target.value)}
+                            />
+                            <button
+                                className={styles.teButtons}
+                                onClick={() => {
+                                    if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
+                                        this.postTemplate(
+                                            this.state.templateData.name,
+                                            this.state.type,
+                                            this.state.contextData,
+                                            this.state.attributes
+                                        );
+                                    }
+                                }}
+                            >
+                                Save
+                            </button>
+                        </div>
                     )}
                 </div>
+                <br />
                 <div className={styles.teMarginTop20}>
                     <label>Attributes : </label>
                 </div>
