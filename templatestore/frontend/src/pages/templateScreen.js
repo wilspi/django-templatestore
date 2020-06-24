@@ -122,7 +122,7 @@ class TemplateScreen extends Component {
                             version: t.version,
                             default: t.default,
                             created_on: getDateInSimpleFormat(t.created_on),
-                            version_alias: t.version_alias ? t.version_alias : '-'
+                            version_alias: t.version_alias ? t.version_alias : '-',
                             created_by: t.created_by ? t.created_by.toString() : '-'
                         }))
                     });
