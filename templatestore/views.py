@@ -23,6 +23,19 @@ def index(request):
     )
 
 
+def render_map_via_jinja(template_map, context):
+    from jinja2 import Template, Environment, DictLoader
+
+
+    template_map = {k: base64decode(v) for k, v in template_map.items()}
+    env = Environment(loader=DictLoader(template_map))
+
+    return base64encode(env.get_template("base").render(context))
+
+
+# def get_template_map_from_subtemplate(subtemplate)
+
+
 def render_via_jinja(template, context):
     from jinja2 import Template
 
@@ -393,20 +406,43 @@ def get_render_template_view(request, name, version=None):
             )
             stpls = SubTemplate.objects.filter(template_version_id=tv.id)
 
+            a = {
+                "header": {"name": "header_test", "version": "0.2"},
+                "footer": {"name": "footer_test", "version": "0.2"},
+            }
+            print(version)
+            if str(version) != "0.7":
+                a = {}
+            b = {}
+            for k, v in a.items():
+                t_1 = Template.objects.get(name=v["name"])
+                tv_1 = TemplateVersion.objects.get(
+                    template_id=t_1.id, version=v["version"]
+                )
+                st_1 = SubTemplate.objects.filter(template_version_id=tv_1.id)
+                b[k] = {}
+                for s in st_1:
+                    b[k][s.config.sub_type] = s.data
+
+            d = []
+            for stpl in stpls:
+                c = {}
+                c["base"] = stpl.data
+                for k, v in b.items():
+                    c[k] = b[k][stpl.config.sub_type]
+                d.append(
+                    {
+                        "sub_type": stpl.config.sub_type,
+                        "rendered_data": render_map_via_jinja(c, data["context_data"]),
+                    }
+                )
+
             try:
                 res = {
                     "version": tv.version,
                     "type": t.type,
                     "attributes": t.attributes,
-                    "sub_templates": [
-                        {
-                            "sub_type": stpl.config.sub_type,
-                            "rendered_data": render_via_jinja(
-                                stpl.data, data["context_data"]
-                            ),
-                        }
-                        for stpl in stpls
-                    ],
+                    "sub_templates": d,
                 }
             except Exception as e:
                 logger.exception(e)
