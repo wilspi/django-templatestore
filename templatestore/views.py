@@ -98,6 +98,7 @@ def get_templates_view(request):
                     "attributes": t.attributes,
                     "created_on": t.created_on,
                     "modified_on": t.modified_on,
+                    "created_by": t.created_by,
                 }
                 for t in templates
             ]
@@ -243,7 +244,10 @@ def post_template_view(request):
             templates = Template.objects.filter(name=data["name"])
             if not len(templates):
                 tmp = Template.objects.create(
-                    name=data["name"], attributes=data["attributes"], type=data["type"]
+                    name=data["name"],
+                    attributes=data["attributes"],
+                    type=data["type"],
+                    created_by=request.POST.get("user_id"),
                 )
                 tmp.save()
 
@@ -275,6 +279,7 @@ def post_template_view(request):
                 template_id=template,
                 version=version,
                 sample_context_data=data["sample_context_data"],
+                created_by=request.POST.get("user_id"),
             )
             tmp_ver.save()
 
@@ -336,6 +341,7 @@ def get_template_versions_view(request, name):
                     "version": tv.version,
                     "default": True if t.default_version_id == tv.id else False,
                     "created_on": tv.created_on,
+                    "created_by": tv.created_by,
                 }
                 for tv in tvs
             ]
@@ -517,8 +523,10 @@ def get_template_details_view(request, name, version):
                 template_id=tmp,
                 version=new_version,
                 sample_context_data=tmp_ver.sample_context_data,
+                created_by=request.POST.get("user_id"),
             )
             tmp_ver_new.save()
+
             for st in sts:
                 SubTemplate.objects.create(
                     template_version_id=tmp_ver_new, config=st.config, data=st.data

@@ -118,7 +118,8 @@ class TemplateScreen extends Component {
                         versions: response.data.map(t => ({
                             version: t.version,
                             default: t.default,
-                            created_on: getDateInSimpleFormat(t.created_on)
+                            created_on: getDateInSimpleFormat(t.created_on),
+                            created_by: t.created_by ? t.created_by.toString() : '-'
                         }))
                     });
                 })
@@ -216,6 +217,11 @@ class TemplateScreen extends Component {
                 <td>
                     <Highlight search={this.state.searchText}>
                         {k.created_on}
+                    </Highlight>
+                </td>
+                <td>
+                    <Highlight search={this.state.searchText}>
+                        {k.created_by}
                     </Highlight>
                 </td>
                 <td>
@@ -414,7 +420,7 @@ class TemplateScreen extends Component {
         // let tableHeaders = ['version', 'created_on', ' - ', ' - ', 'comment'].map(k => (
         //     <th>{k}</th>
         // ));
-        let tableHeaders = ['version', 'created_on', ' - ', ' - '].map((k, index) => (
+        let tableHeaders = ['version', 'created_on', 'created_by', ' - ', ' - '].map((k, index) => (
             <th key={index}>{k}</th>
         ));
 
