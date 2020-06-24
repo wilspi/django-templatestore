@@ -18,6 +18,7 @@ class Template(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)  # TODO: Timezone support check
     modified_on = models.DateTimeField(auto_now=True)
     deleted_on = models.DateTimeField(blank=True, null=True)
+    created_by = models.IntegerField(null=True, blank=True)
 
     class Meta:
         db_table = "templatestore_template"
@@ -56,6 +57,8 @@ class TemplateVersion(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     deleted_on = models.DateTimeField(null=True, blank=True)
+    version_alias = models.CharField(blank=True, max_length=100)
+    created_by = models.IntegerField(null=True, blank=True)
 
     class Meta:
         db_table = "templatestore_template_version"
