@@ -173,6 +173,9 @@
                                     "modified_on": {
                                         "type":"string",
                                         "format":"date-time"
+                                    },
+                                    "created_by": {
+                                        "type": "integer"
                                     }
                                 }
                             }
@@ -234,6 +237,9 @@
                                     "version_alias": {
                                         "type": "string",
                                         "maxLength": 100
+                                    },
+                                    "created_by": {
+                                        "type": "integer"
                                     }
                                 }
                             }
@@ -805,6 +811,9 @@
                 "version_alias": {
                     "type": "string",
                     "maxLength": 100
+                },
+                "created_by": {
+                    "type":"integer"
                 }
             }
         },
