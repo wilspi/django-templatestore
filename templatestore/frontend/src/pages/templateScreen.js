@@ -123,6 +123,7 @@ class TemplateScreen extends Component {
                             default: t.default,
                             created_on: getDateInSimpleFormat(t.created_on),
                             version_alias: t.version_alias ? t.version_alias : '-'
+                            created_by: t.created_by ? t.created_by.toString() : '-'
                         }))
                     });
                 })
@@ -226,6 +227,11 @@ class TemplateScreen extends Component {
                 <td>
                     <Highlight search={this.state.searchText}>
                         {k.version_alias}
+                    </Highlight>
+                </td>
+                <td>
+                    <Highlight search={this.state.searchText}>
+                        {k.created_by}
                     </Highlight>
                 </td>
                 <td>
@@ -431,7 +437,7 @@ class TemplateScreen extends Component {
         // let tableHeaders = ['version', 'created_on', ' - ', ' - ', 'comment'].map(k => (
         //     <th>{k}</th>
         // ));
-        let tableHeaders = ['version', 'created_on', 'version_alias', ' - ', ' - '].map((k, index) => (
+        let tableHeaders = ['version', 'created_on', 'version_alias', 'created_by', ' - ', ' - '].map((k, index) => (
             <th key={index}>{k}</th>
         ));
 
