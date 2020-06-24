@@ -68,7 +68,7 @@
                                 },
                                 "version_alias": {
                                     "type": "string",
-                                    "maxLength": 250
+                                    "maxLength": 100
                                 }
                             }
                         }
@@ -233,7 +233,7 @@
                                     },
                                     "version_alias": {
                                         "type": "string",
-                                        "maxLength": 250
+                                        "maxLength": 100
                                     }
                                 }
                             }
@@ -413,7 +413,7 @@
                                 },
                                 "version_alias": {
                                     "type": "string",
-                                    "maxLength": 250
+                                    "maxLength": 100
                                 }
                             }
                         }
@@ -804,7 +804,7 @@
                 },
                 "version_alias": {
                     "type": "string",
-                    "maxLength": 250
+                    "maxLength": 100
                 }
             }
         },
