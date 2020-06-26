@@ -18,9 +18,7 @@ class Home extends Component {
             'template_name',
             'type',
             'default_version',
-            'created_on',
             'updated_on',
-            'created_by',
             ...this.props.fixedAttributeKeys
         ];
         this.getTableRowsJSX = this.getTableRowsJSX.bind(this);
@@ -36,11 +34,9 @@ class Home extends Component {
                         template_name: t.name,
                         type: t.type,
                         default_version: t.default ? t.version : '-',
-                        created_on: getDateInSimpleFormat(t.created_on),
-                        updated_on: getDateInSimpleFormat(t.modified_on),
-                        created_by: t.created_by ? t.created_by.toString() : '-'
+                        updated_on: getDateInSimpleFormat(t.modified_on)
                     },
-                    ...this.tableHeaderList.slice(6).reduce((result, k) => {
+                    ...this.tableHeaderList.slice(4).reduce((result, k) => {
                         result[k] = t.attributes[k];
                         return result;
                     }, {})
