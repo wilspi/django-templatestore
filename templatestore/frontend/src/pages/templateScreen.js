@@ -740,7 +740,7 @@ class TemplateScreen extends Component {
                             Create
                         </button>
                     ) : (
-                        <div>
+                        <div className={styles.teVersionAliasWrapper}>
                             <input
                                 type="text"
                                 id="version_alias"
