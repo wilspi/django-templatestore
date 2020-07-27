@@ -440,6 +440,7 @@ class TemplateScreen extends Component {
 
         if (this.state.type && Object.keys(this.state.config).length) {
             allAttributes = {
+                ...JSON.parse(this.state.attributes),
                 ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
                 ...this.state.config[this.state.type]["attributes"]
             };
