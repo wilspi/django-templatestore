@@ -35,7 +35,7 @@ class TemplateScreen extends Component {
             subTemplatesData: {},
             config: {},
             contextData: '',
-            attributes: '',
+            attributes: JSON.stringify({}),
             version_alias: '',
             editable: this.props.editable
         };
@@ -57,6 +57,8 @@ class TemplateScreen extends Component {
         this.saveTemplate = this.saveTemplate.bind(this);
         this.setMandatoryAttributes = this.setMandatoryAttributes.bind(this);
         this.onVersionAliasChange = this.onVersionAliasChange.bind(this);
+        this.getAttributesTableRows = this.getAttributesTableRows.bind(this);
+        this.buildOptions = this.buildOptions.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -267,6 +269,51 @@ class TemplateScreen extends Component {
                 </td>
             </tr>
         ));
+        return tableRows;
+    }
+
+    buildOptions(allowedValues) {
+        var arr = [];
+        arr.push(<option value="" disabled selected> Choose Here </option>);
+
+        arr.push(
+            allowedValues.map(t => {
+                return (<option value={t}>{t}</option>);
+            })
+        );
+        return arr;
+    }
+
+    getAttributesTableRows() {
+        let tableRows = [];
+        let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
+
+        Object.keys(mandatoryAttributes).map(t => {
+            tableRows.push(
+                <tr>
+                    <td>
+                        {t}
+                    </td>
+                    <td>
+                        {
+                            mandatoryAttributes[t].hasOwnProperty("allowed_values") ? (
+                                <select
+                                    value={
+                                        JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
+                                    }
+                                >
+                                    {
+                                        this.buildOptions(mandatoryAttributes[t]["allowed_values"])
+                                    }
+                                </select>
+                            ) : (
+                                <input />
+                            )
+                        }
+                    </td>
+                </tr>
+            );
+        });
         return tableRows;
     }
 
@@ -806,6 +853,26 @@ class TemplateScreen extends Component {
                                     data-parent="#accordionEx"
                                 >
                                     <div className="card-body">
+
+                                        <div className={styles.tableWrapper}>
+                                            <table
+                                                className={
+                                                    'table table-striped table-bordered mb-0' +
+                                                    styles.tsTable
+                                                }
+                                            >
+                                                <thead>
+                                                    <tr>
+                                                        <th> Attribute </th>
+                                                        <th> Value </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className={styles.tableBody}>
+                                                    {this.getAttributesTableRows()}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
                                         <AceEditor
                                             name="template-editor"
                                             placeholder="Write attributes here..."
