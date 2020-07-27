@@ -338,7 +338,7 @@ class TemplateScreen extends Component {
     }
 
     setMandatoryAttributes(type) {
-        let generalAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
+        let generalAttributes = Object.keys(backendSettings.TE_TEMPLATE_ATTRIBUTES).reduce(
             (result, attribute) => {
                 result[attribute] = '';
                 return result;
