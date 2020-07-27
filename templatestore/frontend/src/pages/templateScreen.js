@@ -462,6 +462,7 @@ class TemplateScreen extends Component {
                                     onChange={e =>
                                         this.onAttributesChange(t, e.target.value)
                                     }
+                                    disabled={!this.state.editable}
                                 >
                                     {
                                         this.buildOptions(mandatoryAttributes[t]["allowed_values"])
