@@ -272,54 +272,6 @@ class TemplateScreen extends Component {
         return tableRows;
     }
 
-    buildOptions(allowedValues) {
-        var arr = [];
-        arr.push(<option value="" disabled selected> Choose Here </option>);
-
-        arr.push(
-            allowedValues.map(t => {
-                return (<option value={t}>{t}</option>);
-            })
-        );
-        return arr;
-    }
-
-    getAttributesTableRows() {
-        let tableRows = [];
-        let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
-
-        Object.keys(mandatoryAttributes).map(t => {
-            tableRows.push(
-                <tr>
-                    <td>
-                        {t}
-                    </td>
-                    <td>
-                        {
-                            mandatoryAttributes[t].hasOwnProperty("allowed_values") ? (
-                                <select
-                                    value={
-                                        JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
-                                    }
-                                    onChange={e =>
-                                        this.onAttributesChange(t, e.target.value)
-                                    }
-                                >
-                                    {
-                                        this.buildOptions(mandatoryAttributes[t]["allowed_values"])
-                                    }
-                                </select>
-                            ) : (
-                                <input />
-                            )
-                        }
-                    </td>
-                </tr>
-            );
-        });
-        return tableRows;
-    }
-
     getRenderedTemplate(subType, templateData, contextData, renderMode) {
         let data = {
             template: encode(templateData),
@@ -476,6 +428,54 @@ class TemplateScreen extends Component {
         } else {
             this.saveTemplate(data);
         }
+    }
+
+    buildOptions(allowedValues) {
+        var arr = [];
+        arr.push(<option value="" disabled selected> Choose Here </option>);
+
+        arr.push(
+            allowedValues.map(t => {
+                return (<option value={t}>{t}</option>);
+            })
+        );
+        return arr;
+    }
+
+    getAttributesTableRows() {
+        let tableRows = [];
+        let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
+
+        Object.keys(mandatoryAttributes).map(t => {
+            tableRows.push(
+                <tr>
+                    <td>
+                        {t}
+                    </td>
+                    <td>
+                        {
+                            mandatoryAttributes[t].hasOwnProperty("allowed_values") ? (
+                                <select
+                                    value={
+                                        JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
+                                    }
+                                    onChange={e =>
+                                        this.onAttributesChange(t, e.target.value)
+                                    }
+                                >
+                                    {
+                                        this.buildOptions(mandatoryAttributes[t]["allowed_values"])
+                                    }
+                                </select>
+                            ) : (
+                                <input />
+                            )
+                        }
+                    </td>
+                </tr>
+            );
+        });
+        return tableRows;
     }
 
     render() {
