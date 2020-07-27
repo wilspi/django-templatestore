@@ -436,13 +436,16 @@ class TemplateScreen extends Component {
 
     getAttributesTableRows() {
         let tableRows = [];
-        let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
+        let allAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
 
         if (this.state.type && Object.keys(this.state.config).length) {
-            mandatoryAttributes = { ...backendSettings.TE_TEMPLATE_ATTRIBUTES, ...this.state.config[this.state.type]["attributes"] };
+            allAttributes = {
+                ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
+                ...this.state.config[this.state.type]["attributes"]
+            };
         }
 
-        Object.keys(mandatoryAttributes).map(t => {
+        Object.keys(allAttributes).map(t => {
             tableRows.push(
                 <tr>
                     <td>
@@ -450,7 +453,7 @@ class TemplateScreen extends Component {
                     </td>
                     <td>
                         {
-                            mandatoryAttributes[t].hasOwnProperty("allowed_values") ? (
+                            allAttributes[t].hasOwnProperty("allowed_values") ? (
                                 <select
                                     value={
                                         JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
@@ -461,7 +464,7 @@ class TemplateScreen extends Component {
                                     disabled={!this.state.editable}
                                 >
                                     {
-                                        this.buildOptions(mandatoryAttributes[t]["allowed_values"])
+                                        this.buildOptions(allAttributes[t]["allowed_values"])
                                     }
                                 </select>
                             ) : (
