@@ -301,6 +301,9 @@ class TemplateScreen extends Component {
                                     value={
                                         JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
                                     }
+                                    onChange={e =>
+                                        this.onAttributesChange(t, e.target.value)
+                                    }
                                 >
                                     {
                                         this.buildOptions(mandatoryAttributes[t]["allowed_values"])
@@ -372,9 +375,11 @@ class TemplateScreen extends Component {
         });
     }
 
-    onAttributesChange(newValue, event) {
+    onAttributesChange(attributeKey, attributeValue) {
+        let newAttributes = JSON.parse(this.state.attributes);
+        newAttributes[attributeKey] = attributeValue;
         this.setState({
-            attributes: newValue
+            attributes: JSON.stringify(newAttributes)
         });
     }
 
