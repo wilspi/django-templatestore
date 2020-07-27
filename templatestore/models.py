@@ -40,7 +40,9 @@ class Template(models.Model):
                 }
             )
         # add default attributes
-        for k in [attributes for attributes in ts_settings.TE_TEMPLATE_ATTRIBUTES.keys()]:
+        for k in [
+            attributes for attributes in ts_settings.TE_TEMPLATE_ATTRIBUTES.keys()
+        ]:
             if k not in self.attributes:
                 self.attributes[k] = ""
 
