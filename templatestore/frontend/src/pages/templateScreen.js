@@ -469,7 +469,13 @@ class TemplateScreen extends Component {
                                     }
                                 </select>
                             ) : (
-                                <input />
+                                <input
+                                    value={
+                                        JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
+                                    }
+                                    onChange={e => this.onAttributesChange(t, e.target.value)}
+                                    disabled={!this.state.editable}
+                                />
                             )
                         }
                     </td>
