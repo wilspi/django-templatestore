@@ -55,7 +55,6 @@ class TemplateScreen extends Component {
         this.getTypesConfig = this.getTypesConfig.bind(this);
         this.postTemplate = this.postTemplate.bind(this);
         this.saveTemplate = this.saveTemplate.bind(this);
-        this.setMandatoryAttributes = this.setMandatoryAttributes.bind(this);
         this.onVersionAliasChange = this.onVersionAliasChange.bind(this);
         this.getAttributesTableRows = this.getAttributesTableRows.bind(this);
         this.buildOptions = this.buildOptions.bind(this);
@@ -95,9 +94,7 @@ class TemplateScreen extends Component {
                             2
                         ),
                         attributes: JSON.stringify(
-                            response.data.attributes,
-                            null,
-                            2
+                            response.data.attributes
                         ),
                         type: response.data.type,
                         version_alias: response.data.version_alias
@@ -130,6 +127,16 @@ class TemplateScreen extends Component {
                     });
                 })
                 .catch(error => {
+                    console.log(error);
+                });
+            axios
+                .get(backendSettings.TE_BASEPATH + '/api/v1/config')
+                .then(response => {
+                    this.setState({
+                        config: response.data
+                    });
+                })
+                .catch(function(error) {
                     console.log(error);
                 });
         } else {
@@ -341,20 +348,6 @@ class TemplateScreen extends Component {
         });
     }
 
-    setMandatoryAttributes(type) {
-        let generalAttributes = Object.keys(backendSettings.TE_TEMPLATE_ATTRIBUTES).reduce(
-            (result, attribute) => {
-                result[attribute] = '';
-                return result;
-            },
-            {}
-        );
-        let mandatoryAttributes = this.state.config[type]["attributes"];
-        this.setState({
-            attributes: JSON.stringify(Object.assign(generalAttributes, mandatoryAttributes), null, 2)
-        });
-    }
-
     getTypesConfig(config, type) {
         this.setState({
             subTemplatesData: config[type].sub_type.reduce(
@@ -371,7 +364,6 @@ class TemplateScreen extends Component {
             ),
             type: type
         });
-        this.setMandatoryAttributes(type);
     }
 
     saveTemplate(data) {
@@ -445,6 +437,10 @@ class TemplateScreen extends Component {
     getAttributesTableRows() {
         let tableRows = [];
         let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
+
+        if (this.state.type && Object.keys(this.state.config).length) {
+            mandatoryAttributes = { ...backendSettings.TE_TEMPLATE_ATTRIBUTES, ...this.state.config[this.state.type]["attributes"] };
+        }
 
         Object.keys(mandatoryAttributes).map(t => {
             tableRows.push(
