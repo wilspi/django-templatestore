@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def index(request):
     export_settings = {
-        "TE_TEMPLATE_ATTRIBUTE_KEYS": ts_settings.TE_TEMPLATE_ATTRIBUTES_KEYS,
+        "TE_TEMPLATE_ATTRIBUTES": ts_settings.TE_TEMPLATE_ATTRIBUTES,
         "TE_BASEPATH": ts_settings.TE_BASEPATH,
     }
     return render(
