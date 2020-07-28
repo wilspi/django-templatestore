@@ -470,7 +470,6 @@ class TemplateScreen extends Component {
                                         this.onAttributesChange(t, e.target.value)
                                     }
                                     disabled={!this.state.editable}
-                                    className={styles.teAttributesSelect}
                                 >
                                     {
                                         this.buildOptions(allAttributes[t]["allowed_values"])
@@ -481,7 +480,6 @@ class TemplateScreen extends Component {
                                     value={
                                         JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
                                     }
-                                    className={styles.teAttributesTextBox}
                                     onChange={e => this.onAttributesChange(t, e.target.value)}
                                     disabled={!this.state.editable}
                                 />
@@ -890,7 +888,6 @@ class TemplateScreen extends Component {
                                             {this.getAttributes()}
                                             <div className={styles.teAttributesRow}>
                                                 <button
-                                                    className={styles.teAddAttributesButton}
                                                     disabled={!this.state.editable}
                                                     onClick={this.addNewAttribute}
                                                 >
@@ -898,12 +895,10 @@ class TemplateScreen extends Component {
                                                 </button>
                                                 <input
                                                     id="newAttributeKey"
-                                                    className={styles.teAttributesTextBox}
                                                     disabled={!this.state.editable}
                                                 />
                                                 <input
                                                     id="newAttributeValue"
-                                                    className={styles.teAttributesTextBox}
                                                     disabled={!this.state.editable}
                                                 />
                                             </div>
