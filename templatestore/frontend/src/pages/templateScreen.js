@@ -494,8 +494,15 @@ class TemplateScreen extends Component {
     }
 
     addNewAttribute() {
-        console.log(document.getElementById("newAttributeKey").value);
-        console.log(document.getElementById("newAttributeValue").value);
+        let key = document.getElementById("newAttributeKey").value;
+        let value = document.getElementById("newAttributeValue").value;
+        document.getElementById("newAttributeKey").value = "";
+        document.getElementById("newAttributeValue").value = "";
+        let newAttributes = JSON.parse(this.state.attributes);
+        newAttributes[key] = value;
+        this.setState({
+            attributes: JSON.stringify(newAttributes)
+        });
     }
 
     render() {
