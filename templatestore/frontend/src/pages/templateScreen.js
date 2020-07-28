@@ -890,7 +890,10 @@ class TemplateScreen extends Component {
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <button className={styles.teAddAttributesButton}>
+                                        <button
+                                            className={styles.teAddAttributesButton}
+                                            disabled={!this.state.editable}
+                                        >
                                             +
                                         </button>
                                     </div>
