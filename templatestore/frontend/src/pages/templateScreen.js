@@ -35,7 +35,7 @@ class TemplateScreen extends Component {
             subTemplatesData: {},
             config: {},
             contextData: '',
-            attributes: JSON.stringify({}),
+            attributes: '{}',
             version_alias: '',
             editable: this.props.editable
         };
