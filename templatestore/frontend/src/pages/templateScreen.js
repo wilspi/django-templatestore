@@ -436,15 +436,21 @@ class TemplateScreen extends Component {
 
     getAttributesTableRows() {
         let tableRows = [];
-        let allAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
+        let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
 
         if (this.state.type && Object.keys(this.state.config).length) {
-            allAttributes = {
-                ...JSON.parse(this.state.attributes),
+            mandatoryAttributes = {
                 ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
                 ...this.state.config[this.state.type]["attributes"]
             };
         }
+
+        let allAttributes = mandatoryAttributes;
+        Object.keys(JSON.parse(this.state.attributes)).map(t => {
+            if (!mandatoryAttributes.hasOwnProperty(t)) {
+                allAttributes[t] = JSON.parse(this.state.attributes)[t];
+            }
+        });
 
         Object.keys(allAttributes).map(t => {
             tableRows.push(
