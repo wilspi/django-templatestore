@@ -872,7 +872,7 @@ class TemplateScreen extends Component {
                                 >
                                     <div className="card-body">
 
-                                        <div className={styles.tableWrapper}>
+                                        <div className={styles.teAttributesTableWrapper}>
                                             <table
                                                 className={
                                                     'table table-striped table-bordered mb-0' +
@@ -890,7 +890,9 @@ class TemplateScreen extends Component {
                                                 </tbody>
                                             </table>
                                         </div>
-
+                                        <button className={styles.teAddAttributesButton}>
+                                            +
+                                        </button>
                                         <AceEditor
                                             name="template-editor"
                                             placeholder="Write attributes here..."
