@@ -893,19 +893,6 @@ class TemplateScreen extends Component {
                                         <button className={styles.teAddAttributesButton}>
                                             +
                                         </button>
-                                        <AceEditor
-                                            name="template-editor"
-                                            placeholder="Write attributes here..."
-                                            theme={this.aceconfig.theme}
-                                            mode="json"
-                                            fontSize={this.aceconfig.fontSize}
-                                            height={this.aceconfig.height}
-                                            width={this.aceconfig.width}
-                                            value={this.state.attributes}
-                                            onChange={this.onAttributesChange}
-                                            readOnly={!this.state.editable}
-                                            setOptions={{ useWorker: false }}
-                                        />
                                     </div>
                                 </div>
                             </div>
