@@ -898,8 +898,16 @@ class TemplateScreen extends Component {
                                             >
                                                 +
                                             </button>
-                                            <input className={styles.teAttributesTextBox}/>
-                                            <input className={styles.teAttributesTextBox}/>
+                                            <input
+                                                id="newAttributeKey"
+                                                className={styles.teAttributesTextBox}
+                                                disabled={!this.state.editable}
+                                            />
+                                            <input
+                                                id="newAttributeValue"
+                                                className={styles.teAttributesTextBox}
+                                                disabled={!this.state.editable}
+                                            />
                                         </div>
                                     </div>
                                 </div>
