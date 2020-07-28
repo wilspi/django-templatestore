@@ -58,6 +58,7 @@ class TemplateScreen extends Component {
         this.onVersionAliasChange = this.onVersionAliasChange.bind(this);
         this.getAttributesTableRows = this.getAttributesTableRows.bind(this);
         this.buildOptions = this.buildOptions.bind(this);
+        this.addNewAttribute = this.addNewAttribute.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -492,6 +493,11 @@ class TemplateScreen extends Component {
         return tableRows;
     }
 
+    addNewAttribute() {
+        console.log(document.getElementById("newAttributeKey").value);
+        console.log(document.getElementById("newAttributeValue").value);
+    }
+
     render() {
         let chooseVersion = this.state.versions.map(versions => {
             return (
@@ -895,6 +901,7 @@ class TemplateScreen extends Component {
                                             <button
                                                 className={styles.teAddAttributesButton}
                                                 disabled={!this.state.editable}
+                                                onClick={this.addNewAttribute}
                                             >
                                                 +
                                             </button>
