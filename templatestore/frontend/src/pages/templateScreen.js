@@ -897,10 +897,12 @@ class TemplateScreen extends Component {
                                                 </button>
                                                 <input
                                                     id="newAttributeKey"
+                                                    placeholder="New Attribute Key"
                                                     disabled={!this.state.editable}
                                                 />
                                                 <input
                                                     id="newAttributeValue"
+                                                    placeholder="New Attribute Value"
                                                     disabled={!this.state.editable}
                                                 />
                                             </div>
