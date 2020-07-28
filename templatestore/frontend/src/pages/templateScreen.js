@@ -479,6 +479,7 @@ class TemplateScreen extends Component {
                                     value={
                                         JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
                                     }
+                                    className={styles.teAttributesTextBox}
                                     onChange={e => this.onAttributesChange(t, e.target.value)}
                                     disabled={!this.state.editable}
                                 />
@@ -890,12 +891,16 @@ class TemplateScreen extends Component {
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <button
-                                            className={styles.teAddAttributesButton}
-                                            disabled={!this.state.editable}
-                                        >
-                                            +
-                                        </button>
+                                        <div>
+                                            <button
+                                                className={styles.teAddAttributesButton}
+                                                disabled={!this.state.editable}
+                                            >
+                                                +
+                                            </button>
+                                            <input className={styles.teAttributesTextBox}/>
+                                            <input className={styles.teAttributesTextBox}/>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
