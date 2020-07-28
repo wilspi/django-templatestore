@@ -56,7 +56,7 @@ class TemplateScreen extends Component {
         this.postTemplate = this.postTemplate.bind(this);
         this.saveTemplate = this.saveTemplate.bind(this);
         this.onVersionAliasChange = this.onVersionAliasChange.bind(this);
-        this.getAttributesTableRows = this.getAttributesTableRows.bind(this);
+        this.getAttributes = this.getAttributes.bind(this);
         this.buildOptions = this.buildOptions.bind(this);
         this.addNewAttribute = this.addNewAttribute.bind(this);
     }
@@ -435,8 +435,8 @@ class TemplateScreen extends Component {
         return arr;
     }
 
-    getAttributesTableRows() {
-        let tableRows = [];
+    getAttributes() {
+        let attributes = [];
         let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
 
         if (this.state.type && Object.keys(this.state.config).length) {
@@ -454,43 +454,39 @@ class TemplateScreen extends Component {
         });
 
         Object.keys(allAttributes).map(t => {
-            tableRows.push(
-                <tr>
-                    <td>
-                        {t}
-                    </td>
-                    <td>
-                        {
-                            allAttributes[t].hasOwnProperty("allowed_values") ? (
-                                <select
-                                    value={
-                                        JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
-                                    }
-                                    onChange={e =>
-                                        this.onAttributesChange(t, e.target.value)
-                                    }
-                                    disabled={!this.state.editable}
-                                >
-                                    {
-                                        this.buildOptions(allAttributes[t]["allowed_values"])
-                                    }
-                                </select>
-                            ) : (
-                                <input
-                                    value={
-                                        JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
-                                    }
-                                    className={styles.teAttributesTextBox}
-                                    onChange={e => this.onAttributesChange(t, e.target.value)}
-                                    disabled={!this.state.editable}
-                                />
-                            )
-                        }
-                    </td>
-                </tr>
+            attributes.push(
+                <div>
+                    {t}
+                    {
+                        allAttributes[t].hasOwnProperty("allowed_values") ? (
+                            <select
+                                value={
+                                    JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
+                                }
+                                onChange={e =>
+                                    this.onAttributesChange(t, e.target.value)
+                                }
+                                disabled={!this.state.editable}
+                            >
+                                {
+                                    this.buildOptions(allAttributes[t]["allowed_values"])
+                                }
+                            </select>
+                        ) : (
+                            <input
+                                value={
+                                    JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
+                                }
+                                className={styles.teAttributesTextBox}
+                                onChange={e => this.onAttributesChange(t, e.target.value)}
+                                disabled={!this.state.editable}
+                            />
+                        )
+                    }
+                </div>
             );
         });
-        return tableRows;
+        return attributes;
     }
 
     addNewAttribute() {
@@ -885,24 +881,8 @@ class TemplateScreen extends Component {
                                     data-parent="#accordionEx"
                                 >
                                     <div className="card-body">
-
-                                        <div className={styles.teAttributesTableWrapper}>
-                                            <table
-                                                className={
-                                                    'table table-striped table-bordered mb-0' +
-                                                    styles.tsTable
-                                                }
-                                            >
-                                                <thead>
-                                                    <tr>
-                                                        <th> Attribute </th>
-                                                        <th> Value </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className={styles.tableBody}>
-                                                    {this.getAttributesTableRows()}
-                                                </tbody>
-                                            </table>
+                                        <div>
+                                            {this.getAttributes()}
                                         </div>
                                         <div>
                                             <button
