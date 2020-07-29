@@ -674,6 +674,32 @@ def patch_attributes_view(request, name):
                         )
                     )
 
+            invalid_valued_attributes = set(
+                key
+                for key in cfgs[0].attributes.keys()
+                if "allowed_values" in cfgs[0].attributes[key]
+                and data["attributes"][key]
+                not in cfgs[0].attributes[key]["allowed_values"]
+            )
+
+            invalid_valued_attributes = invalid_valued_attributes | set(
+                key
+                for key in ts_settings.TE_TEMPLATE_ATTRIBUTES.keys()
+                if key in data["attributes"]
+                and "allowed_values" in ts_settings.TE_TEMPLATE_ATTRIBUTES[key]
+                and data["attributes"][key]
+                not in ts_settings.TE_TEMPLATE_ATTRIBUTES[key]["allowed_values"]
+            )
+
+            if len(invalid_valued_attributes):
+                raise (
+                    Exception(
+                        "Validation: invalid values for the attributes `"
+                        + str(invalid_valued_attributes)
+                        + "`"
+                    )
+                )
+
             template.update(attributes=data["attributes"])
             data = {"name": name, "attributes": data["attributes"]}
             return JsonResponse(data, status=200)
