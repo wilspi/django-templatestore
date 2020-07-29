@@ -241,6 +241,25 @@ def post_template_view(request):
                     )
                 )
 
+            invalid_valued_attributes = set(
+                key
+                for key in cfgs[0].attributes.keys()
+                if "allowed_values" in cfgs[0].attributes[key]
+                and data["attributes"][key]
+                not in cfgs[0].attributes[key]["allowed_values"]
+            )
+
+            if len(invalid_valued_attributes):
+                raise (
+                    Exception(
+                        "Validation: invalid values for the attributes `"
+                        + str(invalid_valued_attributes)
+                        + "` for type `"
+                        + data["type"]
+                        + "`"
+                    )
+                )
+
             if not re.match("(^[a-zA-Z0-9 ]*$)", data.get("version_alias", "")):
                 raise (
                     Exception(
