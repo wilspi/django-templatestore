@@ -249,13 +249,20 @@ def post_template_view(request):
                 not in cfgs[0].attributes[key]["allowed_values"]
             )
 
+            invalid_valued_attributes = invalid_valued_attributes | set(
+                key
+                for key in ts_settings.TE_TEMPLATE_ATTRIBUTES.keys()
+                if key in data["attributes"]
+                and "allowed_values" in ts_settings.TE_TEMPLATE_ATTRIBUTES[key]
+                and data["attributes"][key]
+                not in ts_settings.TE_TEMPLATE_ATTRIBUTES[key]["allowed_values"]
+            )
+
             if len(invalid_valued_attributes):
                 raise (
                     Exception(
                         "Validation: invalid values for the attributes `"
                         + str(invalid_valued_attributes)
-                        + "` for type `"
-                        + data["type"]
                         + "`"
                     )
                 )
