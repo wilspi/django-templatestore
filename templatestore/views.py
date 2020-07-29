@@ -647,9 +647,16 @@ def patch_attributes_view(request, name):
             if not len(template):
                 raise (Exception("Validation: Template with given name does not exist"))
 
+            cfgs = TemplateConfig.objects.filter(type=template[0].type)
+
             missing_attributes = set(
-                ts_settings.TE_TEMPLATE_ATTRIBUTES_KEYS
+                ts_settings.TE_TEMPLATE_ATTRIBUTES.keys()
             ).difference(set(data["attributes"].keys()))
+
+            missing_attributes = missing_attributes | set(
+                cfgs[0].attributes.keys()
+            ).difference(set(data["attributes"].keys()))
+
             if len(missing_attributes):
                 raise (
                     Exception(
