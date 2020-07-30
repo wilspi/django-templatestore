@@ -497,7 +497,17 @@ class TemplateScreen extends Component {
         let value = document.getElementById("newAttributeValue").value;
         document.getElementById("newAttributeKey").value = "";
         document.getElementById("newAttributeValue").value = "";
-        if (key) {
+
+        let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
+
+        if (this.state.type && Object.keys(this.state.config).length) {
+            mandatoryAttributes = {
+                ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
+                ...this.state.config[this.state.type]["attributes"]
+            };
+        }
+
+        if (key && !mandatoryAttributes.hasOwnProperty(key)) {
             let newAttributes = JSON.parse(this.state.attributes);
             newAttributes[key] = value;
             this.setState({
