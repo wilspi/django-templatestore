@@ -469,7 +469,6 @@ class TemplateScreen extends Component {
                                     onChange={e =>
                                         this.onAttributesChange(t, e.target.value)
                                     }
-                                    disabled={!this.state.editable}
                                 >
                                     {
                                         this.buildOptions(allAttributes[t]["allowed_values"])
@@ -481,7 +480,6 @@ class TemplateScreen extends Component {
                                         JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
                                     }
                                     onChange={e => this.onAttributesChange(t, e.target.value)}
-                                    disabled={!this.state.editable}
                                 />
                             )
                         }
@@ -900,7 +898,6 @@ class TemplateScreen extends Component {
                                             {this.getAttributes()}
                                             <div className={styles.teAttributesRow}>
                                                 <button
-                                                    disabled={!this.state.editable}
                                                     onClick={this.addNewAttribute}
                                                 >
                                                     +
@@ -908,12 +905,10 @@ class TemplateScreen extends Component {
                                                 <input
                                                     id="newAttributeKey"
                                                     placeholder="New Attribute Key"
-                                                    disabled={!this.state.editable}
                                                 />
                                                 <input
                                                     id="newAttributeValue"
                                                     placeholder="New Attribute Value"
-                                                    disabled={!this.state.editable}
                                                 />
                                             </div>
                                         </div>
