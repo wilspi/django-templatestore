@@ -59,6 +59,7 @@ class TemplateScreen extends Component {
         this.getAttributes = this.getAttributes.bind(this);
         this.buildOptions = this.buildOptions.bind(this);
         this.addNewAttribute = this.addNewAttribute.bind(this);
+        this.updateAttributes = this.updateAttributes.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -514,6 +515,23 @@ class TemplateScreen extends Component {
         }
     }
 
+    updateAttributes() {
+        let data = {
+            attributes: JSON.parse(this.state.attributes)
+        };
+        axios
+            .patch(
+                backendSettings.TE_BASEPATH + '/api/v1/template/' + this.state.templateData.name + '/attributes',
+                data
+            )
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     render() {
         let chooseVersion = this.state.versions.map(versions => {
             return (
@@ -911,6 +929,19 @@ class TemplateScreen extends Component {
                                                     placeholder="New Attribute Value"
                                                 />
                                             </div>
+                                        </div>
+                                        <div>
+                                            {
+                                                !this.state.editable ? (
+                                                    <button
+                                                        onClick={this.updateAttributes}
+                                                    >
+                                                        Update
+                                                    </button>
+                                                ) : (
+                                                    ''
+                                                )
+                                            }
                                         </div>
                                     </div>
                                 </div>
