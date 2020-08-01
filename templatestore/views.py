@@ -233,18 +233,15 @@ def post_template_view(request):
             templates = Template.objects.filter(name=data["name"])
             if not len(templates):
                 if "attributes" not in data:
-                    raise (
-                        Exception(
-                            "Validation: missing field `attributes`"
-                        )
-                    )
+                    raise (Exception("Validation: missing field `attributes`"))
 
                 if not len(data["attributes"]):
                     raise (Exception("Validation: attributes field can not be empty"))
 
-                missing_mandatory_attributes = set(cfgs[0].attributes.keys() | ts_settings.TE_TEMPLATE_ATTRIBUTES.keys()).difference(
-                    set(data["attributes"].keys())
-                )
+                missing_mandatory_attributes = set(
+                    cfgs[0].attributes.keys()
+                    | ts_settings.TE_TEMPLATE_ATTRIBUTES.keys()
+                ).difference(set(data["attributes"].keys()))
                 if len(missing_mandatory_attributes):
                     raise (
                         Exception(
