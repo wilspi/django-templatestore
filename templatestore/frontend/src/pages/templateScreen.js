@@ -914,8 +914,9 @@ class TemplateScreen extends Component {
                                     <div className="card-body">
                                         <div className={styles.teAttributesWrapper}>
                                             {this.getAttributes()}
-                                            <div className={styles.teAttributesRow}>
+                                            <div className={styles.teAttributesBlock}>
                                                 <button
+                                                    className={styles.teAddButton}
                                                     onClick={this.addNewAttribute}
                                                 >
                                                     +
@@ -929,19 +930,20 @@ class TemplateScreen extends Component {
                                                     placeholder="New Attribute Value"
                                                 />
                                             </div>
-                                        </div>
-                                        <div>
-                                            {
-                                                !this.state.editable ? (
-                                                    <button
-                                                        onClick={this.updateAttributes}
-                                                    >
+                                            <div className={styles.teAttributesBlock}>
+                                                {
+                                                    !this.state.editable ? (
+                                                        <button
+                                                            className={styles.teUpdateButton}
+                                                            onClick={this.updateAttributes}
+                                                        >
                                                         Update
-                                                    </button>
-                                                ) : (
-                                                    ''
-                                                )
-                                            }
+                                                        </button>
+                                                    ) : (
+                                                        ''
+                                                    )
+                                                }
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
