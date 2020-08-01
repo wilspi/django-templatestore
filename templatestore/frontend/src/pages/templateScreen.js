@@ -55,6 +55,7 @@ class TemplateScreen extends Component {
         this.getTypesConfig = this.getTypesConfig.bind(this);
         this.postTemplate = this.postTemplate.bind(this);
         this.saveTemplate = this.saveTemplate.bind(this);
+        this.setMandatoryAttributes = this.setMandatoryAttributes.bind(this);
         this.onVersionAliasChange = this.onVersionAliasChange.bind(this);
         this.getAttributes = this.getAttributes.bind(this);
         this.buildOptions = this.buildOptions.bind(this);
@@ -350,6 +351,23 @@ class TemplateScreen extends Component {
         });
     }
 
+    setMandatoryAttributes(type) {
+        let mandatoryAttributes = {
+            ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
+            ...this.state.config[type]["attributes"]
+        };
+        let newAttributes = Object.keys(mandatoryAttributes).reduce(
+            (result, attribute) => {
+                result[attribute] = '';
+                return result;
+            },
+            {}
+        );
+        this.setState({
+            attributes: JSON.stringify(newAttributes)
+        });
+    }
+
     getTypesConfig(config, type) {
         this.setState({
             subTemplatesData: config[type].sub_type.reduce(
@@ -366,6 +384,7 @@ class TemplateScreen extends Component {
             ),
             type: type
         });
+        this.setMandatoryAttributes(type);
     }
 
     saveTemplate(data) {
@@ -438,7 +457,7 @@ class TemplateScreen extends Component {
 
     getAttributes() {
         let attributes = [];
-        let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
+        let mandatoryAttributes = {};
 
         if (this.state.type && Object.keys(this.state.config).length) {
             mandatoryAttributes = {
@@ -447,18 +466,27 @@ class TemplateScreen extends Component {
             };
         }
 
-        let allAttributes = mandatoryAttributes;
+        let allAttributes = JSON.parse(JSON.stringify(mandatoryAttributes));
+
         Object.keys(JSON.parse(this.state.attributes)).map(t => {
-            if (!mandatoryAttributes.hasOwnProperty(t)) {
-                allAttributes[t] = JSON.parse(this.state.attributes)[t];
-            }
+            allAttributes[t] = allAttributes[t] || JSON.parse(this.state.attributes)[t];
         });
 
-        Object.keys(allAttributes).map(t => {
+        Object.keys(allAttributes).map((t, index) => {
             attributes.push(
                 <div className={styles.teAttributesRow}>
                     <div className={styles.teAttributesCell}>
-                        {t}
+                        {
+                            mandatoryAttributes.hasOwnProperty(t) ? (
+                                <div>
+                                    {t}
+                                </div>
+                            ) : (
+                                <input
+                                    value={t}
+                                />
+                            )
+                        }
                     </div>
                     <div className={styles.teAttributesCell}>
                         {
