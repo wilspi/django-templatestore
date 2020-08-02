@@ -337,7 +337,7 @@ class TemplateScreen extends Component {
         });
     }
 
-    onAttributesChange(attributeKey, newValue, index, keyChange = false) {
+    onAttributesChange(attributeKey, newValue, keyChange = false) {
         let newAttributes = JSON.parse(this.state.attributes);
         if (keyChange === true) {
             let attributes = {};
@@ -497,7 +497,7 @@ class TemplateScreen extends Component {
                                 <input
                                     value={t}
                                     onChange={e =>
-                                        this.onAttributesChange(t, e.target.value, index, true)
+                                        this.onAttributesChange(t, e.target.value, true)
                                     }
                                 />
                             )
@@ -523,7 +523,9 @@ class TemplateScreen extends Component {
                                     value={
                                         JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
                                     }
-                                    onChange={e => this.onAttributesChange(t, e.target.value, index)}
+                                    onChange={
+                                        e => this.onAttributesChange(t, e.target.value)
+                                    }
                                 />
                             )
                         }
