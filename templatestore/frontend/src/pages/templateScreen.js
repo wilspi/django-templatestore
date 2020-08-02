@@ -490,7 +490,7 @@ class TemplateScreen extends Component {
                     <div className={styles.teAttributesCell}>
                         {
                             mandatoryAttributes.hasOwnProperty(t) ? (
-                                <div>
+                                <div className={styles.teLabel}>
                                     {t}
                                 </div>
                             ) : (
