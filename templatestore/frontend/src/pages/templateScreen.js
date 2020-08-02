@@ -959,9 +959,9 @@ class TemplateScreen extends Component {
                                     <div className="card-body">
                                         <div className={styles.teAttributesWrapper}>
                                             {this.getAttributes()}
-                                            <div className={styles.teAttributesRow}>
+                                            <div className={styles.teAddNewAttributes}>
                                                 <button
-                                                    className={styles.teAddButton}
+                                                    className={styles.teAddNewAttributeButton}
                                                     onClick={this.addNewAttribute}
                                                 >
                                                     +
@@ -975,7 +975,7 @@ class TemplateScreen extends Component {
                                                     placeholder="New Attribute Value"
                                                 />
                                             </div>
-                                            <div className={styles.teAttributesRow}>
+                                            <div>
                                                 {
                                                     !this.state.editable ? (
                                                         <button
