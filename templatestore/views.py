@@ -646,11 +646,12 @@ def patch_attributes_view(request, name):
             if "attributes" not in data:
                 raise (Exception("Validation: Attributes are not provided"))
 
-            template = Template.objects.filter(name=name)
-            if not len(template):
+            try:
+                template = Template.objects.get(name=name)
+            except Exception as e:
                 raise (Exception("Validation: Template with given name does not exist"))
 
-            cfgs = TemplateConfig.objects.filter(type=template[0].type)
+            cfgs = TemplateConfig.objects.filter(type=template.type)
 
             missing_attributes = set(
                 ts_settings.TE_TEMPLATE_ATTRIBUTES.keys()
@@ -703,7 +704,8 @@ def patch_attributes_view(request, name):
                     )
                 )
 
-            template.update(attributes=data["attributes"])
+            template.attributes = data["attributes"]
+            template.save(update_fields=["attributes", "modified_on"])
             data = {"name": name, "attributes": data["attributes"]}
             return JsonResponse(data, status=200)
         except Exception as e:
