@@ -453,15 +453,15 @@ class TemplateScreen extends Component {
     }
 
     buildOptions(allowedValues) {
-        var arr = [];
-        arr.push(<option value="" disabled selected> Choose Here </option>);
+        var options = [];
+        options.push(<option value="" disabled selected> Choose Here </option>);
 
-        arr.push(
+        options.push(
             allowedValues.map(t => {
                 return (<option value={t}>{t}</option>);
             })
         );
-        return arr;
+        return options;
     }
 
     getAttributes() {
