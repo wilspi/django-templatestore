@@ -536,8 +536,6 @@ class TemplateScreen extends Component {
     addNewAttribute() {
         let key = document.getElementById("newAttributeKey").value;
         let value = document.getElementById("newAttributeValue").value;
-        document.getElementById("newAttributeKey").value = "";
-        document.getElementById("newAttributeValue").value = "";
 
         let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
 
@@ -551,6 +549,8 @@ class TemplateScreen extends Component {
         if (key && !mandatoryAttributes.hasOwnProperty(key)) {
             let newAttributes = JSON.parse(this.state.attributes);
             newAttributes[key] = value;
+            document.getElementById("newAttributeKey").value = "";
+            document.getElementById("newAttributeValue").value = "";
             this.setState({
                 attributes: JSON.stringify(newAttributes)
             });
@@ -567,6 +567,7 @@ class TemplateScreen extends Component {
                 data
             )
             .then(response => {
+                // Todo : Add Success Alert box
                 console.log(response.data);
             })
             .catch(error => {
