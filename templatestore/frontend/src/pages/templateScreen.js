@@ -331,18 +331,22 @@ class TemplateScreen extends Component {
     }
 
     onAttributesChange(attributeKey, newValue, keyChange = false) {
-        let newAttributes = JSON.parse(this.state.attributes);
-        if (keyChange === true) {
-            let attributes = {};
-            for (var i in newAttributes) {
-                if (i === attributeKey) {
-                    attributes[newValue] = newAttributes[attributeKey];
-                } else {
-                    attributes[i] = newAttributes[i];
-                }
-            }
-            newAttributes = attributes;
+        let currentAttributes = JSON.parse(this.state.attributes);
+        let newAttributes = {};
+        if (keyChange) {
+            newAttributes = Object.keys(currentAttributes).reduce(
+                (result, attribute) => {
+                    if (attribute === attributeKey) {
+                        result[newValue] = currentAttributes[attributeKey];
+                    } else {
+                        result[attribute] = currentAttributes[attribute];
+                    }
+                    return result;
+                },
+                {}
+            );
         } else {
+            newAttributes = currentAttributes;
             newAttributes[attributeKey] = newValue;
         }
         this.setState({
