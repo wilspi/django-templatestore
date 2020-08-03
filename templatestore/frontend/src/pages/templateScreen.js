@@ -132,34 +132,27 @@ class TemplateScreen extends Component {
                 .catch(error => {
                     console.log(error);
                 });
-            axios
-                .get(backendSettings.TE_BASEPATH + '/api/v1/config')
-                .then(response => {
-                    this.setState({
-                        config: response.data
-                    });
-                })
-                .catch(function(error) {
-                    console.log(error);
-                });
-        } else {
-            axios
-                .get(backendSettings.TE_BASEPATH + '/api/v1/config')
-                .then(response => {
-                    let defaultType = Object.keys(response.data)[0];
-                    this.setState({
-                        config: response.data
-                    });
-                    this.getTypesConfig(response.data, defaultType);
-                })
-                .catch(function(error) {
-                    console.log(error);
-                });
-
-            this.setState({
-                contextData: JSON.stringify({ name: 'abc' }, null, 2)
-            });
         }
+
+        axios
+            .get(backendSettings.TE_BASEPATH + '/api/v1/config')
+            .then(response => {
+                if (this.state.editable) {
+                    this.setState({
+                        contextData: JSON.stringify({ name: 'abc' }, null, 2),
+                        config: response.data
+                    });
+                    let defaultType = Object.keys(response.data)[0];
+                    this.getTypesConfig(response.data, defaultType);
+                } else {
+                    this.setState({
+                        config: response.data
+                    });
+                }
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
     }
 
     openTemplateVersion(version) {
