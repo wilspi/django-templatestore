@@ -59,6 +59,7 @@ class TemplateScreen extends Component {
         this.saveTemplate = this.saveTemplate.bind(this);
         this.setMandatoryAttributes = this.setMandatoryAttributes.bind(this);
         this.onVersionAliasChange = this.onVersionAliasChange.bind(this);
+        this.showAlerts = this.showAlerts.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -303,9 +304,7 @@ class TemplateScreen extends Component {
                 })
                 .catch(function(error) {
                     console.log(error);
-                    this.setState({
-                        alertMessage: error.response.data.message
-                    });
+                    this.showAlerts(error.response.data.message);
                 });
             if (renderMode === 'html') {
                 this.setState({
@@ -313,9 +312,7 @@ class TemplateScreen extends Component {
                 });
             }
         } catch (error) {
-            this.setState({
-                alertMessage: error.message
-            });
+            this.showAlerts(error.message);
         }
     }
 
@@ -402,10 +399,7 @@ class TemplateScreen extends Component {
                 );
             })
             .catch(error => {
-                this.setState({
-                    alertMessage: error.response.data.message
-                });
-                console.log(error);
+                this.showAlerts(error.response.data.message);
             });
     }
 
@@ -455,9 +449,7 @@ class TemplateScreen extends Component {
                             '/versions'
                     )
                     .then(response => {
-                        this.setState({
-                            alertMessage: "Template with this name already exists"
-                        });
+                        this.showAlerts("Template with this name already exists");
                     })
                     .catch(error => {
                         this.saveTemplate(data);
@@ -466,10 +458,14 @@ class TemplateScreen extends Component {
                 this.saveTemplate(data);
             }
         } catch (error) {
-            this.setState({
-                alertMessage: error.message
-            });
+            this.showAlerts(error.message);
         }
+    }
+
+    showAlerts(errorMessage = '') {
+        this.setState({
+            alertMessage: errorMessage
+        });
     }
 
     render() {
@@ -935,9 +931,7 @@ class TemplateScreen extends Component {
                 <AlertModal
                     errorMessage={this.state.alertMessage}
                     onClose={(e) =>
-                        this.setState({
-                            alertMessage: ''
-                        })
+                        this.showAlerts()
                     }
                 />
             </div>
