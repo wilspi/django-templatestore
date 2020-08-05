@@ -38,7 +38,6 @@ class TemplateScreen extends Component {
             contextData: '',
             attributes: '',
             editable: this.props.editable,
-            showAlert: false,
             alertMessage: '',
             version_alias: ''
         };
@@ -305,7 +304,6 @@ class TemplateScreen extends Component {
                 .catch(function(error) {
                     console.log(error);
                     this.setState({
-                        showAlert: true,
                         alertMessage: error.response.data.message
                     });
                 });
@@ -316,7 +314,6 @@ class TemplateScreen extends Component {
             }
         } catch (error) {
             this.setState({
-                showAlert: true,
                 alertMessage: error.message
             });
         }
@@ -406,7 +403,6 @@ class TemplateScreen extends Component {
             })
             .catch(error => {
                 this.setState({
-                    showAlert: true,
                     alertMessage: error.response.data.message
                 });
                 console.log(error);
@@ -460,7 +456,6 @@ class TemplateScreen extends Component {
                     )
                     .then(response => {
                         this.setState({
-                            showAlert: true,
                             alertMessage: "Template with this name already exists"
                         });
                     })
@@ -472,7 +467,6 @@ class TemplateScreen extends Component {
             }
         } catch (error) {
             this.setState({
-                showAlert: true,
                 alertMessage: error.message
             });
         }
@@ -939,11 +933,10 @@ class TemplateScreen extends Component {
                     </div>
                 </div>
                 <AlertModal
-                    isOpen={this.state.showAlert}
                     errorMessage={this.state.alertMessage}
                     onClose={(e) =>
                         this.setState({
-                            showAlert: false
+                            alertMessage: ''
                         })
                     }
                 />

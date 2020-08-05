@@ -12,7 +12,7 @@ class AlertModal extends Component {
         return (
             <div>
                 <Modal
-                    isOpen={this.props.isOpen}
+                    isOpen={this.props.errorMessage}
                     className={styles.modal}
                     onRequestClose={this.props.onClose}
                 >
