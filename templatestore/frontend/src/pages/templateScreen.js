@@ -278,7 +278,7 @@ class TemplateScreen extends Component {
             try {
                 contextData = JSON.parse(contextData);
             } catch (error) {
-                throw new Error("Sample_Context_Data must be a valid JSON");
+                throw new Error("sample_context_data must be a valid JSON");
             }
             let data = {
                 template: encode(templateData),
@@ -422,7 +422,7 @@ class TemplateScreen extends Component {
             try {
                 contextData = JSON.parse(contextData);
             } catch (error) {
-                throw new Error("Sample_Context_Data must be a valid JSON");
+                throw new Error("sample_context_data must be a valid JSON");
             }
 
             try {
