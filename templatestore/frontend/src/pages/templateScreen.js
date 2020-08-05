@@ -350,27 +350,34 @@ class TemplateScreen extends Component {
     }
 
     onAttributesChange(attributeKey, newValue, keyChange = false) {
-        let currentAttributes = JSON.parse(this.state.attributes);
-        let newAttributes = {};
-        if (keyChange) {
-            newAttributes = Object.keys(currentAttributes).reduce(
-                (result, attribute) => {
-                    if (attribute === attributeKey) {
-                        result[newValue] = currentAttributes[attributeKey];
-                    } else {
-                        result[attribute] = currentAttributes[attribute];
-                    }
-                    return result;
-                },
-                {}
-            );
-        } else {
-            newAttributes = currentAttributes;
-            newAttributes[attributeKey] = newValue;
+        try {
+            let currentAttributes = JSON.parse(this.state.attributes);
+            let newAttributes = {};
+            if (keyChange) {
+                newAttributes = Object.keys(currentAttributes).reduce(
+                    (result, attribute) => {
+                        if (attribute === attributeKey) {
+                            result[newValue] = currentAttributes[attributeKey];
+                        } else {
+                            result[attribute] = currentAttributes[attribute];
+                        }
+                        return result;
+                    },
+                    {}
+                );
+            } else {
+                newAttributes = currentAttributes;
+                newAttributes[attributeKey] = newValue;
+            }
+            this.setState({
+                attributes: JSON.stringify(newAttributes)
+            });
+        } catch (error) {
+            this.setState({
+                showAlert: true,
+                alertMessage: error.message
+            });
         }
-        this.setState({
-            attributes: JSON.stringify(newAttributes)
-        });
     }
 
     onVersionAliasChange(newValue, event) {
@@ -380,20 +387,27 @@ class TemplateScreen extends Component {
     }
 
     setMandatoryAttributes(type) {
-        let mandatoryAttributes = {
-            ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
-            ...this.state.config[type]["attributes"]
-        };
-        let newAttributes = Object.keys(mandatoryAttributes).reduce(
-            (result, attribute) => {
-                result[attribute] = '';
-                return result;
-            },
-            {}
-        );
-        this.setState({
-            attributes: JSON.stringify(newAttributes)
-        });
+        try {
+            let mandatoryAttributes = {
+                ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
+                ...this.state.config[type]["attributes"]
+            };
+            let newAttributes = Object.keys(mandatoryAttributes).reduce(
+                (result, attribute) => {
+                    result[attribute] = '';
+                    return result;
+                },
+                {}
+            );
+            this.setState({
+                attributes: JSON.stringify(newAttributes)
+            });
+        } catch (error) {
+            this.setState({
+                showAlert: true,
+                alertMessage: error.message
+            });
+        }
     }
 
     getTypesConfig(config, type) {
@@ -517,94 +531,108 @@ class TemplateScreen extends Component {
     }
 
     getAttributes() {
-        let attributes = [];
-        let mandatoryAttributes = {};
+        try {
+            let attributes = [];
+            let mandatoryAttributes = {};
 
-        if (this.state.type && Object.keys(this.state.config).length) {
-            mandatoryAttributes = {
-                ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
-                ...this.state.config[this.state.type]["attributes"]
-            };
+            if (this.state.type && Object.keys(this.state.config).length) {
+                mandatoryAttributes = {
+                    ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
+                    ...this.state.config[this.state.type]["attributes"]
+                };
+            }
+
+            let allAttributes = JSON.parse(JSON.stringify(mandatoryAttributes));
+
+            Object.keys(JSON.parse(this.state.attributes)).map(t => {
+                allAttributes[t] = allAttributes[t] || JSON.parse(this.state.attributes)[t];
+            });
+
+            Object.keys(allAttributes).map((t, index) => {
+                attributes.push(
+                    <div className={styles.teAttributesRow}>
+                        <div className={styles.teAttributesCell}>
+                            {
+                                mandatoryAttributes.hasOwnProperty(t) ? (
+                                    <div className={styles.teLabel}>
+                                        {t}
+                                    </div>
+                                ) : (
+                                    <input
+                                        value={t}
+                                        onChange={e =>
+                                            this.onAttributesChange(t, e.target.value, true)
+                                        }
+                                    />
+                                )
+                            }
+                        </div>
+                        <div className={styles.teAttributesCell}>
+                            {
+                                allAttributes[t].hasOwnProperty("allowed_values") ? (
+                                    <select
+                                        value={
+                                            JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
+                                        }
+                                        onChange={e =>
+                                            this.onAttributesChange(t, e.target.value)
+                                        }
+                                    >
+                                        {
+                                            this.buildOptions(allAttributes[t]["allowed_values"])
+                                        }
+                                    </select>
+                                ) : (
+                                    <input
+                                        value={
+                                            JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
+                                        }
+                                        onChange={
+                                            e => this.onAttributesChange(t, e.target.value)
+                                        }
+                                    />
+                                )
+                            }
+                        </div>
+                    </div>
+                );
+            });
+            return attributes;
+        } catch (error) {
+            this.setState({
+                showAlert: true,
+                alertMessage: error.message
+            });
         }
-
-        let allAttributes = JSON.parse(JSON.stringify(mandatoryAttributes));
-
-        Object.keys(JSON.parse(this.state.attributes)).map(t => {
-            allAttributes[t] = allAttributes[t] || JSON.parse(this.state.attributes)[t];
-        });
-
-        Object.keys(allAttributes).map((t, index) => {
-            attributes.push(
-                <div className={styles.teAttributesRow}>
-                    <div className={styles.teAttributesCell}>
-                        {
-                            mandatoryAttributes.hasOwnProperty(t) ? (
-                                <div className={styles.teLabel}>
-                                    {t}
-                                </div>
-                            ) : (
-                                <input
-                                    value={t}
-                                    onChange={e =>
-                                        this.onAttributesChange(t, e.target.value, true)
-                                    }
-                                />
-                            )
-                        }
-                    </div>
-                    <div className={styles.teAttributesCell}>
-                        {
-                            allAttributes[t].hasOwnProperty("allowed_values") ? (
-                                <select
-                                    value={
-                                        JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
-                                    }
-                                    onChange={e =>
-                                        this.onAttributesChange(t, e.target.value)
-                                    }
-                                >
-                                    {
-                                        this.buildOptions(allAttributes[t]["allowed_values"])
-                                    }
-                                </select>
-                            ) : (
-                                <input
-                                    value={
-                                        JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
-                                    }
-                                    onChange={
-                                        e => this.onAttributesChange(t, e.target.value)
-                                    }
-                                />
-                            )
-                        }
-                    </div>
-                </div>
-            );
-        });
-        return attributes;
     }
 
     addNewAttribute() {
-        let key = document.getElementById("newAttributeKey").value;
-        let value = document.getElementById("newAttributeValue").value;
+        try {
+            let key = document.getElementById("newAttributeKey").value;
+            let value = document.getElementById("newAttributeValue").value;
 
-        let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
+            let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
 
-        if (this.state.type && Object.keys(this.state.config).length) {
-            mandatoryAttributes = {
-                ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
-                ...this.state.config[this.state.type]["attributes"]
-            };
-        }
+            if (this.state.type && Object.keys(this.state.config).length) {
+                mandatoryAttributes = {
+                    ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
+                    ...this.state.config[this.state.type]["attributes"]
+                };
+            }
 
-        if (key && !mandatoryAttributes.hasOwnProperty(key)) {
-            let newAttributes = JSON.parse(this.state.attributes);
-            newAttributes[key] = value;
-            document.getElementById("newAttributeKey").value = "";
-            document.getElementById("newAttributeValue").value = "";
+            if (key && !mandatoryAttributes.hasOwnProperty(key)) {
+                let newAttributes = JSON.parse(this.state.attributes);
+                newAttributes[key] = value;
+                document.getElementById("newAttributeKey").value = "";
+                document.getElementById("newAttributeValue").value = "";
+                this.setState({
+                    attributes: JSON.stringify(newAttributes)
+                });
+            }
+        } catch (error) {
             this.setState({
-                attributes: JSON.stringify(newAttributes)
+                showAlert: true,
+                alertMessage: error.message
             });
         }
     }
@@ -619,11 +647,16 @@ class TemplateScreen extends Component {
                 data
             )
             .then(response => {
-                // Todo : Add Success Alert box
-                console.log(response.data);
+                this.setState({
+                    showAlert: true,
+                    alertMessage: "Attributes Updated !"
+                });
             })
             .catch(error => {
-                console.log(error);
+                this.setState({
+                    showAlert: true,
+                    alertMessage: error.response.data.message
+                });
             });
     }
 
