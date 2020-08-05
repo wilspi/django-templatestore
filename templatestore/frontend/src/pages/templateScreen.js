@@ -36,11 +36,11 @@ class TemplateScreen extends Component {
             subTemplatesData: {},
             config: {},
             contextData: '',
-            attributes: '',
             editable: this.props.editable,
             showAlert: false,
             alertMessage: '',
-            version_alias: ''
+            attributes: '{}',
+            version_alias: '',
         };
         this.aceconfig = {
             theme: 'monokai',
@@ -60,6 +60,10 @@ class TemplateScreen extends Component {
         this.saveTemplate = this.saveTemplate.bind(this);
         this.setMandatoryAttributes = this.setMandatoryAttributes.bind(this);
         this.onVersionAliasChange = this.onVersionAliasChange.bind(this);
+        this.getAttributes = this.getAttributes.bind(this);
+        this.buildOptions = this.buildOptions.bind(this);
+        this.addNewAttribute = this.addNewAttribute.bind(this);
+        this.updateAttributes = this.updateAttributes.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -96,9 +100,7 @@ class TemplateScreen extends Component {
                             2
                         ),
                         attributes: JSON.stringify(
-                            response.data.attributes,
-                            null,
-                            2
+                            response.data.attributes
                         ),
                         type: response.data.type,
                         version_alias: response.data.version_alias
@@ -133,24 +135,27 @@ class TemplateScreen extends Component {
                 .catch(error => {
                     console.log(error);
                 });
-        } else {
-            axios
-                .get(backendSettings.TE_BASEPATH + '/api/v1/config')
-                .then(response => {
+        }
+
+        axios
+            .get(backendSettings.TE_BASEPATH + '/api/v1/config')
+            .then(response => {
+                if (this.state.editable) {
+                    this.setState({
+                        contextData: JSON.stringify({ name: 'abc' }, null, 2),
+                        config: response.data
+                    });
                     let defaultType = Object.keys(response.data)[0];
+                    this.getTypesConfig(response.data, defaultType);
+                } else {
                     this.setState({
                         config: response.data
                     });
-                    this.getTypesConfig(response.data, defaultType);
-                })
-                .catch(function(error) {
-                    console.log(error);
-                });
-
-            this.setState({
-                contextData: JSON.stringify({ name: 'abc' }, null, 2)
+                }
+            })
+            .catch(function(error) {
+                console.log(error);
             });
-        }
     }
 
     openTemplateVersion(version) {
@@ -344,9 +349,27 @@ class TemplateScreen extends Component {
         });
     }
 
-    onAttributesChange(newValue, event) {
+    onAttributesChange(attributeKey, newValue, keyChange = false) {
+        let currentAttributes = JSON.parse(this.state.attributes);
+        let newAttributes = {};
+        if (keyChange) {
+            newAttributes = Object.keys(currentAttributes).reduce(
+                (result, attribute) => {
+                    if (attribute === attributeKey) {
+                        result[newValue] = currentAttributes[attributeKey];
+                    } else {
+                        result[attribute] = currentAttributes[attribute];
+                    }
+                    return result;
+                },
+                {}
+            );
+        } else {
+            newAttributes = currentAttributes;
+            newAttributes[attributeKey] = newValue;
+        }
         this.setState({
-            attributes: newValue
+            attributes: JSON.stringify(newAttributes)
         });
     }
 
@@ -357,16 +380,19 @@ class TemplateScreen extends Component {
     }
 
     setMandatoryAttributes(type) {
-        let generalAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS.reduce(
+        let mandatoryAttributes = {
+            ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
+            ...this.state.config[type]["attributes"]
+        };
+        let newAttributes = Object.keys(mandatoryAttributes).reduce(
             (result, attribute) => {
                 result[attribute] = '';
                 return result;
             },
             {}
         );
-        let mandatoryAttributes = this.state.config[type]["attributes"];
         this.setState({
-            attributes: JSON.stringify(Object.assign(generalAttributes, mandatoryAttributes), null, 2)
+            attributes: JSON.stringify(newAttributes)
         });
     }
 
@@ -476,6 +502,129 @@ class TemplateScreen extends Component {
                 alertMessage: error.message
             });
         }
+    }
+
+    buildOptions(allowedValues) {
+        var options = [];
+        options.push(<option value="" disabled selected> Choose Here </option>);
+
+        options.push(
+            allowedValues.map(t => {
+                return (<option value={t}>{t}</option>);
+            })
+        );
+        return options;
+    }
+
+    getAttributes() {
+        let attributes = [];
+        let mandatoryAttributes = {};
+
+        if (this.state.type && Object.keys(this.state.config).length) {
+            mandatoryAttributes = {
+                ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
+                ...this.state.config[this.state.type]["attributes"]
+            };
+        }
+
+        let allAttributes = JSON.parse(JSON.stringify(mandatoryAttributes));
+
+        Object.keys(JSON.parse(this.state.attributes)).map(t => {
+            allAttributes[t] = allAttributes[t] || JSON.parse(this.state.attributes)[t];
+        });
+
+        Object.keys(allAttributes).map((t, index) => {
+            attributes.push(
+                <div className={styles.teAttributesRow}>
+                    <div className={styles.teAttributesCell}>
+                        {
+                            mandatoryAttributes.hasOwnProperty(t) ? (
+                                <div className={styles.teLabel}>
+                                    {t}
+                                </div>
+                            ) : (
+                                <input
+                                    value={t}
+                                    onChange={e =>
+                                        this.onAttributesChange(t, e.target.value, true)
+                                    }
+                                />
+                            )
+                        }
+                    </div>
+                    <div className={styles.teAttributesCell}>
+                        {
+                            allAttributes[t].hasOwnProperty("allowed_values") ? (
+                                <select
+                                    value={
+                                        JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
+                                    }
+                                    onChange={e =>
+                                        this.onAttributesChange(t, e.target.value)
+                                    }
+                                >
+                                    {
+                                        this.buildOptions(allAttributes[t]["allowed_values"])
+                                    }
+                                </select>
+                            ) : (
+                                <input
+                                    value={
+                                        JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
+                                    }
+                                    onChange={
+                                        e => this.onAttributesChange(t, e.target.value)
+                                    }
+                                />
+                            )
+                        }
+                    </div>
+                </div>
+            );
+        });
+        return attributes;
+    }
+
+    addNewAttribute() {
+        let key = document.getElementById("newAttributeKey").value;
+        let value = document.getElementById("newAttributeValue").value;
+
+        let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
+
+        if (this.state.type && Object.keys(this.state.config).length) {
+            mandatoryAttributes = {
+                ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
+                ...this.state.config[this.state.type]["attributes"]
+            };
+        }
+
+        if (key && !mandatoryAttributes.hasOwnProperty(key)) {
+            let newAttributes = JSON.parse(this.state.attributes);
+            newAttributes[key] = value;
+            document.getElementById("newAttributeKey").value = "";
+            document.getElementById("newAttributeValue").value = "";
+            this.setState({
+                attributes: JSON.stringify(newAttributes)
+            });
+        }
+    }
+
+    updateAttributes() {
+        let data = {
+            attributes: JSON.parse(this.state.attributes)
+        };
+        axios
+            .patch(
+                backendSettings.TE_BASEPATH + '/api/v1/template/' + this.state.templateData.name + '/attributes',
+                data
+            )
+            .then(response => {
+                // Todo : Add Success Alert box
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     render() {
@@ -858,19 +1007,39 @@ class TemplateScreen extends Component {
                                     data-parent="#accordionEx"
                                 >
                                     <div className="card-body">
-                                        <AceEditor
-                                            name="template-editor"
-                                            placeholder="Write attributes here..."
-                                            theme={this.aceconfig.theme}
-                                            mode="json"
-                                            fontSize={this.aceconfig.fontSize}
-                                            height={this.aceconfig.height}
-                                            width={this.aceconfig.width}
-                                            value={this.state.attributes}
-                                            onChange={this.onAttributesChange}
-                                            readOnly={!this.state.editable}
-                                            setOptions={{ useWorker: false }}
-                                        />
+                                        <div className={styles.teAttributesWrapper}>
+                                            {this.getAttributes()}
+                                            <div className={styles.teAddNewAttributes}>
+                                                <button
+                                                    className={styles.teAddNewAttributeButton}
+                                                    onClick={this.addNewAttribute}
+                                                >
+                                                    +
+                                                </button>
+                                                <input
+                                                    id="newAttributeKey"
+                                                    placeholder="New Attribute Key"
+                                                />
+                                                <input
+                                                    id="newAttributeValue"
+                                                    placeholder="New Attribute Value"
+                                                />
+                                            </div>
+                                            <div>
+                                                {
+                                                    !this.state.editable ? (
+                                                        <button
+                                                            className={styles.teUpdateButton}
+                                                            onClick={this.updateAttributes}
+                                                        >
+                                                        Update
+                                                        </button>
+                                                    ) : (
+                                                        ''
+                                                    )
+                                                }
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
