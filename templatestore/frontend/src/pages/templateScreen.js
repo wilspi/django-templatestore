@@ -588,25 +588,29 @@ class TemplateScreen extends Component {
     }
 
     addNewAttribute() {
-        let key = document.getElementById("newAttributeKey").value;
-        let value = document.getElementById("newAttributeValue").value;
+        try {
+            let key = document.getElementById("newAttributeKey").value;
+            let value = document.getElementById("newAttributeValue").value;
 
-        document.getElementById("newAttributeKey").value = "";
-        document.getElementById("newAttributeValue").value = "";
+            document.getElementById("newAttributeKey").value = "";
+            document.getElementById("newAttributeValue").value = "";
 
-        if (!key) {
-            // TODO: Throw error that key can not be empty.
+            if (!key) {
+                throw new Error("Please enter a non empty attribute key");
+            }
+
+            if (JSON.parse(this.state.attributes).hasOwnProperty(key)) {
+                throw new Error("Attribute `" + key + "` already exists");
+            }
+
+            let newAttributes = { ...JSON.parse(this.state.attributes), [key]: value };
+
+            this.setState({
+                attributes: JSON.stringify(newAttributes)
+            });
+        } catch (error) {
+            this.showAlerts(error.message);
         }
-
-        if (JSON.parse(this.state.attributes).hasOwnProperty(key)) {
-            // TODO: Throw error that key already exists.
-        }
-
-        let newAttributes = { ...JSON.parse(this.state.attributes), [key]: value };
-
-        this.setState({
-            attributes: JSON.stringify(newAttributes)
-        });
     }
 
     updateAttributes() {
@@ -627,11 +631,10 @@ class TemplateScreen extends Component {
                 data
             )
             .then(response => {
-                // Todo : Add Success Alert box
-                console.log(response.data);
+                this.showAlerts("Attributes updated successfully !");
             })
             .catch(error => {
-                console.log(error);
+                this.showAlerts(error.response.data.message);
             });
     }
 
