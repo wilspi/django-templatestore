@@ -570,9 +570,17 @@ class TemplateScreen extends Component {
     }
 
     updateAttributes() {
+        let newAttributes = Object.keys(JSON.parse(this.state.attributes)).reduce((object, key) => {
+            if (key) {
+                object[key] = JSON.parse(this.state.attributes)[key];
+            }
+            return object;
+        }, {});
+
         let data = {
-            attributes: JSON.parse(this.state.attributes)
+            attributes: newAttributes
         };
+
         axios
             .patch(
                 backendSettings.TE_BASEPATH + '/api/v1/template/' + this.state.templateData.name + '/attributes',
