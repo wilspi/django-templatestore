@@ -614,15 +614,12 @@ class TemplateScreen extends Component {
     }
 
     updateAttributes() {
-        let newAttributes = Object.keys(JSON.parse(this.state.attributes)).reduce((object, key) => {
-            if (key) {
-                object[key] = JSON.parse(this.state.attributes)[key];
-            }
-            return object;
-        }, {});
+        if (JSON.parse(this.state.attributes).hasOwnProperty("")) {
+            // TODO : throw error that key cannot be empty
+        }
 
         let data = {
-            attributes: newAttributes
+            attributes: JSON.parse(this.state.attributes)
         };
 
         axios
