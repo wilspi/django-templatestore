@@ -549,9 +549,6 @@ class TemplateScreen extends Component {
         let key = document.getElementById("newAttributeKey").value;
         let value = document.getElementById("newAttributeValue").value;
 
-        document.getElementById("newAttributeKey").value = "";
-        document.getElementById("newAttributeValue").value = "";
-
         if (!key) {
             // TODO: Throw error that key can not be empty.
         }
@@ -559,6 +556,9 @@ class TemplateScreen extends Component {
         if (JSON.parse(this.state.attributes).hasOwnProperty(key)) {
             // TODO: Throw error that key already exists.
         }
+
+        document.getElementById("newAttributeKey").value = "";
+        document.getElementById("newAttributeValue").value = "";
 
         let newAttributes = { ...JSON.parse(this.state.attributes), [key]: value };
 
