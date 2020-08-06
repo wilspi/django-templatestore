@@ -550,24 +550,23 @@ class TemplateScreen extends Component {
         let key = document.getElementById("newAttributeKey").value;
         let value = document.getElementById("newAttributeValue").value;
 
-        let mandatoryAttributes = backendSettings.TE_TEMPLATE_ATTRIBUTES;
+        document.getElementById("newAttributeKey").value = "";
+        document.getElementById("newAttributeValue").value = "";
 
-        if (this.state.type && Object.keys(this.state.config).length) {
-            mandatoryAttributes = {
-                ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
-                ...this.state.config[this.state.type]["attributes"]
-            };
+        if (!key) {
+            // TODO: Throw error that key can not be empty.
         }
 
-        if (key && !mandatoryAttributes.hasOwnProperty(key)) {
-            let newAttributes = JSON.parse(this.state.attributes);
-            newAttributes[key] = value;
-            document.getElementById("newAttributeKey").value = "";
-            document.getElementById("newAttributeValue").value = "";
-            this.setState({
-                attributes: JSON.stringify(newAttributes)
-            });
+        if (JSON.parse(this.state.attributes).hasOwnProperty(key)) {
+            // TODO: Throw error that key already exists.
         }
+
+        let newAttributes = JSON.parse(this.state.attributes);
+        newAttributes[key] = value;
+
+        this.setState({
+            attributes: JSON.stringify(newAttributes)
+        });
     }
 
     updateAttributes() {
