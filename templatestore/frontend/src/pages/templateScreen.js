@@ -614,25 +614,29 @@ class TemplateScreen extends Component {
     }
 
     updateAttributes() {
-        if (JSON.parse(this.state.attributes).hasOwnProperty("")) {
-            // TODO : throw error that key cannot be empty
+        try {
+            if (JSON.parse(this.state.attributes).hasOwnProperty("")) {
+                throw new Error("Attributes can not have empty key");
+            }
+
+            let data = {
+                attributes: JSON.parse(this.state.attributes)
+            };
+
+            axios
+                .patch(
+                    backendSettings.TE_BASEPATH + '/api/v1/template/' + this.state.templateData.name + '/attributes',
+                    data
+                )
+                .then(response => {
+                    this.showAlerts("Attributes updated successfully !");
+                })
+                .catch(error => {
+                    this.showAlerts(error.response.data.message);
+                });
+        } catch (error) {
+            this.showAlerts(error.message);
         }
-
-        let data = {
-            attributes: JSON.parse(this.state.attributes)
-        };
-
-        axios
-            .patch(
-                backendSettings.TE_BASEPATH + '/api/v1/template/' + this.state.templateData.name + '/attributes',
-                data
-            )
-            .then(response => {
-                this.showAlerts("Attributes updated successfully !");
-            })
-            .catch(error => {
-                this.showAlerts(error.response.data.message);
-            });
     }
 
     deleteAttribute(attributeKey) {
