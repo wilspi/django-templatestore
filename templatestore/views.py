@@ -251,8 +251,6 @@ def post_template_view(request):
                         Exception(
                             "Validation: missing mandatory attributes `"
                             + str(missing_mandatory_attributes)
-                            + "` for type `"
-                            + data["type"]
                             + "`"
                         )
                     )
@@ -661,8 +659,6 @@ def patch_attributes_view(request, name):
                     Exception(
                         "Validation: missing mandatory attributes `"
                         + str(missing_mandatory_attributes)
-                        + "` for type `"
-                        + data["type"]
                         + "`"
                     )
                 )
