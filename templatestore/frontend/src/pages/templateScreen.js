@@ -560,8 +560,7 @@ class TemplateScreen extends Component {
             // TODO: Throw error that key already exists.
         }
 
-        let newAttributes = JSON.parse(this.state.attributes);
-        newAttributes[key] = value;
+        let newAttributes = { ...JSON.parse(this.state.attributes), [key]: value };
 
         this.setState({
             attributes: JSON.stringify(newAttributes)
