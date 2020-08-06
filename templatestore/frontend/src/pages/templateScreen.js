@@ -347,8 +347,7 @@ class TemplateScreen extends Component {
                 {}
             );
         } else {
-            newAttributes = currentAttributes;
-            newAttributes[attributeKey] = newValue;
+            newAttributes = { ...currentAttributes, [attributeKey]: newValue };
         }
         this.setState({
             attributes: JSON.stringify(newAttributes)
