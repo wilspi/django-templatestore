@@ -61,6 +61,7 @@ class TemplateScreen extends Component {
         this.buildOptions = this.buildOptions.bind(this);
         this.addNewAttribute = this.addNewAttribute.bind(this);
         this.updateAttributes = this.updateAttributes.bind(this);
+        this.deleteAttribute = this.deleteAttribute.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -526,6 +527,18 @@ class TemplateScreen extends Component {
                                 />
                             )
                         }
+                        {
+                            mandatoryAttributes.hasOwnProperty(t) ? (
+                                ''
+                            ) : (
+                                <span
+                                    className={styles.teDeleteAttribute}
+                                    onClick={() => this.deleteAttribute(t)}
+                                >
+                                    &times;
+                                </span>
+                            )
+                        }
                     </div>
                 </div>
             );
@@ -573,6 +586,10 @@ class TemplateScreen extends Component {
             .catch(error => {
                 console.log(error);
             });
+    }
+
+    deleteAttribute(attributeKey) {
+        console.log("delete", attributeKey);
     }
 
     render() {
