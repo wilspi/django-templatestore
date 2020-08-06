@@ -589,7 +589,15 @@ class TemplateScreen extends Component {
     }
 
     deleteAttribute(attributeKey) {
-        console.log("delete", attributeKey);
+        let newAttributes = Object.keys(JSON.parse(this.state.attributes)).reduce((object, key) => {
+            if (key !== attributeKey) {
+                object[key] = JSON.parse(this.state.attributes)[key];
+            }
+            return object;
+        }, {});
+        this.setState({
+            attributes: JSON.stringify(newAttributes)
+        });
     }
 
     render() {
