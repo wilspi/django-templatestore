@@ -238,10 +238,14 @@ def post_template_view(request):
                 if not len(data["attributes"]):
                     raise (Exception("Validation: attributes field can not be empty"))
 
+                mandatory_attributes = dict()
+                mandatory_attributes.update(cfgs[0].attributes)
+                mandatory_attributes.update(ts_settings.TE_TEMPLATE_ATTRIBUTES)
+
                 missing_mandatory_attributes = set(
-                    cfgs[0].attributes.keys()
-                    | ts_settings.TE_TEMPLATE_ATTRIBUTES.keys()
+                    mandatory_attributes.keys()
                 ).difference(set(data["attributes"].keys()))
+
                 if len(missing_mandatory_attributes):
                     raise (
                         Exception(
@@ -255,19 +259,10 @@ def post_template_view(request):
 
                 invalid_valued_attributes = set(
                     key
-                    for key in cfgs[0].attributes.keys()
-                    if "allowed_values" in cfgs[0].attributes[key]
+                    for key in mandatory_attributes.keys()
+                    if "allowed_values" in mandatory_attributes[key]
                     and data["attributes"][key]
-                    not in cfgs[0].attributes[key]["allowed_values"]
-                )
-
-                invalid_valued_attributes = invalid_valued_attributes | set(
-                    key
-                    for key in ts_settings.TE_TEMPLATE_ATTRIBUTES.keys()
-                    if key in data["attributes"]
-                    and "allowed_values" in ts_settings.TE_TEMPLATE_ATTRIBUTES[key]
-                    and data["attributes"][key]
-                    not in ts_settings.TE_TEMPLATE_ATTRIBUTES[key]["allowed_values"]
+                    not in mandatory_attributes[key]["allowed_values"]
                 )
 
                 if len(invalid_valued_attributes):
@@ -644,7 +639,7 @@ def patch_attributes_view(request, name):
             data = json.loads(request.body)
 
             if "attributes" not in data:
-                raise (Exception("Validation: Attributes are not provided"))
+                raise (Exception("Validation: attributes are not provided"))
 
             try:
                 template = Template.objects.get(name=name)
@@ -653,46 +648,31 @@ def patch_attributes_view(request, name):
 
             cfgs = TemplateConfig.objects.filter(type=template.type)
 
-            missing_attributes = set(
-                ts_settings.TE_TEMPLATE_ATTRIBUTES.keys()
-            ).difference(set(data["attributes"].keys()))
+            mandatory_attributes = dict()
+            mandatory_attributes.update(cfgs[0].attributes)
+            mandatory_attributes.update(ts_settings.TE_TEMPLATE_ATTRIBUTES)
 
-            missing_attributes = missing_attributes | set(
-                cfgs[0].attributes.keys()
-            ).difference(set(data["attributes"].keys()))
+            missing_mandatory_attributes = set(mandatory_attributes.keys()).difference(
+                set(data["attributes"].keys())
+            )
 
-            if len(missing_attributes):
+            if len(missing_mandatory_attributes):
                 raise (
                     Exception(
                         "Validation: missing mandatory attributes `"
-                        + str(missing_attributes)
+                        + str(missing_mandatory_attributes)
+                        + "` for type `"
+                        + data["type"]
                         + "`"
                     )
                 )
 
-            for key in data["attributes"]:
-                if not isinstance(data["attributes"][key], str):
-                    raise (
-                        Exception(
-                            "Validation: Attributes must be a key value pair and value must be a string"
-                        )
-                    )
-
             invalid_valued_attributes = set(
                 key
-                for key in cfgs[0].attributes.keys()
-                if "allowed_values" in cfgs[0].attributes[key]
+                for key in mandatory_attributes.keys()
+                if "allowed_values" in mandatory_attributes[key]
                 and data["attributes"][key]
-                not in cfgs[0].attributes[key]["allowed_values"]
-            )
-
-            invalid_valued_attributes = invalid_valued_attributes | set(
-                key
-                for key in ts_settings.TE_TEMPLATE_ATTRIBUTES.keys()
-                if key in data["attributes"]
-                and "allowed_values" in ts_settings.TE_TEMPLATE_ATTRIBUTES[key]
-                and data["attributes"][key]
-                not in ts_settings.TE_TEMPLATE_ATTRIBUTES[key]["allowed_values"]
+                not in mandatory_attributes[key]["allowed_values"]
             )
 
             if len(invalid_valued_attributes):
@@ -703,6 +683,14 @@ def patch_attributes_view(request, name):
                         + "`"
                     )
                 )
+
+            for key in data["attributes"]:
+                if not isinstance(data["attributes"][key], str):
+                    raise (
+                        Exception(
+                            "Validation: attributes must be a key value pair and value must be a string"
+                        )
+                    )
 
             template.attributes = data["attributes"]
             template.save(update_fields=["attributes", "modified_on"])
