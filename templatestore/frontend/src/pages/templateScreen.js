@@ -431,10 +431,10 @@ class TemplateScreen extends Component {
             type: type,
             sub_templates: subTemplates,
             sample_context_data: JSON.parse(contextData),
-            attributes: JSON.parse(attributes),
             version_alias: this.state.version_alias
         };
         if (this.state.editable) {
+            data["attributes"] = JSON.parse(attributes);
             axios
                 .get(
                     backendSettings.TE_BASEPATH +
