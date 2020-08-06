@@ -238,9 +238,7 @@ def post_template_view(request):
                 if not len(data["attributes"]):
                     raise (Exception("Validation: attributes field can not be empty"))
 
-                mandatory_attributes = dict()
-                mandatory_attributes.update(cfgs[0].attributes)
-                mandatory_attributes.update(ts_settings.TE_TEMPLATE_ATTRIBUTES)
+                mandatory_attributes = {**cfgs[0].attributes, **ts_settings.TE_TEMPLATE_ATTRIBUTES}
 
                 missing_mandatory_attributes = set(
                     mandatory_attributes.keys()
@@ -646,9 +644,7 @@ def patch_attributes_view(request, name):
 
             cfgs = TemplateConfig.objects.filter(type=template.type)
 
-            mandatory_attributes = dict()
-            mandatory_attributes.update(cfgs[0].attributes)
-            mandatory_attributes.update(ts_settings.TE_TEMPLATE_ATTRIBUTES)
+            mandatory_attributes = {**cfgs[0].attributes, **ts_settings.TE_TEMPLATE_ATTRIBUTES}
 
             missing_mandatory_attributes = set(mandatory_attributes.keys()).difference(
                 set(data["attributes"].keys())
