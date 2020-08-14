@@ -1041,10 +1041,12 @@ class TemplateScreen extends Component {
                                                     +
                                                 </button>
                                                 <input
+                                                    className={styles.teNewAttributeInput}
                                                     id="newAttributeKey"
                                                     placeholder="New Attribute Key"
                                                 />
                                                 <input
+                                                    className={styles.teNewAttributeInput}
                                                     id="newAttributeValue"
                                                     placeholder="New Attribute Value"
                                                 />
