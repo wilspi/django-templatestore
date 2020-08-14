@@ -985,12 +985,6 @@ class TemplateScreen extends Component {
                                         <div className={styles.teAttributesWrapper}>
                                             {this.getAttributes()}
                                             <div className={styles.teAddNewAttributes}>
-                                                <button
-                                                    className={styles.teAddNewAttributeButton}
-                                                    onClick={this.addNewAttribute}
-                                                >
-                                                    +
-                                                </button>
                                                 <input
                                                     className={styles.teNewAttributeInput}
                                                     id="newAttributeKey"
@@ -1003,6 +997,12 @@ class TemplateScreen extends Component {
                                                 />
                                             </div>
                                             <div>
+                                                <button
+                                                    className={styles.teAddNewAttributeButton}
+                                                    onClick={this.addNewAttribute}
+                                                >
+                                                    +
+                                                </button>
                                                 {
                                                     !this.state.editable ? (
                                                         <button
