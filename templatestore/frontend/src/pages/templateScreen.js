@@ -985,22 +985,24 @@ class TemplateScreen extends Component {
                                         <div className={styles.teAttributesWrapper}>
                                             {this.getAttributes()}
                                             <div className={styles.teAddNewAttributes}>
+                                                <input
+                                                    className={styles.teNewAttributeInput}
+                                                    id="newAttributeKey"
+                                                    placeholder="New Attribute Key"
+                                                />
+                                                <input
+                                                    className={styles.teNewAttributeInput}
+                                                    id="newAttributeValue"
+                                                    placeholder="New Attribute Value"
+                                                />
+                                            </div>
+                                            <div>
                                                 <button
                                                     className={styles.teAddNewAttributeButton}
                                                     onClick={this.addNewAttribute}
                                                 >
                                                     +
                                                 </button>
-                                                <input
-                                                    id="newAttributeKey"
-                                                    placeholder="New Attribute Key"
-                                                />
-                                                <input
-                                                    id="newAttributeValue"
-                                                    placeholder="New Attribute Value"
-                                                />
-                                            </div>
-                                            <div>
                                                 {
                                                     !this.state.editable ? (
                                                         <button
