@@ -58,7 +58,7 @@ class TemplateScreen extends Component {
         this.setMandatoryAttributes = this.setMandatoryAttributes.bind(this);
         this.onVersionAliasChange = this.onVersionAliasChange.bind(this);
         this.getAttributes = this.getAttributes.bind(this);
-        this.buildOptions = this.buildOptions.bind(this);
+        this.getAttributeOptions = this.getAttributeOptions.bind(this);
         this.addNewAttribute = this.addNewAttribute.bind(this);
         this.updateAttributes = this.updateAttributes.bind(this);
         this.deleteAttribute = this.deleteAttribute.bind(this);
@@ -452,7 +452,7 @@ class TemplateScreen extends Component {
         }
     }
 
-    buildOptions(allowedValues) {
+    getAttributeOptions(allowedValues) {
         var options = [];
         options.push(<option value="" disabled selected> Choose Here </option>);
 
@@ -512,7 +512,7 @@ class TemplateScreen extends Component {
                                     }
                                 >
                                     {
-                                        this.buildOptions(allAttributes[t]["allowed_values"])
+                                        this.getAttributeOptions(allAttributes[t]["allowed_values"])
                                     }
                                 </select>
                             ) : (
