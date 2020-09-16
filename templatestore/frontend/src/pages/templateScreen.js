@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
+import AlertModal from './../components/alertModal/alertModal';
 import 'ace-builds';
 import 'ace-builds/webpack-resolver';
 import AceEditor from 'react-ace';
@@ -35,6 +36,7 @@ class TemplateScreen extends Component {
             subTemplatesData: {},
             config: {},
             contextData: '',
+            alertMessage: '',
             attributes: '{}',
             version_alias: '',
             editable: this.props.editable
@@ -57,6 +59,7 @@ class TemplateScreen extends Component {
         this.saveTemplate = this.saveTemplate.bind(this);
         this.setMandatoryAttributes = this.setMandatoryAttributes.bind(this);
         this.onVersionAliasChange = this.onVersionAliasChange.bind(this);
+        this.showAlerts = this.showAlerts.bind(this);
         this.getAttributes = this.getAttributes.bind(this);
         this.getAttributeOptions = this.getAttributeOptions.bind(this);
         this.addNewAttribute = this.addNewAttribute.bind(this);
@@ -277,35 +280,45 @@ class TemplateScreen extends Component {
     }
 
     getRenderedTemplate(subType, templateData, contextData, renderMode) {
-        let data = {
-            template: encode(templateData),
-            context: JSON.parse(contextData),
-            handler: 'jinja2',
-            output: renderMode
-        };
-        axios
-            .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
-            .then(response => {
-                this.setState({
-                    subTemplatesData: Object.keys(
-                        this.state.subTemplatesData
-                    ).reduce((result, k) => {
-                        result[k] = this.state.subTemplatesData[k];
-                        result[k].output =
-                            k === subType ?
-                                decode(response.data.rendered_template) :
-                                this.state.subTemplatesData[k].output;
-                        return result;
-                    }, {})
+        try {
+            try {
+                contextData = JSON.parse(contextData);
+            } catch (error) {
+                throw new Error("sample_context_data must be a valid JSON");
+            }
+            let data = {
+                template: encode(templateData),
+                context: contextData,
+                handler: 'jinja2',
+                output: renderMode
+            };
+            axios
+                .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
+                .then(response => {
+                    this.setState({
+                        subTemplatesData: Object.keys(
+                            this.state.subTemplatesData
+                        ).reduce((result, k) => {
+                            result[k] = this.state.subTemplatesData[k];
+                            result[k].output =
+                                k === subType ?
+                                    decode(response.data.rendered_template) :
+                                    this.state.subTemplatesData[k].output;
+                            return result;
+                        }, {})
+                    });
+                })
+                .catch(function(error) {
+                    console.log(error);
+                    this.showAlerts(error.response.data.message);
                 });
-            })
-            .catch(function(error) {
-                console.log(error);
-            });
-        if (renderMode === 'html') {
-            this.setState({
-                previewSubType: subType
-            });
+            if (renderMode === 'html') {
+                this.setState({
+                    previewSubType: subType
+                });
+            }
+        } catch (error) {
+            this.showAlerts(error.message);
         }
     }
 
@@ -412,44 +425,73 @@ class TemplateScreen extends Component {
                 );
             })
             .catch(error => {
-                console.log(error);
+                this.showAlerts(error.response.data.message);
             });
     }
 
     postTemplate(name, type, contextData, attributes) {
-        let subTemplates = [];
-        Object.keys(this.state.subTemplatesData).map(t => {
-            let subTemplate = {
-                sub_type: this.state.subTemplatesData[t].subType,
-                data: encode(this.state.subTemplatesData[t].data)
+        try {
+            var re = new RegExp("^[a-zA-Z]+[a-zA-Z0-9_]*$");
+            if (!re.test(name)) {
+                throw new Error("Validation: `" + name + "` is not a valid template name");
+            }
+
+            let subTemplates = [];
+            Object.keys(this.state.subTemplatesData).map(t => {
+                let subTemplate = {
+                    sub_type: this.state.subTemplatesData[t].subType,
+                    data: encode(this.state.subTemplatesData[t].data)
+                };
+                subTemplates.push(subTemplate);
+            });
+
+            try {
+                contextData = JSON.parse(contextData);
+            } catch (error) {
+                throw new Error("sample_context_data must be a valid JSON");
+            }
+
+            try {
+                attributes = JSON.parse(attributes);
+            } catch (error) {
+                throw new Error("Attributes must be a valid JSON");
+            }
+
+            let data = {
+                name: name,
+                type: type,
+                sub_templates: subTemplates,
+                sample_context_data: contextData,
+                version_alias: this.state.version_alias
             };
-            subTemplates.push(subTemplate);
-        });
-        let data = {
-            name: name,
-            type: type,
-            sub_templates: subTemplates,
-            sample_context_data: JSON.parse(contextData),
-            version_alias: this.state.version_alias
-        };
-        if (this.state.editable) {
-            data["attributes"] = JSON.parse(attributes);
-            axios
-                .get(
-                    backendSettings.TE_BASEPATH +
-                        '/api/v1/template/' +
-                        name +
-                        '/versions'
-                )
-                .then(response => {
-                    console.log('Template with this name already exists'); //Add Alert here
-                })
-                .catch(error => {
-                    this.saveTemplate(data);
-                });
-        } else {
-            this.saveTemplate(data);
+
+            if (this.state.editable) {
+                data["attributes"] = attributes;
+                axios
+                    .get(
+                        backendSettings.TE_BASEPATH +
+                            '/api/v1/template/' +
+                            name +
+                            '/versions'
+                    )
+                    .then(response => {
+                        this.showAlerts("Template with this name already exists");
+                    })
+                    .catch(error => {
+                        this.saveTemplate(data);
+                    });
+            } else {
+                this.saveTemplate(data);
+            }
+        } catch (error) {
+            this.showAlerts(error.message);
         }
+    }
+
+    showAlerts(errorMessage = '') {
+        this.setState({
+            alertMessage: errorMessage
+        });
     }
 
     getAttributeOptions(allowedValues) {
@@ -546,48 +588,55 @@ class TemplateScreen extends Component {
     }
 
     addNewAttribute() {
-        let key = document.getElementById("newAttributeKey").value;
-        let value = document.getElementById("newAttributeValue").value;
+        try {
+            let key = document.getElementById("newAttributeKey").value;
+            let value = document.getElementById("newAttributeValue").value;
 
-        if (!key) {
-            // TODO: Throw error that key can not be empty.
+            if (!key) {
+                throw new Error("Please enter a non empty attribute key");
+            }
+
+            if (JSON.parse(this.state.attributes).hasOwnProperty(key)) {
+                throw new Error("Attribute `" + key + "` already exists");
+            }
+
+            document.getElementById("newAttributeKey").value = "";
+            document.getElementById("newAttributeValue").value = "";
+
+            let newAttributes = { ...JSON.parse(this.state.attributes), [key]: value };
+
+            this.setState({
+                attributes: JSON.stringify(newAttributes)
+            });
+        } catch (error) {
+            this.showAlerts(error.message);
         }
-
-        if (JSON.parse(this.state.attributes).hasOwnProperty(key)) {
-            // TODO: Throw error that key already exists.
-        }
-
-        document.getElementById("newAttributeKey").value = "";
-        document.getElementById("newAttributeValue").value = "";
-
-        let newAttributes = { ...JSON.parse(this.state.attributes), [key]: value };
-
-        this.setState({
-            attributes: JSON.stringify(newAttributes)
-        });
     }
 
     updateAttributes() {
-        if (JSON.parse(this.state.attributes).hasOwnProperty("")) {
-            // TODO : throw error that key cannot be empty
+        try {
+            if (JSON.parse(this.state.attributes).hasOwnProperty("")) {
+                throw new Error("Attributes can not have empty key");
+            }
+
+            let data = {
+                attributes: JSON.parse(this.state.attributes)
+            };
+
+            axios
+                .patch(
+                    backendSettings.TE_BASEPATH + '/api/v1/template/' + this.state.templateData.name + '/attributes',
+                    data
+                )
+                .then(response => {
+                    this.showAlerts("Attributes updated successfully !");
+                })
+                .catch(error => {
+                    this.showAlerts(error.response.data.message);
+                });
+        } catch (error) {
+            this.showAlerts(error.message);
         }
-
-        let data = {
-            attributes: JSON.parse(this.state.attributes)
-        };
-
-        axios
-            .patch(
-                backendSettings.TE_BASEPATH + '/api/v1/template/' + this.state.templateData.name + '/attributes',
-                data
-            )
-            .then(response => {
-                // Todo : Add Success Alert box
-                console.log(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
     }
 
     deleteAttribute(attributeKey) {
@@ -852,7 +901,7 @@ class TemplateScreen extends Component {
                     role="tablist"
                     aria-multiselectable="true"
                 >
-                    <div>
+                    <div className={styles.teScreenTable}>
                         {
                             <div className={styles.teCard + ' card'}>
                                 <div
@@ -953,7 +1002,7 @@ class TemplateScreen extends Component {
                     role="tablist"
                     aria-multiselectable="true"
                 >
-                    <div>
+                    <div className={styles.teScreenTable}>
                         {
                             <div className={styles.teCard + ' card'}>
                                 <div
@@ -1084,6 +1133,12 @@ class TemplateScreen extends Component {
                         </div>
                     </div>
                 </div>
+                <AlertModal
+                    errorMessage={this.state.alertMessage}
+                    onClose={(e) =>
+                        this.showAlerts()
+                    }
+                />
             </div>
         );
     }
