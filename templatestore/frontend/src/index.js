@@ -12,7 +12,7 @@ const Root = () => (
             <Route exact path={backendSettings.TE_BASEPATH + '/'}>
                 <Home
                     fixedAttributeKeys={
-                        backendSettings.TE_TEMPLATE_ATTRIBUTE_KEYS
+                        Object.keys(backendSettings.TE_TEMPLATE_ATTRIBUTES)
                     }
                 />
             </Route>
