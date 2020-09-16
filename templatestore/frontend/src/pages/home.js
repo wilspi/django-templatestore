@@ -18,7 +18,6 @@ class Home extends Component {
             'template_name',
             'type',
             'default_version',
-            'created_on',
             'updated_on',
             ...this.props.fixedAttributeKeys
         ];
@@ -35,10 +34,9 @@ class Home extends Component {
                         template_name: t.name,
                         type: t.type,
                         default_version: t.default ? t.version : '-',
-                        created_on: getDateInSimpleFormat(t.created_on),
                         updated_on: getDateInSimpleFormat(t.modified_on)
                     },
-                    ...this.tableHeaderList.slice(5).reduce((result, k) => {
+                    ...this.tableHeaderList.slice(4).reduce((result, k) => {
                         result[k] = t.attributes[k];
                         return result;
                     }, {})
@@ -86,15 +84,15 @@ class Home extends Component {
         );
 
         for (let i = 0; i < filteredTemplates.length; i++) {
-            let columnData = Object.values(filteredTemplates[i]).map(k => (
-                <td>
+            let columnData = Object.values(filteredTemplates[i]).map((k, index) => (
+                <td key={index}>
                     <Highlight search={this.state.searchText}>
                         {k !== '' ? k : '-'}
                     </Highlight>
                 </td>
             ));
             tableRows.push(
-                <tr>
+                <tr key={i}>
                     {columnData}
                     <td>
                         <button
@@ -127,8 +125,8 @@ class Home extends Component {
     }
 
     render() {
-        var tableHeaders = [...this.tableHeaderList, ...[' - ']].map(k => (
-            <th>{k}</th>
+        var tableHeaders = [...this.tableHeaderList, ...[' - ']].map((k, index) => (
+            <th key={index}>{k}</th>
         ));
         return (
             <div className={styles.tsPage + ' container'}>

@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def index(request):
     export_settings = {
-        "TE_TEMPLATE_ATTRIBUTE_KEYS": ts_settings.TE_TEMPLATE_ATTRIBUTES_KEYS,
+        "TE_TEMPLATE_ATTRIBUTES": ts_settings.TE_TEMPLATE_ATTRIBUTES,
         "TE_BASEPATH": ts_settings.TE_BASEPATH,
     }
     return render(
@@ -98,6 +98,7 @@ def get_templates_view(request):
                     "attributes": t.attributes,
                     "created_on": t.created_on,
                     "modified_on": t.modified_on,
+                    "created_by": t.created_by,
                 }
                 for t in templates
             ]
@@ -131,7 +132,6 @@ def post_template_view(request):
                 "name",
                 "type",
                 "sub_templates",
-                "attributes",
                 "sample_context_data",
             }
             missing_fields = required_fields.difference(set(data.keys()))
@@ -218,32 +218,66 @@ def post_template_view(request):
                     )
                 )
 
-            if not len(data["attributes"]):
-                raise (Exception("Validation: attributes field can not be empty"))
-
             if not len(data["sample_context_data"]):
                 raise (
                     Exception("Validation: sample_context_data field can not be empty")
                 )
 
-            missing_mandatory_attributes = set(cfgs[0].attributes.keys()).difference(
-                set(data["attributes"].keys())
-            )
-            if len(missing_mandatory_attributes):
+            if not re.match("(^[a-zA-Z0-9 ]*$)", data.get("version_alias", "")):
                 raise (
                     Exception(
-                        "Validation: missing mandatory attributes `"
-                        + str(missing_mandatory_attributes)
-                        + "` for type `"
-                        + data["type"]
-                        + "`"
+                        "Validation: version_alias must contain only alphanumeric and space characters"
                     )
                 )
 
             templates = Template.objects.filter(name=data["name"])
             if not len(templates):
+                if "attributes" not in data:
+                    raise (Exception("Validation: missing field `attributes`"))
+
+                if not len(data["attributes"]):
+                    raise (Exception("Validation: attributes field can not be empty"))
+
+                mandatory_attributes = {
+                    **cfgs[0].attributes,
+                    **ts_settings.TE_TEMPLATE_ATTRIBUTES,
+                }
+
+                missing_mandatory_attributes = set(
+                    mandatory_attributes.keys()
+                ).difference(set(data["attributes"].keys()))
+
+                if len(missing_mandatory_attributes):
+                    raise (
+                        Exception(
+                            "Validation: missing mandatory attributes `"
+                            + str(missing_mandatory_attributes)
+                            + "`"
+                        )
+                    )
+
+                invalid_valued_attributes = set(
+                    key
+                    for key in mandatory_attributes.keys()
+                    if "allowed_values" in mandatory_attributes[key]
+                    and data["attributes"][key]
+                    not in mandatory_attributes[key]["allowed_values"]
+                )
+
+                if len(invalid_valued_attributes):
+                    raise (
+                        Exception(
+                            "Validation: invalid values for the attributes `"
+                            + str(invalid_valued_attributes)
+                            + "`"
+                        )
+                    )
+
                 tmp = Template.objects.create(
-                    name=data["name"], attributes=data["attributes"], type=data["type"]
+                    name=data["name"],
+                    attributes=data["attributes"],
+                    type=data["type"],
+                    created_by=request.POST.get("user_id"),
                 )
                 tmp.save()
 
@@ -275,6 +309,8 @@ def post_template_view(request):
                 template_id=template,
                 version=version,
                 sample_context_data=data["sample_context_data"],
+                version_alias=data["version_alias"] if "version_alias" in data else "",
+                created_by=request.POST.get("user_id"),
             )
             tmp_ver.save()
 
@@ -336,6 +372,8 @@ def get_template_versions_view(request, name):
                     "version": tv.version,
                     "default": True if t.default_version_id == tv.id else False,
                     "created_on": tv.created_on,
+                    "version_alias": tv.version_alias,
+                    "created_by": tv.created_by,
                 }
                 for tv in tvs
             ]
@@ -470,6 +508,7 @@ def get_template_details_view(request, name, version):
                 "default": True if t.default_version_id == tv.id else False,
                 "attributes": t.attributes,
                 "sample_context_data": tv.sample_context_data,
+                "version_alias": tv.version_alias,
             }
 
             return JsonResponse(res, safe=False)
@@ -517,8 +556,11 @@ def get_template_details_view(request, name, version):
                 template_id=tmp,
                 version=new_version,
                 sample_context_data=tmp_ver.sample_context_data,
+                version_alias=tmp_ver.version_alias,
+                created_by=request.POST.get("user_id"),
             )
             tmp_ver_new.save()
+
             for st in sts:
                 SubTemplate.objects.create(
                     template_version_id=tmp_ver_new, config=st.config, data=st.data
@@ -596,20 +638,46 @@ def patch_attributes_view(request, name):
             data = json.loads(request.body)
 
             if "attributes" not in data:
-                raise (Exception("Validation: Attributes are not provided"))
+                raise (Exception("Validation: attributes are not provided"))
 
-            template = Template.objects.filter(name=name)
-            if not len(template):
+            try:
+                template = Template.objects.get(name=name)
+            except Exception as e:
                 raise (Exception("Validation: Template with given name does not exist"))
 
-            missing_attributes = set(
-                ts_settings.TE_TEMPLATE_ATTRIBUTES_KEYS
-            ).difference(set(data["attributes"].keys()))
-            if len(missing_attributes):
+            cfgs = TemplateConfig.objects.filter(type=template.type)
+
+            mandatory_attributes = {
+                **cfgs[0].attributes,
+                **ts_settings.TE_TEMPLATE_ATTRIBUTES,
+            }
+
+            missing_mandatory_attributes = set(mandatory_attributes.keys()).difference(
+                set(data["attributes"].keys())
+            )
+
+            if len(missing_mandatory_attributes):
                 raise (
                     Exception(
                         "Validation: missing mandatory attributes `"
-                        + str(missing_attributes)
+                        + str(missing_mandatory_attributes)
+                        + "`"
+                    )
+                )
+
+            invalid_valued_attributes = set(
+                key
+                for key in mandatory_attributes.keys()
+                if "allowed_values" in mandatory_attributes[key]
+                and data["attributes"][key]
+                not in mandatory_attributes[key]["allowed_values"]
+            )
+
+            if len(invalid_valued_attributes):
+                raise (
+                    Exception(
+                        "Validation: invalid values for the attributes `"
+                        + str(invalid_valued_attributes)
                         + "`"
                     )
                 )
@@ -618,11 +686,12 @@ def patch_attributes_view(request, name):
                 if not isinstance(data["attributes"][key], str):
                     raise (
                         Exception(
-                            "Validation: Attributes must be a key value pair and value must be a string"
+                            "Validation: attributes must be a key value pair and value must be a string"
                         )
                     )
 
-            template.update(attributes=data["attributes"])
+            template.attributes = data["attributes"]
+            template.save(update_fields=["attributes", "modified_on"])
             data = {"name": name, "attributes": data["attributes"]}
             return JsonResponse(data, status=200)
         except Exception as e:

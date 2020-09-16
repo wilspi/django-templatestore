@@ -1,5 +1,7 @@
 .teScreenTable {
     margin-bottom: 20px;
+    z-index: 0;
+    isolation: isolate;
 }
 
 .teRowBlock {
@@ -134,5 +136,120 @@ h5 {
 
 .teMarginTop20 {
     margin-top: 20px;
+}
 
+.teVersionAlias {
+    padding-left: 20px;
+    margin-right: 20px;
+    border: 1px solid #9ca1a7;
+    border-radius: 5px;
+    color: #000;
+    font-size: 16px;
+    &:focus {
+        outline: none;
+    }
+}
+
+.teVersionAliasWrapper {
+    float: right;
+}
+
+.teAttributesWrapper {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 500px;
+
+    .teAttributesRow {
+        display: block;
+        margin: 0 0 15px 0;
+        padding: 0 0 0 0;
+    }
+
+    .teAttributesCell {
+        display: inline-block;
+        min-width: 205px;
+    }
+
+    .teLabel {
+        margin: 0;
+        border: 1px solid #9ca1a7;
+        border-radius: 5px;
+        padding: 1px 2px 1px 20px;
+        width: 190px;
+    }
+
+    .teAddNewAttributes {
+        margin: 15px 0 0 0;
+    }
+
+    .teAddNewAttributeButton {
+        margin-top: 20px;
+        font-size: 16px;
+        border: 1px solid #9ca1a7;
+        color: #ffffff;
+        background-color: #9ca1a7;
+        padding: 0px 7px;
+        &:focus {
+            outline: none;
+        }
+        border-radius: 50%;
+    }
+
+    .teUpdateButton {
+        margin-top: 20px;
+        font-size: 16px;
+        border: 1px solid #9ca1a7;
+        color: #ffffff;
+        background-color: #9ca1a7;
+        &:focus {
+            outline: none;
+        }
+        border-radius: 5px;
+        margin: 20px 0 0 305px;
+    }
+
+    .teNewAttributeInput {
+        margin: 0 15px 0 0;
+    }
+
+    select {
+        border: 1px solid #9ca1a7;
+        border-radius: 5px;
+        text-indent: 15px;
+        padding: 3px;
+        width: 190px;
+        &:focus {
+            outline: none;
+        }
+    }
+
+    input {
+        margin: 0;
+        padding-left: 20px;
+        display: inline-block;
+        border: 1px solid #9ca1a7;
+        border-radius: 5px;
+        color: #000;
+        font-size: 16px;
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .teDeleteAttribute {
+        color: #808080;
+        float: right;
+        font-size: 20px;
+        font-weight: bold;
+        margin-left: 5px;
+    }
+
+    .teDeleteAttribute:hover,
+
+    .teDeleteAttribute:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
 }
