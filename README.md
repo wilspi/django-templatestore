@@ -51,7 +51,7 @@ Currently following templating libraries are supported:
 * #### Update requirements
   * `python`
     ```
-    python -m pip install -r requirements.txt # python
+    pip install -r requirements.txt # python
     ```
   * `node`
     ```

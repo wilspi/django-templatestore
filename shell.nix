@@ -42,7 +42,6 @@ in
 
       postgresql_11
       python37
-      python37Packages.pip
       python37Packages.virtualenv
       cacert
     ] ++ (
@@ -66,7 +65,7 @@ in
       echo "Using ${python37.name}, and ${postgresql_11.name}."
       [ ! -d '$PROJDIR/django-templatestore-dev' ] && virtualenv django-templatestore-dev && echo "SETUP django-templatestore-dev: DONE"
       source django-templatestore-dev/bin/activate
-      python -m pip install -r requirements.txt
+      pip install -r requirements.txt
       # cd templatestore/frontend/ && npm install && npm run build && cd -
       echo "ENV: django-templatestore-dev ACTIVATED";
     '';
