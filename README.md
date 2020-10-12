@@ -3,8 +3,6 @@
 
 `django-templatestore` is a [Django](https://www.djangoproject.com/) application/ UI tool to edit and save your templates. 
 
-Demo application:  [send_me_a_mail]()
-
 ### Quick start
 Follow steps to quickly add `django-templatestore` to your existing django application:  
 1. Install [`django-templatestore`](https://pypi.org/project/django-templatestore/0.1/)
@@ -38,13 +36,6 @@ Currently following templating libraries are supported:
  - [ ] [`handlebarsjs`](https://handlebarsjs.com/guide/)
 
 
-### Share your screenshot
-* [send_me_a_mail]()
-
-[templateditor.herokuapp.com](https://templateditor.herokuapp.com)
-![templateditor.herokuapp.com](https://i.imgur.com/ixPn47L.jpg)
-
-
 ### Development
 * #### Setup
 
@@ -68,6 +59,10 @@ Currently following templating libraries are supported:
     ```
 
 * #### Run
+  * Migrate database
+    ```
+    python manage.py migrate
+    ```
   * Build js and collect static files
     ```
     cd templatestore/frontend/ && npm run build && cd - && python manage.py collectstatic --noinput
