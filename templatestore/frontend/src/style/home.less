@@ -1,3 +1,4 @@
+table
 
 .tsTable {
      margin: 40px 40px;
@@ -13,8 +14,11 @@
           height: 80vh;
           overflow: auto;
           margin-top: 15px;
-          thead {
-               background-color: #dedede;
+          thead tr th {
+              background-color: #dedede;
+              position: sticky;
+              z-index: 100;
+              top: 0;
           }
           tbody {
                height: 400px;
