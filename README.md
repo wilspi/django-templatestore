@@ -73,3 +73,9 @@ Currently following templating libraries are supported:
     ```
 
   
+* #### Script to Run for migration
+    
+ * Run below command
+   ```bash
+   python migrate_created_by.py --uat > script_output.txt
+```
