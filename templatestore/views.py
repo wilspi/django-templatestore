@@ -278,6 +278,7 @@ def post_template_view(request):
                     attributes=data["attributes"],
                     type=data["type"],
                     created_by=request.POST.get("user_id"),
+                    user_email=request.POST.get("email"),
                 )
                 tmp.save()
 
@@ -311,6 +312,7 @@ def post_template_view(request):
                 sample_context_data=data["sample_context_data"],
                 version_alias=data["version_alias"] if "version_alias" in data else "",
                 created_by=request.POST.get("user_id"),
+                user_email=request.POST.get("email"),
             )
             tmp_ver.save()
 
@@ -558,6 +560,7 @@ def get_template_details_view(request, name, version):
                 sample_context_data=tmp_ver.sample_context_data,
                 version_alias=tmp_ver.version_alias,
                 created_by=request.POST.get("user_id"),
+                user_email=request.POST.get("email"),
             )
             tmp_ver_new.save()
 
