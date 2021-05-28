@@ -5,6 +5,7 @@ import { backendSettings } from './utils.js';
 import Home from './pages/home.js';
 import TemplateScreen from './pages/templateScreen.js';
 import Page404 from './pages/404.js';
+import Page403 from './pages/403.js';
 
 const Root = () => (
     <Router forceRefresh>
@@ -25,6 +26,13 @@ const Root = () => (
             >
                 <TemplateScreen />
             </Route>
+            <Route
+                exact
+                path={backendSettings.TE_BASEPATH + '/403'}
+            >
+                <Page403 />
+            </Route>
+
             <Route component={Page404} />
         </Switch>
     </Router>
