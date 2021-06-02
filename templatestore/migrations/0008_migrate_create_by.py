@@ -2,14 +2,15 @@
 
 from django.db import migrations
 import requests
+from templatestore import app_settings as ts_settings
 
 
-API_URL = None
+API_URL = ts_settings.USER_SERVICE_URL
 
 
 def get_email_from_user_id(user_id, context):
     try:
-        res = requests.get(API_URL + str(user_id))
+        res = requests.get(API_URL+'get/?id=' + str(user_id))
         body = res.json()
         print("body recieved", body)
         email = 'email'
