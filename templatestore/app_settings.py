@@ -9,3 +9,4 @@ TE_TEMPLATE_ATTRIBUTES = getattr(settings, "TE_TEMPLATE_ATTRIBUTES", {})
 TE_ROWLIMIT = getattr(settings, "TE_ROWLIMIT", 1000)
 TE_BASEPATH = "/" + getattr(settings, "TE_BASEPATH", "").lstrip("/").rstrip("/")
 TE_BASEPATH = "" if TE_BASEPATH == "/" else TE_BASEPATH
+USER_SERVICE_URL = getattr(settings, "USER_SERVICE_URL", "")

@@ -98,7 +98,7 @@ def get_templates_view(request):
                     "attributes": t.attributes,
                     "created_on": t.created_on,
                     "modified_on": t.modified_on,
-                    "created_by": t.created_by,
+                    "created_by": t.user_email,
                 }
                 for t in templates
             ]
@@ -277,7 +277,7 @@ def post_template_view(request):
                     name=data["name"],
                     attributes=data["attributes"],
                     type=data["type"],
-                    created_by=request.POST.get("user_id"),
+                    user_email=request.POST.get("email"),
                 )
                 tmp.save()
 
@@ -310,7 +310,7 @@ def post_template_view(request):
                 version=version,
                 sample_context_data=data["sample_context_data"],
                 version_alias=data["version_alias"] if "version_alias" in data else "",
-                created_by=request.POST.get("user_id"),
+                user_email=request.POST.get("email"),
             )
             tmp_ver.save()
 
@@ -373,7 +373,7 @@ def get_template_versions_view(request, name):
                     "default": True if t.default_version_id == tv.id else False,
                     "created_on": tv.created_on,
                     "version_alias": tv.version_alias,
-                    "created_by": tv.created_by,
+                    "created_by": tv.user_email,
                 }
                 for tv in tvs
             ]
@@ -557,7 +557,7 @@ def get_template_details_view(request, name, version):
                 version=new_version,
                 sample_context_data=tmp_ver.sample_context_data,
                 version_alias=tmp_ver.version_alias,
-                created_by=request.POST.get("user_id"),
+                user_email=request.POST.get("email"),
             )
             tmp_ver_new.save()
 
