@@ -140,7 +140,7 @@ class Home extends Component {
                             type="button"
                             onClick={() => this.openNewTemplatePage()}
                         >
-                            Add New Template
+                            Add New Achintya Template
                         </button>
                     </div>
                 </div>
