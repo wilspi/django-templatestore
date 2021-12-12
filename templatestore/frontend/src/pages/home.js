@@ -6,13 +6,20 @@ import { backendSettings, getDateInSimpleFormat } from './../utils.js';
 import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
 import PropTypes from 'prop-types';
+import Type from './../components/Filter/filterByType';
+import Lob from './../components/Filter/filterByLob';
+import Journey from './../components/Filter/filterByJourney';
 
 class Home extends Component {
     constructor(props) {
         super(props);
         this.state = {
             templatesData: [],
-            searchText: ''
+            searchText: '',
+            filterType: '',
+            filterLob: '',
+            showFilter: false,
+            filterJourney: ''
         };
         this.tableHeaderList = [
             'template_name',
@@ -60,6 +67,7 @@ class Home extends Component {
     }
 
     getTableRowsJSX() {
+        console.log(this);
         let tableRows = [];
         let filteredTemplates = this.state.templatesData.reduce(
             (result, template) => {
@@ -72,10 +80,13 @@ class Home extends Component {
                                     .toLowerCase()
                                     .indexOf(
                                         this.state.searchText.toLowerCase()
-                                    ) !== -1);
+                                    ) !== -1 && template.type.toLowerCase().indexOf(this.state.filterType.toLowerCase()) !== -1 &&
+                                     template.lob.toLowerCase().indexOf(this.state.filterLob.toLowerCase()) !== -1 &&
+                                     template.journey.toLowerCase().indexOf(this.state.filterJourney.toLowerCase()) !== -1);
                         return res;
                     }, false)
                 ) {
+                    console.log(template.lob);
                     result.push(template);
                 }
                 return result;
@@ -124,6 +135,27 @@ class Home extends Component {
         });
     }
 
+    handleDropdownChangeType(e) {
+        this.setState({ filterType: e });
+    }
+
+    handleDropdownChangeLob(e) {
+        this.setState({ filterLob: e });
+    }
+
+    handleDropdownChangeJourney(e) {
+        this.setState({ filterJourney: e });
+    }
+
+    _showMessage() {
+        this.setState({
+            showFilter: !this.state.showFilter,
+            filterJourney: '',
+            filterLob: '',
+            filterType: ''
+        });
+    }
+
     render() {
         var tableHeaders = [...this.tableHeaderList, ...[' - ']].map((k, index) => (
             <th key={index}>{k}</th>
@@ -131,17 +163,31 @@ class Home extends Component {
         return (
             <div className={styles.tsPage + ' container'}>
                 <div>
-                    <h1>Template StoreSSS</h1>
+                    <h1>Template Store</h1>
                 </div>
-                <div className="d-flex justify-content-between">
+                <div className="d-flex justify-content-between mb-4">
                     <SearchBox onChange={this.onSearchTextChange.bind(this)} />
-                    <div className={styles.tsAddTemplateBtn}>
-                        <button
-                            type="button"
-                            onClick={() => this.openNewTemplatePage()}
-                        >
-                            Add New Achintya Template
-                        </button>
+                </div>
+                <div className={styles.subcontainer}>
+                    <div className ={styles.left}> <h4> More Actions : </h4>
+                        <div className={styles.tsAddTemplateBtn}>
+                            <button
+                                type="button"
+                                onClick={() => this.openNewTemplatePage()}
+                            >
+                                Add New Template
+                            </button>
+                        </div>
+                        <br />
+                        <button onClick={this._showMessage.bind(this)} className={styles.tsAddFilterBtn}>Add/Remove Filter</button>
+                    </div>
+
+                    <div className ={styles.right}> <h4> Filter Templates : </h4>
+                        <div>
+                            { this.state.showFilter && <Type onChange={this.handleDropdownChangeType.bind(this)} /> }
+                            { this.state.showFilter && <Lob onChange={this.handleDropdownChangeLob.bind(this)} /> }
+                            { this.state.showFilter && <Journey onChange={this.handleDropdownChangeJourney.bind(this)} /> }
+                        </div>
                     </div>
                 </div>
                 <div className={styles.tableWrapper}>

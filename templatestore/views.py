@@ -6,6 +6,7 @@ from datetime import datetime
 import json
 import re
 import logging
+import requests
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
 from templatestore.utils import base64decode, base64encode
 from templatestore import app_settings as ts_settings
@@ -27,6 +28,29 @@ def render_via_jinja(template, context):
     from jinja2 import Template
 
     return base64encode(Template(base64decode(template)).render(context))
+
+@csrf_exempt
+def render_pdf(request):
+    # log requests
+    if request.method != "POST":
+        return HttpResponseBadRequest("invalid request method: " + request.method)
+
+    try:
+        #print(request.body)
+        x = json.dumps({'html': request.body.decode()})
+        print(x)
+        pdf=requests.post("http://wkpdfgen-dev.ackodev.com/render_pdf/", data=x)
+        print(pdf)
+        return HttpResponse(pdf,content_type='application/pdf')
+
+    except Exception as e:
+        logger.exception(e)
+
+        return HttpResponse(
+            json.dumps({"message": str(e)}),
+            content_type="application/json",
+            status=400,
+        )
 
 
 @csrf_exempt
