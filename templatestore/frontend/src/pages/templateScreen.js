@@ -279,12 +279,6 @@ class TemplateScreen extends Component {
         return tableRows;
     }
 
-
-    // getRenderedTemplateV1(this) {
-    //     try{
-    //         console.log(this.state.contextData)
-    //     }
-    // }
     getRenderedTemplate(subType, templateData, contextData, renderMode) {
         try {
             try {
@@ -783,23 +777,44 @@ class TemplateScreen extends Component {
                                     </div>
 
                                     <div className={styles.teVersionWrapper}>
-                                        <button
-                                            className={styles.teButtons}
-                                            onClick={() => {
-                                                this.getRenderedTemplatePdf(
-                                                    t,
-                                                    this.state.subTemplatesData[
-                                                        t
-                                                    ].data,
-                                                    this.state.contextData,
-                                                    this.state.subTemplatesData[
-                                                        t
-                                                    ].renderMode
-                                                );
-                                            }}
-                                        >
-                                            Render PDF
-                                        </button>
+                                        {this.state.subTemplatesData[t]
+                                            .renderMode === 'html' ? (
+                                                <button
+                                                    className={styles.teButtons}
+                                                    onClick={() => {
+                                                        this.getRenderedTemplatePdf(
+                                                            t,
+                                                            this.state.subTemplatesData[
+                                                                t
+                                                            ].data,
+                                                            this.state.contextData,
+                                                            this.state.subTemplatesData[
+                                                                t
+                                                            ].renderMode
+                                                        );
+                                                    }}
+                                                >
+                                                    Render PDF
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className={styles.teButtons}
+                                                    onClick={() => {
+                                                        this.getRenderedTemplate(
+                                                            t,
+                                                            this.state.subTemplatesData[
+                                                                t
+                                                            ].data,
+                                                            this.state.contextData,
+                                                            this.state.subTemplatesData[
+                                                                t
+                                                            ].renderMode
+                                                        );
+                                                    }}
+                                                >
+                                                    Render123
+                                                </button>
+                                            )}
                                         {this.state.subTemplatesData[t]
                                             .renderMode === 'html' ? (
                                                 <button
@@ -985,6 +1000,49 @@ class TemplateScreen extends Component {
                     </div>
                 </div>
                 <br />
+                <div className={styles.teSaveContainer}>
+                    {this.state.editable ? (
+                        <button
+                            className={styles.teButtons}
+                            onClick={() => {
+                                this.postTemplate(
+                                    document.getElementById('tmp_name').value,
+                                    this.state.type,
+                                    this.state.contextData,
+                                    this.state.attributes
+                                );
+                            }}
+                        >
+                            Create
+                        </button>
+                    ) : (
+                        <div className={styles.teVersionAliasWrapper}>
+                            <input
+                                type="text"
+                                id="version_alias"
+                                className={styles.teVersionAlias}
+                                value={this.state.version_alias}
+                                placeholder="version_alias"
+                                onChange={e => this.onVersionAliasChange(e.target.value)}
+                            />
+                            <button
+                                className={styles.teButtons}
+                                onClick={() => {
+                                    if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
+                                        this.postTemplate(
+                                            this.state.templateData.name,
+                                            this.state.type,
+                                            this.state.contextData,
+                                            this.state.attributes
+                                        );
+                                    }
+                                }}
+                            >
+                                    Save
+                            </button>
+                        </div>
+                    )}
+                </div>
                 <div className={styles.teMarginTop20}>
                     <label>Attributes : </label>
                 </div>
@@ -1069,7 +1127,7 @@ class TemplateScreen extends Component {
                 ) : (
                     <div>
                         <div className={styles.teMarginTop20}>
-                            <label>Versionsss : </label>
+                            <label>Versions : </label>
                         </div>
                         <div className={styles.teVersionTable}>
                             <div className={styles.teSearchWrapper}>
@@ -1091,50 +1149,6 @@ class TemplateScreen extends Component {
                                     </thead>
                                     <tbody>{this.getTableRowsJSX()}</tbody>
                                 </table>
-
-                                <div className={styles.teSaveContainer}>
-                                    {this.state.editable ? (
-                                        <button
-                                            className={styles.teButtons}
-                                            onClick={() => {
-                                                this.postTemplate(
-                                                    document.getElementById('tmp_name').value,
-                                                    this.state.type,
-                                                    this.state.contextData,
-                                                    this.state.attributes
-                                                );
-                                            }}
-                                        >
-                                            Create
-                                        </button>
-                                    ) : (
-                                        <div className={styles.teVersionAliasWrapper}>
-                                            <input
-                                                type="text"
-                                                id="version_alias"
-                                                className={styles.teVersionAlias}
-                                                value={this.state.version_alias}
-                                                placeholder="version_alias"
-                                                onChange={e => this.onVersionAliasChange(e.target.value)}
-                                            />
-                                            <button
-                                                className={styles.teButtons}
-                                                onClick={() => {
-                                                    if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
-                                                        this.postTemplate(
-                                                            this.state.templateData.name,
-                                                            this.state.type,
-                                                            this.state.contextData,
-                                                            this.state.attributes
-                                                        );
-                                                    }
-                                                }}
-                                            >
-                                                    Save
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
                             </div>
                         </div>
                     </div>

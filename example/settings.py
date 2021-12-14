@@ -73,10 +73,10 @@ WSGI_APPLICATION = "example.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "templatestore",
-        "USER": "root",
-        "PASSWORD": "",
-        "HOST": "",
+        "NAME": "ackodev_templates",
+        "USER": "ackodev_templates_rw_v1",
+        "PASSWORD": "9qMzTLnHLhS7bQXDo3Gj",
+        "HOST": "acko-services-dev-rds.acko.in",
         "PORT": "5432",
     }
 }
@@ -114,6 +114,22 @@ STATICFILES_DIRS = []
 STATIC_ROOT = "static/"
 
 # Template Store - Example Configs
-TE_TEMPLATE_ATTRIBUTES = {"attribute1": {}, "attribute2": {}}
+TE_TEMPLATE_ATTRIBUTES = {
+    "lob": {
+        "allowed_values": [
+            "Auto",
+            "Health",
+            "Electronics",
+            "Partnerships",
+            "Visit",
+            "Acko Drive",
+            "Central",
+            "Achintya"
+        ],
+    },
+    "journey": {
+        "allowed_values": ["Policy", "Claim", "IVR", "Purchase", "Pre Inspection", "CX 360", "Reporting","Achintya"],
+    },
+}
 TE_ROWLIMIT = 1000
 TE_BASEPATH = "/"

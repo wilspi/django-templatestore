@@ -14,7 +14,10 @@ module.exports = {
             use: [
                'babel-loader',
                'eslint-loader'
-            ]
+            ],
+            options: {
+               fix: true
+            }
          },
          {
             test: /\.less$/,

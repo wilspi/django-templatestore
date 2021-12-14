@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import styles from './filter.less';
+import { backendSettings } from "../../utils";
 
 class Journey extends Component {
     constructor(props) {
@@ -16,19 +17,32 @@ class Journey extends Component {
         this.setState({ selectValue: e.target.value });
     }
 
+    getAttributeOptions() {
+        let attribute = { };
+        attribute = {
+            ...backendSettings.TE_TEMPLATE_ATTRIBUTES
+        };
+        console.log(attribute);
+        let allowedValues = attribute["journey"]["allowed_values"];
+        console.log(allowedValues);
+        var options = [];
+        options.push(
+            allowedValues.map(t => {
+                return (<option value={t}>{t}</option>);
+            })
+        );
+        return options;
+    }
+
     render() {
         return (
             <div>
                 <div>
                     <select id="dropdown" className={styles.filter} onChange={this.handleDropdownChange}>
                         <option value="">Choose Journey</option>
-                        <option value="Policy">Policy</option>
-                        <option value="Claim">Claim</option>
-                        <option value="IVR">IVR</option>
-                        <option value="Purchase">Purchase</option>
-                        <option value="Pre Inspection">Pre Inspection</option>
-                        <option value="CX 360">CX 360</option>
-                        <option value="Reporting">Reporting</option>
+                        {
+                            this.getAttributeOptions()
+                        }
                     </select>
                 </div>
 

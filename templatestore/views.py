@@ -38,7 +38,7 @@ def render_pdf(request):
     try:
         #print(request.body)
         x = json.dumps({'html': request.body.decode()})
-        print(x)
+        #print(x)
         pdf=requests.post("http://wkpdfgen-dev.ackodev.com/render_pdf/", data=x)
         print(pdf)
         return HttpResponse(pdf,content_type='application/pdf')
