@@ -71,7 +71,14 @@ WSGI_APPLICATION = "example.wsgi.application"
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {}
+    "default": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "NAME": "",
+        "USER": "",
+        "PASSWORD": "",
+        "HOST": "",
+        "PORT": "",
+    }
 }
 
 # Password validation
@@ -116,12 +123,11 @@ TE_TEMPLATE_ATTRIBUTES = {
             "Partnerships",
             "Visit",
             "Acko Drive",
-            "Central",
-            "Achintya"
+            "Central"
         ],
     },
     "journey": {
-        "allowed_values": ["Policy", "Claim", "IVR", "Purchase", "Pre Inspection", "CX 360", "Reporting","Achintya"],
+        "allowed_values": ["Policy", "Claim", "IVR", "Purchase", "Pre Inspection", "CX 360", "Reporting"],
     },
 }
 TE_ROWLIMIT = 1000
