@@ -22,9 +22,7 @@ class Lob extends Component {
         attribute = {
             ...backendSettings.TE_TEMPLATE_ATTRIBUTES
         };
-        console.log(attribute);
         let allowedValues = attribute["lob"]["allowed_values"];
-        console.log(allowedValues);
         var options = [];
         options.push(
             allowedValues.map(t => {

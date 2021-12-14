@@ -36,11 +36,8 @@ def render_pdf(request):
         return HttpResponseBadRequest("invalid request method: " + request.method)
 
     try:
-        #print(request.body)
         x = json.dumps({'html': request.body.decode()})
-        #print(x)
         pdf=requests.post("http://wkpdfgen-dev.ackodev.com/render_pdf/", data=x)
-        print(pdf)
         return HttpResponse(pdf,content_type='application/pdf')
 
     except Exception as e:
@@ -49,7 +46,7 @@ def render_pdf(request):
         return HttpResponse(
             json.dumps({"message": str(e)}),
             content_type="application/json",
-            status=400,
+            status=500,
         )
 
 

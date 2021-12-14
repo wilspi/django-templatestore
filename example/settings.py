@@ -71,14 +71,7 @@ WSGI_APPLICATION = "example.wsgi.application"
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "ackodev_templates",
-        "USER": "ackodev_templates_rw_v1",
-        "PASSWORD": "9qMzTLnHLhS7bQXDo3Gj",
-        "HOST": "acko-services-dev-rds.acko.in",
-        "PORT": "5432",
-    }
+    "default": {}
 }
 
 # Password validation
