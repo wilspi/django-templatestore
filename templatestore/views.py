@@ -35,7 +35,7 @@ def render_via_jinja(template, context):
 @csrf_exempt
 def render_pdf(request):
     # log requests
-    logger.info("Inside in pdf")
+    logger.info('Inside in pdf')
     if request.method != "POST":
         return HttpResponseBadRequest("invalid request method: " + request.method)
 

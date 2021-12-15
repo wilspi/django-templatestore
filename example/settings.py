@@ -131,6 +131,6 @@ TE_TEMPLATE_ATTRIBUTES = {
     },
 }
 
-WKPDFGEN_SERVICE_URL = "http://wkpdfgen.ackodev.com"
+WKPDFGEN_SERVICE_URL = "http://wkpdfgen.ackodev.com123"
 TE_ROWLIMIT = 1000
 TE_BASEPATH = "/"

@@ -325,7 +325,7 @@ class TemplateScreen extends Component {
     getRenderedTemplatePdf(subType, templateData, contextData, renderMode) {
         try {
             axios
-                .post(backendSettings.TE_BASEPATH + '/api/v1/render/pdf', (this.state.subTemplatesData.htmlpart.data).toString(), {
+                .put(backendSettings.TE_BASEPATH + '/api/v1/render/pdf', (this.state.subTemplatesData.htmlpart.data).toString(), {
                     responseType: "blob"
                 })
                 .then((response) => {
