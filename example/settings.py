@@ -73,11 +73,11 @@ WSGI_APPLICATION = "example.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "ackodev_templates",
-        "USER": "ackodev_templates_rw_v1",
-        "PASSWORD": "9qMzTLnHLhS7bQXDo3Gj",
-        "HOST": "acko-services-dev-rds.acko.in",
-        "PORT": "5432",
+        "NAME": "",
+        "USER": "",
+        "PASSWORD": "",
+        "HOST": "",
+        "PORT": "",
     }
 }
 
@@ -131,6 +131,5 @@ TE_TEMPLATE_ATTRIBUTES = {
     },
 }
 
-WKPDFGEN_SERVICE_URL = "http://wkpdfgen.ackodev.com123"
 TE_ROWLIMIT = 1000
 TE_BASEPATH = "/"

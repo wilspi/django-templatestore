@@ -11,4 +11,3 @@ TE_BASEPATH = "/" + getattr(settings, "TE_BASEPATH", "").lstrip("/").rstrip("/")
 TE_BASEPATH = "" if TE_BASEPATH == "/" else TE_BASEPATH
 USER_SERVICE_URL = getattr(settings, "USER_SERVICE_URL", "")
 WKPDFGEN_SERVICE_URL = getattr(settings, "WKPDFGEN_SERVICE_URL", "")
-print("WKPDF "+ WKPDFGEN_SERVICE_URL)
