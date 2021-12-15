@@ -40,9 +40,9 @@ def render_pdf(request):
         return HttpResponseBadRequest("invalid request method: " + request.method)
 
     try:
-        logger.info(PDF_URL+'Achintya')
+        logger.info(PDF_URL+'Achintya'+"Mittal")
         x = json.dumps({'html': request.body.decode()})
-        pdf=requests.post(PDF_URL + '/render_pdf/', data=x)
+        pdf=requests.post("https://wkpdfgen.ackodev.com/render_pdf/", data=x)
         return HttpResponse(pdf,content_type='application/pdf')
 
     except Exception as e:
