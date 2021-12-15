@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 PDF_URL = ts_settings.WKPDFGEN_SERVICE_URL
 
 
+
+
 def index(request):
     export_settings = {
         "TE_TEMPLATE_ATTRIBUTES": ts_settings.TE_TEMPLATE_ATTRIBUTES,
@@ -37,8 +39,9 @@ def render_pdf(request):
         return HttpResponseBadRequest("invalid request method: " + request.method)
 
     try:
+        print(PDF_URL)
         x = json.dumps({'html': request.body.decode()})
-        pdf=requests.post(PDF_URL + "/render_pdf/", data=x)
+        pdf=requests.post(PDF_URL + '/render_pdf/', data=x)
         return HttpResponse(pdf,content_type='application/pdf')
 
     except Exception as e:
