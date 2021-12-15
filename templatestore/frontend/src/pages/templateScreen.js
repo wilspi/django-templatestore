@@ -811,7 +811,7 @@ class TemplateScreen extends Component {
                                                         );
                                                     }}
                                                 >
-                                                    Render123
+                                                    Render
                                                 </button>
                                             )}
                                         {this.state.subTemplatesData[t]

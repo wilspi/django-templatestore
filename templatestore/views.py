@@ -35,11 +35,12 @@ def render_via_jinja(template, context):
 @csrf_exempt
 def render_pdf(request):
     # log requests
+    logger.info("Inside in pdf")
     if request.method != "POST":
         return HttpResponseBadRequest("invalid request method: " + request.method)
 
     try:
-        print(PDF_URL+'Achintya')
+        logger.info(PDF_URL+'Achintya')
         x = json.dumps({'html': request.body.decode()})
         pdf=requests.post(PDF_URL + '/render_pdf/', data=x)
         return HttpResponse(pdf,content_type='application/pdf')
