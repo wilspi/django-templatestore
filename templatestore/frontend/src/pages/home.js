@@ -86,7 +86,6 @@ class Home extends Component {
                         return res;
                     }, false)
                 ) {
-                    console.log(template.lob);
                     result.push(template);
                 }
                 return result;
