@@ -324,8 +324,19 @@ class TemplateScreen extends Component {
 
     getRenderedTemplatePdf(subType, templateData, contextData, renderMode) {
         try {
+            try {
+                contextData = JSON.parse(contextData);
+            } catch (error) {
+                throw new Error("sample_context_data must be a valid JSON");
+            }
+            let data = {
+                template: encode(templateData),
+                context: contextData,
+                handler: 'jinja2',
+                output: renderMode
+            };
             axios
-                .post(backendSettings.TE_BASEPATH + '/render_pdf', (this.state.subTemplatesData.htmlpart.data).toString(), {
+                .post(backendSettings.TE_BASEPATH + '/render_pdf', data, {
                     responseType: "blob"
                 })
                 .then((response) => {

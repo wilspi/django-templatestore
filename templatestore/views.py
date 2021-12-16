@@ -13,6 +13,7 @@ from templatestore import app_settings as ts_settings
 
 logger = logging.getLogger(__name__)
 PDF_URL = ts_settings.WKPDFGEN_SERVICE_URL
+PDF_ASSET_URL = ts_settings.WKPDFGEN_ASSET_URL
 
 
 
@@ -39,8 +40,12 @@ def render_pdf(request):
         return HttpResponseBadRequest("invalid request method: " + request.method)
 
     try:
-        x = json.dumps({'html': request.body.decode()})
-        pdf=requests.post("http://wkpdfgen-uat.internal.ackodev.com/render_pdf", data=x)
+        data = json.loads(request.body)
+        template = data["template"]
+        context = data["context"]
+        context["base_path"] = PDF_ASSET_URL
+        rendered_html_template = render_via_jinja(template,context)
+        pdf=requests.post(PDF_URL+'/render_pdf/', data=json.dumps({'html': str(base64decode(rendered_html_template))}))
         return HttpResponse(pdf,content_type='application/pdf')
 
     except Exception as e:
