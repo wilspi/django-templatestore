@@ -4,6 +4,7 @@ from templatestore import views
 urlpatterns = [
     # apis
     path("api/v1/template", views.post_template_view),
+    path("render_pdf", views.render_pdf),
     path("api/v1/render", views.render_template_view),
     path("api/v1/templates", views.get_templates_view),
     re_path(

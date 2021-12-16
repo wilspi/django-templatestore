@@ -160,7 +160,7 @@ class TemplateScreen extends Component {
     }
 
     openTemplateVersion(version) {
-        this.props.history.push(
+        window.open(
             backendSettings.TE_BASEPATH +
                 '/t/' +
                 this.state.templateData.name +
@@ -307,6 +307,46 @@ class TemplateScreen extends Component {
                             return result;
                         }, {})
                     });
+                })
+                .catch(function(error) {
+                    console.log(error);
+                    this.showAlerts(error.response.data.message);
+                });
+            if (renderMode === 'html') {
+                this.setState({
+                    previewSubType: subType
+                });
+            }
+        } catch (error) {
+            this.showAlerts(error.message);
+        }
+    }
+
+    getRenderedTemplatePdf(subType, templateData, contextData, renderMode) {
+        try {
+            try {
+                contextData = JSON.parse(contextData);
+            } catch (error) {
+                throw new Error("sample_context_data must be a valid JSON");
+            }
+            let data = {
+                template: encode(templateData),
+                context: contextData,
+                handler: 'jinja2',
+                output: renderMode
+            };
+            axios
+                .post(backendSettings.TE_BASEPATH + '/render_pdf', data, {
+                    responseType: "blob"
+                })
+                .then((response) => {
+                    //Create a Blob from the PDF Stream
+                    const file = new Blob([response.data], { type: "application/pdf" });
+                    //Build a URL from the file
+                    const fileURL = URL.createObjectURL(file);
+                    //Open the URL on new Window
+                    const pdfWindow = window.open();
+                    pdfWindow.location.href = fileURL;
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -747,23 +787,44 @@ class TemplateScreen extends Component {
                                     </div>
 
                                     <div className={styles.teVersionWrapper}>
-                                        <button
-                                            className={styles.teButtons}
-                                            onClick={() => {
-                                                this.getRenderedTemplate(
-                                                    t,
-                                                    this.state.subTemplatesData[
-                                                        t
-                                                    ].data,
-                                                    this.state.contextData,
-                                                    this.state.subTemplatesData[
-                                                        t
-                                                    ].renderMode
-                                                );
-                                            }}
-                                        >
-                                            Render
-                                        </button>
+                                        {this.state.subTemplatesData[t]
+                                            .renderMode === 'html' ? (
+                                                <button
+                                                    className={styles.teButtons}
+                                                    onClick={() => {
+                                                        this.getRenderedTemplatePdf(
+                                                            t,
+                                                            this.state.subTemplatesData[
+                                                                t
+                                                            ].data,
+                                                            this.state.contextData,
+                                                            this.state.subTemplatesData[
+                                                                t
+                                                            ].renderMode
+                                                        );
+                                                    }}
+                                                >
+                                                    Render PDF
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className={styles.teButtons}
+                                                    onClick={() => {
+                                                        this.getRenderedTemplate(
+                                                            t,
+                                                            this.state.subTemplatesData[
+                                                                t
+                                                            ].data,
+                                                            this.state.contextData,
+                                                            this.state.subTemplatesData[
+                                                                t
+                                                            ].renderMode
+                                                        );
+                                                    }}
+                                                >
+                                                    Render
+                                                </button>
+                                            )}
                                         {this.state.subTemplatesData[t]
                                             .renderMode === 'html' ? (
                                                 <button
@@ -785,7 +846,7 @@ class TemplateScreen extends Component {
                                                         );
                                                     }}
                                                 >
-                                                Preview
+                                                Preview HTML
                                                 </button>
                                             ) : (
                                                 ''
@@ -987,12 +1048,11 @@ class TemplateScreen extends Component {
                                     }
                                 }}
                             >
-                                Save
+                                    Save
                             </button>
                         </div>
                     )}
                 </div>
-                <br />
                 <div className={styles.teMarginTop20}>
                     <label>Attributes : </label>
                 </div>

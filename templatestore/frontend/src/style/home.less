@@ -12,7 +12,7 @@
      .tableWrapper {
           height: 80vh;
           overflow: auto;
-          margin-top: 15px;
+          margin-top: 150px;
           thead {
                background-color: #dedede;
           }
@@ -32,12 +32,38 @@
                }
           }
      }   
-     .tsAddTemplateBtn {
-          button {
+
+     .subcontainer {
+          height: auto;
+     }
+
+     .tsDropdown {
+          flex:1;
+          flex-direction: "row";
+          justify-content: "space-around";
+     }
+
+     .left {
+          float: left;
+          .tsAddTemplateBtn {
+               button {
+                    border-radius: 5px;
+                    border: 1px solid #9ca1a7;
+                    color: #ffffff;
+                    background-color: #9ca1a7;
+               }
+          }
+          
+          .tsAddFilterBtn {
                border-radius: 5px;
                border: 1px solid #9ca1a7;
                color: #ffffff;
                background-color: #9ca1a7;
+               
           }
-     }    
+     }
+
+     .right {
+          float: right;
+     }
 }

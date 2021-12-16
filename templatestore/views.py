@@ -6,11 +6,16 @@ from datetime import datetime
 import json
 import re
 import logging
+import requests
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
 from templatestore.utils import base64decode, base64encode
 from templatestore import app_settings as ts_settings
 
 logger = logging.getLogger(__name__)
+PDF_URL = ts_settings.WKPDFGEN_SERVICE_URL
+PDF_ASSET_URL = ts_settings.WKPDFGEN_ASSET_URL
+
+
 
 
 def index(request):
@@ -27,6 +32,30 @@ def render_via_jinja(template, context):
     from jinja2 import Template
 
     return base64encode(Template(base64decode(template)).render(context))
+
+@csrf_exempt
+def render_pdf(request):
+    # log requests
+    if request.method != "POST":
+        return HttpResponseBadRequest("invalid request method: " + request.method)
+
+    try:
+        data = json.loads(request.body)
+        template = data["template"]
+        context = data["context"]
+        context["base_path"] = PDF_ASSET_URL
+        rendered_html_template = render_via_jinja(template,context)
+        pdf=requests.post(PDF_URL+'/render_pdf/', data=json.dumps({'html': str(base64decode(rendered_html_template))}))
+        return HttpResponse(pdf,content_type='application/pdf')
+
+    except Exception as e:
+        logger.exception(e)
+
+        return HttpResponse(
+            json.dumps({"message": str(e)}),
+            content_type="application/json",
+            status=500,
+        )
 
 
 @csrf_exempt

@@ -10,3 +10,5 @@ TE_ROWLIMIT = getattr(settings, "TE_ROWLIMIT", 1000)
 TE_BASEPATH = "/" + getattr(settings, "TE_BASEPATH", "").lstrip("/").rstrip("/")
 TE_BASEPATH = "" if TE_BASEPATH == "/" else TE_BASEPATH
 USER_SERVICE_URL = getattr(settings, "USER_SERVICE_URL", "")
+WKPDFGEN_SERVICE_URL = getattr(settings, "WKPDFGEN_SERVICE_URL", "")
+WKPDFGEN_ASSET_URL = getattr(settings, "WKPDFGEN_ASSET_URL", "")
