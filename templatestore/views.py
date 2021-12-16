@@ -40,7 +40,7 @@ def render_pdf(request):
 
     try:
         x = json.dumps({'html': request.body.decode()})
-        pdf=requests.post("https://wkpdfgen-dev.ackodev.com/render_pdf/", data=x)
+        pdf=requests.post("http://wkpdfgen-uat.internal.ackodev.com/render_pdf", data=x)
         return HttpResponse(pdf,content_type='application/pdf')
 
     except Exception as e:
