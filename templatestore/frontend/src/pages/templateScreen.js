@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
+var Promise = require('promise');
 import axios from 'axios';
+import "regenerator-runtime/runtime";
 import { withRouter } from 'react-router';
+import { generateDate, generateNameOfUrl, validateURL } from '../utils.js';
 import {
     encode,
     decode,
@@ -17,12 +20,14 @@ import 'ace-builds/webpack-resolver';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/theme-github';
+import Tinyurlcomp from '../components/Tinyurlcomp.js';
 const languages = ['html', 'handlebars', 'json'];
 languages.forEach(lang => {
     require(`ace-builds/src-noconflict/mode-${lang}`);
     require(`ace-builds/src-noconflict/snippets/${lang}`);
 });
-
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+axios.defaults.xsrfCookieName = "csrftoken";
 class TemplateScreen extends Component {
     constructor(props) {
         super(props);
@@ -39,8 +44,10 @@ class TemplateScreen extends Component {
             alertMessage: '',
             attributes: '{}',
             version_alias: '',
+            tinyUrlObj: [],
             editable: this.props.editable
         };
+        this.listOfUrls = [];
         this.aceconfig = {
             theme: 'monokai',
             fontSize: 16,
@@ -65,16 +72,20 @@ class TemplateScreen extends Component {
         this.addNewAttribute = this.addNewAttribute.bind(this);
         this.updateAttributes = this.updateAttributes.bind(this);
         this.deleteAttribute = this.deleteAttribute.bind(this);
+        this.scan = this.scan.bind(this);
+        this.setTinyUrlinContextData = this.setTinyUrlinContextData.bind(this);
+        this.updatelistOfUrls = this.updatelistOfUrls.bind(this);
+        // this.setListOfUrls = this.setListOfUrls.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
             axios
                 .get(
                     backendSettings.TE_BASEPATH +
-                        '/api/v1/template/' +
-                        this.state.templateData.name +
-                        '/' +
-                        this.state.templateData.version
+                    '/api/v1/template/' +
+                    this.state.templateData.name +
+                    '/' +
+                    this.state.templateData.version
                 )
                 .then(response => {
                     this.setState({
@@ -118,9 +129,9 @@ class TemplateScreen extends Component {
             axios
                 .get(
                     backendSettings.TE_BASEPATH +
-                        '/api/v1/template/' +
-                        this.state.templateData.name +
-                        '/versions'
+                    '/api/v1/template/' +
+                    this.state.templateData.name +
+                    '/versions'
                 )
                 .then(response => {
                     this.setState({
@@ -157,15 +168,182 @@ class TemplateScreen extends Component {
             .catch(function(error) {
                 console.log(error);
             });
+        this.settinyUrlObj();
+        // if (this.state.contextData) );
     }
+    /* eslint-disable */
+    // componentDidUpdate(prevProps,prevState) {
+    //     console.log("helooowwww");
+    //     //Typical usage, don't forget to compare the props
+    //     if (this.state.contextData.localeCompare(prevState.contextData) !== 0) {
+    //     //   this.fetchData(this.props.userName);
+    //         if (this.state.contextData!="") {
+    //             var temp = [];
+    //             this.scan([], JSON.parse(this.state.contextData), temp);
+    //             this.setState({
+    //                 listOfUrls: temp
+    //             });
+    //         }
+    //     }
+    // }
+    /* eslint-enable */
+    scan(parent, obj) {
+        var k;
+        if (obj instanceof Object) {
+            for (k in obj) {
+                if (obj.hasOwnProperty(k)) {
+                    //recursive call to scan property
+                    parent.push(k);
+                    this.scan(parent, obj[k]);
+                    parent.pop();
+                }
+            }
+        } else if (validateURL(obj)) {
+            let name = generateNameOfUrl(parent);
+            this.listOfUrls.push(name);
+            // console.log(listOfUrls);
+        }
+        return;
+    }
+    setTinyUrlinContextData(obj) {
+        // console.log(obj);
+        let attributes = JSON.parse(this.state.attributes);
+        if (attributes.lob === "" || attributes.journey === "") {
+            alert("Please select attributes first");
+            return;
+        }
+        let contextData = JSON.parse(this.state.contextData); // eslint-disable-line no-unused-vars
 
+        // return temp;
+        var tiniedUrl = [];
+        let promises = [];
+        for (const item in obj) {
+            if (item === 'tinyUrlArray') {
+                obj[item].forEach(obj2 => {
+                    for (const url in obj2) {
+                        let [days, months, years] = obj2[url].split(',');
+                        let expiry = generateDate(days, months, years);// eslint-disable-line no-unused-vars
+                        let str = 'contextData' + url;
+                        let data = {
+                            original_url: eval(str),
+                            lob: attributes.lob,
+                            journey: attributes.journey,
+                            expiry_time: expiry
+                        };
+                        // console.log(typeof (this.state.attributes), this.state.attributes);
+                        // console.log(data);
+                        promises.push(
+                            axios({
+                                method: 'post',
+                                url: "https://tinyurl.internal.ackodev.com/api/v1/create_tiny_url",
+                                data: data
+                            }).then((response) => {
+                                console.log(response.data.tiny_url);
+                                // temp=response.data.tiny_url;
+                                tiniedUrl.push([url, response.data.tiny_url]);
+                            }).catch((err) => {
+                                console.log(err);
+                                alert(err);
+                                return err;
+                            })
+                        );
+                        // tiniedUrl.push([url, this.generateTinyUrl(url, expiry)]);
+                        // var temp=await this.generateTinyUrl(url, expiry);
+                        // tiniedUrl.push(temp);
+                        // let str = "contextData" + url + "=response.data['tiny_url']";
+                        // console.log(ans);
+                    }
+                });
+            }
+
+            // console.log(item, obj[item]);
+        }
+        var temp = JSON.parse(this.state.contextData);// eslint-disable-line no-unused-vars
+        Promise.all(promises).then(() => {
+            for (let i = 0; i < tiniedUrl.length; i++) {
+                var s = "temp" + tiniedUrl[i][0] + "='" + tiniedUrl[i][1] + "'";
+                console.log(s);
+                eval(s);
+                // console.log(eval("temp" + tiniedUrl[i][0]));
+            }
+            this.setState({
+                contextData: JSON.stringify(temp)
+            });
+            return true;
+        });
+        return false;
+    }
+    settinyUrlObj() {
+        let data = {
+            name: this.state.templateData.name,
+            version: this.state.templateData.version
+        };
+        axios({
+            method: 'post',
+            url: "http://localhost:8000/getTinyUrlFromDB",
+            data: data
+        }).then((response) => {
+            console.log(typeof (response.data), response.data);
+            this.setState({
+                tinyUrlObj: response.data
+            });
+        });
+    }
+    updatelistOfUrls() {
+        if (this.state.contextData !== "") {
+            console.log("inside meathod");
+            this.listOfUrls = [];
+            this.scan([], JSON.parse(this.state.contextData));
+        }
+    }
+    // tempfn=async(tiniedUrl) => {
+    //
+    // }
+    // generateTinyUrl=async (url, expiry)=> {
+    //     let attributes = JSON.parse(this.state.attributes);
+    //     if (attributes.lob === "" || attributes.journey === "") {
+    //         alert("Please select attributes first");
+    //         return;
+    //     }
+    //     let contextData = JSON.parse(this.state.contextData); // eslint-disable-line no-unused-vars
+    //     let str = 'contextData' + url;
+    //     let data = {
+    //         original_url: eval(str),
+    //         lob: attributes.lob,
+    //         journey: attributes.journey,
+    //         expiry_time: expiry
+    //     };
+    //     // console.log(typeof (this.state.attributes), this.state.attributes);
+    //     console.log(data);
+    //     var temp;
+    //     axios({
+    //         method: 'post',
+    //         url: "https://tinyurl.internal.ackodev.com/api/v1/create_tiny_url",
+    //         data: data
+    //     }).then((response) => {
+    //         console.log(response.data.tiny_url);
+    //         temp=response.data.tiny_url;
+    //         // tiniedUrl.push(response.data.tiny_url);
+    //         // let str = "contextData" + url + "=response.data['tiny_url']";
+    //         // eval(str);
+    //         // // alert("Saved from frontend");
+    //         // this.setState({
+    //         //     contextData: JSON.stringify(contextData)
+    //         // });
+    //     }).catch((err) => {
+    //         console.log(err);
+    //         alert(err);
+    //         return err;
+    //     });
+    //     return temp;
+    // }
     openTemplateVersion(version) {
         window.open(
             backendSettings.TE_BASEPATH +
-                '/t/' +
-                this.state.templateData.name +
-                '/' +
-                version
+            '/t/' +
+            this.state.templateData.name +
+            '/' +
+            version
         );
     }
 
@@ -173,10 +351,10 @@ class TemplateScreen extends Component {
         axios
             .post(
                 backendSettings.TE_BASEPATH +
-                    '/api/v1/template/' +
-                    this.state.templateData.name +
-                    '/' +
-                    version,
+                '/api/v1/template/' +
+                this.state.templateData.name +
+                '/' +
+                version,
                 {
                     default: true
                 }
@@ -184,10 +362,10 @@ class TemplateScreen extends Component {
             .then(response => {
                 this.props.history.push(
                     backendSettings.TE_BASEPATH +
-                        '/t/' +
-                        response.data.name +
-                        '/' +
-                        response.data.version
+                    '/t/' +
+                    response.data.name +
+                    '/' +
+                    response.data.version
                 );
             })
             .catch(error => {
@@ -290,7 +468,8 @@ class TemplateScreen extends Component {
                 template: encode(templateData),
                 context: contextData,
                 handler: 'jinja2',
-                output: renderMode
+                output: renderMode,
+                tinyUrlArray: this.listOfUrls
             };
             axios
                 .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
@@ -458,10 +637,10 @@ class TemplateScreen extends Component {
             .then(response => {
                 this.props.history.push(
                     backendSettings.TE_BASEPATH +
-                        '/t/' +
-                        response.data.name +
-                        '/' +
-                        response.data.version
+                    '/t/' +
+                    response.data.name +
+                    '/' +
+                    response.data.version
                 );
             })
             .catch(error => {
@@ -510,9 +689,9 @@ class TemplateScreen extends Component {
                 axios
                     .get(
                         backendSettings.TE_BASEPATH +
-                            '/api/v1/template/' +
-                            name +
-                            '/versions'
+                        '/api/v1/template/' +
+                        name +
+                        '/versions'
                     )
                     .then(response => {
                         this.showAlerts("Template with this name already exists");
@@ -690,7 +869,6 @@ class TemplateScreen extends Component {
             attributes: JSON.stringify(newAttributes)
         });
     }
-
     render() {
         let chooseVersion = this.state.versions.map(versions => {
             return (
@@ -804,7 +982,7 @@ class TemplateScreen extends Component {
                                                         );
                                                     }}
                                                 >
-                                                    Render PDF
+                                                Render PDF
                                                 </button>
                                             ) : (
                                                 <button
@@ -822,7 +1000,7 @@ class TemplateScreen extends Component {
                                                         );
                                                     }}
                                                 >
-                                                    Render
+                                                Render
                                                 </button>
                                             )}
                                         {this.state.subTemplatesData[t]
@@ -911,7 +1089,7 @@ class TemplateScreen extends Component {
                             )}
                             <label>Default : </label>
                             {!this.state.editable &&
-                            this.state.templateData.default ? (
+                                this.state.templateData.default ? (
                                     <i
                                         className="fa fa-check-circle"
                                         aria-hidden="true"
@@ -1048,10 +1226,17 @@ class TemplateScreen extends Component {
                                     }
                                 }}
                             >
-                                    Save
+                                Save
                             </button>
                         </div>
                     )}
+                </div>
+                <br/>
+                <div>
+                    {console.log("rerendered")}
+                    {this.updatelistOfUrls()}
+                    {/* <h1>{JSON.stringify(this.state.tinyUrlObj)}</h1> */}
+                    <Tinyurlcomp handleEvent={this.onContextChange} attributes={this.state.attributes} listOfUrls={this.listOfUrls} templateName={this.state.templateData.name} templateVersion={this.state.templateData.version} setTinyUrlinContextData={this.setTinyUrlinContextData} tinyUrlObj={this.state.tinyUrlObj}/>
                 </div>
                 <div className={styles.teMarginTop20}>
                     <label>Attributes : </label>
@@ -1118,7 +1303,7 @@ class TemplateScreen extends Component {
                                                             className={styles.teUpdateButton}
                                                             onClick={this.updateAttributes}
                                                         >
-                                                        Update
+                                                            Update
                                                         </button>
                                                     ) : (
                                                         ''
@@ -1174,9 +1359,9 @@ class TemplateScreen extends Component {
                                 style={{ height: '90vh', padding: '0' }}
                             >
                                 {this.state.previewSubType &&
-                                this.state.subTemplatesData.hasOwnProperty(
-                                    this.state.previewSubType
-                                ) ? (
+                                    this.state.subTemplatesData.hasOwnProperty(
+                                        this.state.previewSubType
+                                    ) ? (
                                         <iframe
                                             height="100%"
                                             width="100%"

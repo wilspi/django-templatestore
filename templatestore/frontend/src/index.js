@@ -6,7 +6,6 @@ import Home from './pages/home.js';
 import TemplateScreen from './pages/templateScreen.js';
 import Page404 from './pages/404.js';
 import Page403 from './pages/403.js';
-
 const Root = () => (
     <Router forceRefresh>
         <Switch>
