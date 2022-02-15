@@ -73,11 +73,11 @@ WSGI_APPLICATION = "example.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "",
-        "USER": "",
-        "PASSWORD": "",
-        "HOST": "",
-        "PORT": "",
+        "NAME": "ackodev_templates",
+        "USER": "ackodev_templates_rw_v1",
+        "PASSWORD": "9qMzTLnHLhS7bQXDo3Gj",
+        "HOST": "acko-services-dev-rds.acko.in",
+        "PORT": "5432",
     }
 }
 
@@ -130,6 +130,12 @@ TE_TEMPLATE_ATTRIBUTES = {
         "allowed_values": ["Policy", "Claim", "IVR", "Purchase", "Pre Inspection", "CX 360", "Reporting"],
     },
 }
-
 TE_ROWLIMIT = 1000
 TE_BASEPATH = "/"
+# GDAL_LIBRARY_PATH="/opt/homebrew/Cellar/gdal/3.4.1_1/lib -lgdal"
+GDAL_LIBRARY_PATH = '/opt/homebrew/opt/gdal/lib/libgdal.dylib'
+GEOS_LIBRARY_PATH = '/opt/homebrew/opt/geos/lib/libgeos_c.dylib'
+
+WKPDFGEN_SERVICE_URL="https://wkpdfgen.ackodev.com/"
+WKPDFGEN_ASSET_URL="https://wkpdfgen-uat.ackoassets.com/pdfgen/templates"
+USER_SERVICE_URL="http://entity-service.internal.ackodev.com/api/user/"

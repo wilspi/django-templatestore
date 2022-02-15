@@ -44,3 +44,22 @@ export function getDateInSimpleFormat(datestr) {
 export const backendSettings = JSON.parse(
     document.getElementById('settings-data').textContent.replace(/&quot;/g, '"')
 );
+export function validateURL(str) {
+    var regex = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
+    return regex.test(str);
+}
+export function generateNameOfUrl(parent) {
+    let ans = "";
+    for (let i = 0; i < parent.length; i++) {
+        ans += ("['" + parent[i] + "']");
+    }
+    return ans;
+}
+export function generateDate(days, months, years) {
+    var date = new Date();
+    console.log(date);
+    date.setDate(date.getDate() + parseInt(days, 10));
+    date.setMonth(date.getMonth() + parseInt(months, 10));
+    date.setFullYear(date.getFullYear() + parseInt(years, 10));
+    return date.toISOString();
+}
