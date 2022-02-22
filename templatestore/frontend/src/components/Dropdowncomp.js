@@ -2,27 +2,25 @@ import React from 'react';
 import styles from '../style/templateScreen.less';
 export default function Dropdowncomp(props) {
     return (
-        <div className="row" style={{ margin: '0 0 15px 0' }}>
-            {console.log(props.expiry)}
-            <div className="col">
+        <div className={styles.teAttributesRow}>
+            <div className={styles.teAttributesCell}>
                 <select
                     name="urlKey"
                     value={props.urlKey}
                     placeholder="Choose a value"
                     onChange={(e) => props.handleChange(e, props.id)}
                 >
-                    <option value="" disabled>Choose a value</option>
+                    <option value="" disabled>Choose URL</option>
                     {props.listOfUrls.map((urlopt) => (
-                        <option value={urlopt}>{urlopt}</option>
+                        <option value={urlopt} disabled={props.urlKey !== urlopt && urlopt in props.visited} >{urlopt}</option>
                     ))}
                 </select>
             </div>
-            <div className="col">
+            <div className={styles.teAttributesCell}>
                 <select
                     name="expiry"
                     value={props.expiry}
                     placeholder="Choose a value"
-                    className={styles.teAttributesCell}
                     onChange={(e) => props.handleChange(e, props.id)}
                 >
                     <option value="" disabled>Choose Expiry</option>
@@ -33,7 +31,12 @@ export default function Dropdowncomp(props) {
                     <option value="0,6,0">6 Months</option>
                     <option value="0,0,1">1 Year</option>
                 </select>
-                <button type="button" className="close" data-dismiss="modal" onClick={(e) => props.removeDropdown(e, props.id)}>×</button>
+                <span
+                    className={styles.teDeleteAttribute}
+                    onClick={(e) => props.removeDropdown(e, props.id)}
+                >
+                    &times;
+                </span>
             </div>
         </div>
     );
