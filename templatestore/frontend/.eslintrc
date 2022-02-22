@@ -14,7 +14,6 @@
       }
    },
    "rules": {
-       "space-before-function-paren": ["error", "never"],
-       "no-alert": "off"
+       "space-before-function-paren": ["error", "never"]
    }
 }

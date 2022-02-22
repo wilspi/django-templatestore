@@ -12,7 +12,6 @@ django-templatestore-dev/
 
 # node modules
 templatestore/frontend/node_modules
-node_modules
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

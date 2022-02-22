@@ -14,11 +14,12 @@ def base64encode(rendered_output):
     output = base64.b64encode(rendered_output.encode("utf-8"))
     return str(output.decode("utf-8"))
 
-def generateDate(days, months, years):
+def generateDate(days):
     # .isoformat()
     IST = pytz.timezone('Asia/Kolkata')
-    dt = datetime.datetime.now(IST)+relativedelta(days=+days)+relativedelta(months=+months)+relativedelta(years=+years)
+    dt = datetime.datetime.now(IST)+relativedelta(days=+days)
     return str(dt.isoformat())
+
 def generatePayload(templateTable,versionTable,param):
     ans=[]
     i=0
@@ -26,11 +27,8 @@ def generatePayload(templateTable,versionTable,param):
         original_url='versionTable.sample_context_data'+versionTable.tiny_url[i]['urlKey']
         lob=templateTable.attributes['lob']
         journey=templateTable.attributes['journey']
-        expiry=versionTable.tiny_url[i]['expiry'].split(',')
-        days=expiry[0]
-        months=expiry[1]
-        years=expiry[2]
-        expiry=generateDate(int(days),int(months),int(years))
+        days=versionTable.tiny_url[i]['expiry']
+        expiry=generateDate(int(days))
         ans.append({"original_url":eval(original_url),
                 "lob":lob,
                 "journey":journey,

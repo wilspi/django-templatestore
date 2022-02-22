@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import styles from '../style/templateScreen.less';
 import axios from 'axios';
 import { backendSettings } from './../utils.js';
-import Dropdowncomp from './Dropdowncomp';
-export default function Tinyurlcomp(props) {
+import TinyUrlDropdownComponent from './TinyUrlDropdownComponent';
+
+export default function TinyUrlComponent(props) {
     if (props.contextData === '') return <></>;
     var tinyUrlObjLocal = props.tinyUrlObj;
     const [items, setItems] = useState([{ urlKey: "", expiry: "" }]);
@@ -22,6 +23,7 @@ export default function Tinyurlcomp(props) {
         setVisited(tempvisited);
         setItems(temp);
     }
+
     function addNewDropdown() {
         if (items.length) {
             if (items[items.length - 1]['urlKey'] === "" || items[items.length - 1]['expiry'] === "") {
@@ -32,14 +34,16 @@ export default function Tinyurlcomp(props) {
         var newItems = [...items, { urlKey: "", expiry: "" }];
         setItems(newItems);
     }
+
     function removeDropdown(e, givenId) {
         e.preventDefault();
         const newItems = items.filter(el => el.urlKey !== givenId);
         let tempvisited = { ...visited };
-        delete tempvisited[givenId]; // eslint-disable-line
+        tempvisited[givenId] = 0;
         setVisited(tempvisited);
         setItems(newItems);
     }
+
     function handleChange(e, id) {
         e.persist();
         if (e.target.value === "") {
@@ -51,7 +55,7 @@ export default function Tinyurlcomp(props) {
         if (e.target.name === 'urlKey') {
             tempvisited[e.target.value] = 1;
             if (id !== "") {
-                delete tempvisited[id]; // eslint-disable-line
+                tempvisited[id] = 0;
             }
             setVisited(tempvisited);
         }
@@ -79,13 +83,12 @@ export default function Tinyurlcomp(props) {
         return { thingsRemoved: removedArray,
             thingsAdded: addedArray };
     }
-    /*eslint-disable */
+
     function valueSelected(e) {
         e.preventDefault();
         let data = {};
         for (let i = 0; i < items.length; i++) {
             if (items[i].urlKey === "" || items[i].expiry === "") {
-                // alert("Please choose correct url and expiry");
                 props.showAlerts("Can't leave url or expiry blank");
                 return;
             }
@@ -97,25 +100,25 @@ export default function Tinyurlcomp(props) {
         }
 
         for (var i = 0; i < changes['thingsRemoved'].length; i++) {
-            const index = tinyUrlObjLocal.findIndex(obj => obj.urlKey === changes['thingsRemoved'][i].urlKey);
+            const index = tinyUrlObjLocal.findIndex(obj => obj.urlKey === changes['thingsRemoved'][i].urlKey); // eslint-disable-line
             if (index !== -1)tinyUrlObjLocal.splice(index, 1);
         }
-        if(changes['thingsAdded'].length){
-            if(tinyUrlObjLocal)tinyUrlObjLocal = [...tinyUrlObjLocal, ...changes['thingsAdded']];
-            else tinyUrlObjLocal=changes['thingsAdded'];
+        if (changes['thingsAdded'].length) {
+            if (tinyUrlObjLocal)tinyUrlObjLocal = [...tinyUrlObjLocal, ...changes['thingsAdded']];
+            else tinyUrlObjLocal = changes['thingsAdded'];
         }
         data['tinyUrlArray'] = tinyUrlObjLocal;
         data['templateName'] = props.templateName;
         data['templateVersion'] = props.templateVersion;
         axios({
             method: 'put',
-            url: backendSettings.TE_BASEPATH + '/generate_tiny_url',
+            url: backendSettings.TE_BASEPATH + '/save_tiny_url',
             data: data
         }).then((response) => {
             props.showAlerts(response.data.message);
         }).catch((err) => {props.showAlerts(err);});
     }
-    /*eslint-enable */
+
     return (
         <>
             <div className={styles.teMarginTop20}>
@@ -157,9 +160,9 @@ export default function Tinyurlcomp(props) {
                             <div className="card-body">
                                 <div className={styles.teAttributesWrapper}>
                                     {items.map((item, index) => (
-                                        <Dropdowncomp id={item.urlKey} key={item.urlKey} urlKey={item.urlKey} expiry={item.expiry} handleChange={handleChange} removeDropdown={removeDropdown} listOfUrls={props.listOfUrls} visited={visited}/>
+                                        <TinyUrlDropdownComponent id={item.urlKey} key={item.urlKey} urlKey={item.urlKey} expiry={item.expiry} handleChange={handleChange} removeDropdown={removeDropdown} urlKeyList={props.urlKeyList} visited={visited}/>
                                     ))}
-                                    {items.length < props.listOfUrls.length ?
+                                    {items.length < props.urlKeyList.length ?
                                         <button
                                             className={styles.teAddNewAttributeButton}
                                             onClick={addNewDropdown}

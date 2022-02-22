@@ -44,10 +44,11 @@ export function getDateInSimpleFormat(datestr) {
 export const backendSettings = JSON.parse(
     document.getElementById('settings-data').textContent.replace(/&quot;/g, '"')
 );
+
 export function validateURL(str) {
-    var regex = /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/;
-    return regex.test(str);
+    return (/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/).test(str);
 }
+
 export function generateNameOfUrl(parent) {
     let ans = "";
     for (let i = 0; i < parent.length; i++) {
@@ -55,6 +56,7 @@ export function generateNameOfUrl(parent) {
     }
     return ans;
 }
+
 export function generateDate(days, months, years) {
     var date = new Date();
     date.setDate(date.getDate() + parseInt(days, 10));

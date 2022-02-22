@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from '../style/templateScreen.less';
-export default function Dropdowncomp(props) {
+
+export default function TinyUrlDropdownComponent(props) {
     return (
         <div className={styles.teAttributesRow}>
             <div className={styles.teAttributesCell}>
@@ -11,8 +12,8 @@ export default function Dropdowncomp(props) {
                     onChange={(e) => props.handleChange(e, props.id)}
                 >
                     <option value="" disabled>Choose URL</option>
-                    {props.listOfUrls.map((urlopt) => (
-                        <option value={urlopt} disabled={props.urlKey !== urlopt && urlopt in props.visited} >{urlopt}</option>
+                    {props.urlKeyList.map((urlKey) => (
+                        <option value={urlKey} disabled={props.urlKey !== urlKey && props.visited[urlKey] === 1} >{urlKey}</option>
                     ))}
                 </select>
             </div>
@@ -24,12 +25,12 @@ export default function Dropdowncomp(props) {
                     onChange={(e) => props.handleChange(e, props.id)}
                 >
                     <option value="" disabled>Choose Expiry</option>
-                    <option value="1,0,0">1 Day</option>
-                    <option value="3,0,0">3 Day</option>
-                    <option value="7,0,0">1 Week</option>
-                    <option value="0,1,0">1 Month</option>
-                    <option value="0,6,0">6 Months</option>
-                    <option value="0,0,1">1 Year</option>
+                    <option value="1">1 Day</option>
+                    <option value="3">3 Day</option>
+                    <option value="7">7 Days</option>
+                    <option value="30">30 days</option>
+                    <option value="182">182 Days</option>
+                    <option value="365">365 Days</option>
                 </select>
                 <span
                     className={styles.teDeleteAttribute}

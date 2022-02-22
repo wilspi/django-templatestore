@@ -444,7 +444,7 @@ def get_tiny_url_from_db(request):
         )
     
 @csrf_exempt
-def generate_tiny_url(request):
+def save_tiny_url(request):
     if request.method != "PUT":
         return HttpResponseBadRequest("invalid request method: " + request.method)
     # Get the required template
@@ -526,7 +526,6 @@ def get_render_template_view(request, name, version=None):
                 exec(temp)
                 i=i+1
                 
-            
             stpls = SubTemplate.objects.filter(template_version_id=tv.id)
             try:
                 res = {
