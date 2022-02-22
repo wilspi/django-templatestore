@@ -23,9 +23,7 @@ def generatePayload(templateTable,versionTable,param):
     ans=[]
     i=0
     while i< len(versionTable.tiny_url):
-        print(versionTable.tiny_url[i]['urlKey'], versionTable.tiny_url[i]['expiry'])
         original_url='versionTable.sample_context_data'+versionTable.tiny_url[i]['urlKey']
-        # print(data['tinyUrlArray'])
         lob=templateTable.attributes['lob']
         journey=templateTable.attributes['journey']
         expiry=versionTable.tiny_url[i]['expiry'].split(',')
@@ -40,4 +38,3 @@ def generatePayload(templateTable,versionTable,param):
                 })
         i=i+1
     return ans
-    # print(data['tinyUrlArray'])

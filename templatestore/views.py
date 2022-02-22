@@ -66,7 +66,6 @@ def render_template_view(request):
 
     try:
         data = json.loads(request.body)
-        print(data)
         required_fields = {"template", "context", "handler"}
         missing_fields = required_fields.difference(set(data.keys()))
 
@@ -78,7 +77,6 @@ def render_template_view(request):
         template = data["template"]
         context = data["context"]
         handler = data["handler"]
-        # print(template)
         if not re.match(
             "(^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$)", template
         ):
@@ -86,7 +84,6 @@ def render_template_view(request):
 
         if handler == "jinja2":
             rendered_template = render_via_jinja(template, context)
-            print(rendered_template)
             data = {
                 "rendered_template": rendered_template,
                 "rendered_on": datetime.now(),
@@ -396,7 +393,6 @@ def get_template_versions_view(request, name):
             tvs = TemplateVersion.objects.filter(template_id=t.id).order_by("-id")[
                 offset : offset + limit
             ]
-            print(type(tvs))
             version_list = [
                 {
                     "version": tv.version,
@@ -407,7 +403,6 @@ def get_template_versions_view(request, name):
                 }
                 for tv in tvs
             ]
-            # print(version_list[11])
             return JsonResponse(version_list, safe=False)
 
         except Exception as e:
@@ -428,15 +423,12 @@ def get_template_versions_view(request, name):
 def get_tiny_url_from_db(request):
     if request.method != "POST":
         return HttpResponseBadRequest("invalid request method: " + request.method)
-    print("this is data from request")
     data=json.loads(request.body)
-    print(data)
     try:
         templateTable=Template.objects.get(name=data['name'])
         try:
             versionTable= TemplateVersion.objects.get(template_id_id=templateTable.id,version=data['version'])
             data = json.dumps(versionTable.tiny_url)
-            print(data,'data from db')
             return HttpResponse(data)
         except Exception:
             raise (
@@ -453,7 +445,6 @@ def get_tiny_url_from_db(request):
     
 @csrf_exempt
 def generate_tiny_url(request):
-    print("from generate tiny url")
     if request.method != "PUT":
         return HttpResponseBadRequest("invalid request method: " + request.method)
     # Get the required template
@@ -525,16 +516,13 @@ def get_render_template_view(request, name, version=None):
                 if version
                 else TemplateVersion.objects.get(id=t.default_version_id)
             )
-            print(tv.tiny_url)
             # versionTable= TemplateVersion.objects.get(template_id_id=templateTable.id,version=version)
             listOfData=generatePayload(t,tv,tv.tiny_url)
             i=0          
             while i < len(listOfData):
                 result = requests.post(api,json.dumps(listOfData[i]),headers={"content-type": "application/json"})
                 result=result.json() 
-                print(tv.tiny_url[i])
                 temp="data['context_data']"+tv.tiny_url[i]['urlKey']+"='"+ result['tiny_url']+"'"
-                print(temp)
                 exec(temp)
                 i=i+1
                 
