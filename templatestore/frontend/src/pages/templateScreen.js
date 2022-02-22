@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-var Promise = require('promise');
 import axios from 'axios';
 import "regenerator-runtime/runtime";
 import { withRouter } from 'react-router';
-import { generateDate, generateNameOfUrl, validateURL } from '../utils.js';
+import { generateNameOfUrl, validateURL } from '../utils.js';
 import {
     encode,
     decode,
@@ -20,14 +19,13 @@ import 'ace-builds/webpack-resolver';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/theme-github';
-import Tinyurlcomp from '../components/Tinyurlcomp.js';
+import TinyUrlComponent from '../components/TinyUrlComponent.js';
 const languages = ['html', 'handlebars', 'json'];
 languages.forEach(lang => {
     require(`ace-builds/src-noconflict/mode-${lang}`);
     require(`ace-builds/src-noconflict/snippets/${lang}`);
 });
-axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
-axios.defaults.xsrfCookieName = "csrftoken";
+
 class TemplateScreen extends Component {
     constructor(props) {
         super(props);
@@ -45,9 +43,9 @@ class TemplateScreen extends Component {
             attributes: '{}',
             version_alias: '',
             tinyUrlObj: [],
+            urlKeyList: [],
             editable: this.props.editable
         };
-        this.listOfUrls = [];
         this.aceconfig = {
             theme: 'monokai',
             fontSize: 16,
@@ -73,9 +71,7 @@ class TemplateScreen extends Component {
         this.updateAttributes = this.updateAttributes.bind(this);
         this.deleteAttribute = this.deleteAttribute.bind(this);
         this.scan = this.scan.bind(this);
-        this.setTinyUrlinContextData = this.setTinyUrlinContextData.bind(this);
-        this.updatelistOfUrls = this.updatelistOfUrls.bind(this);
-        // this.setListOfUrls = this.setListOfUrls.bind(this);
+        this.updateurlKeyList = this.updateurlKeyList.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -117,6 +113,7 @@ class TemplateScreen extends Component {
                         type: response.data.type,
                         version_alias: response.data.version_alias
                     });
+                    this.updateurlKeyList();
                 })
                 .catch(error => {
                     console.log(error);
@@ -164,30 +161,32 @@ class TemplateScreen extends Component {
                         config: response.data
                     });
                 }
+                this.updateurlKeyList();
             })
             .catch(function(error) {
                 console.log(error);
             });
         this.settinyUrlObj();
-        // if (this.state.contextData) );
     }
-    scan(parent, obj) {
+
+    scan(parent, obj, result) {
         var k;
         if (obj instanceof Object) {
             for (k in obj) {
                 if (obj.hasOwnProperty(k)) {
                     //recursive call to scan property
                     parent.push(k);
-                    this.scan(parent, obj[k]);
+                    this.scan(parent, obj[k], result);
                     parent.pop();
                 }
             }
         } else if (validateURL(obj)) {
             let name = generateNameOfUrl(parent);
-            this.listOfUrls.push(name);
+            result.push(name);
         }
         return;
     }
+
     settinyUrlObj() {
         let data = {
             name: this.state.templateData.name,
@@ -203,10 +202,14 @@ class TemplateScreen extends Component {
             });
         });
     }
-    updatelistOfUrls() {
+
+    updateurlKeyList() {
         if (this.state.contextData !== "") {
-            this.listOfUrls = [];
-            this.scan([], JSON.parse(this.state.contextData));
+            var result = [];
+            this.scan([], JSON.parse(this.state.contextData), result);
+            this.setState({
+                urlKeyList: result
+            });
         }
     }
 
@@ -342,7 +345,7 @@ class TemplateScreen extends Component {
                 context: contextData,
                 handler: 'jinja2',
                 output: renderMode,
-                tinyUrlArray: this.listOfUrls
+                tinyUrlArray: this.state.urlKeyList
             };
             axios
                 .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
@@ -434,6 +437,7 @@ class TemplateScreen extends Component {
         this.setState({
             contextData: newValue
         });
+        this.updateurlKeyList();
     }
 
     onAttributesChange(attributeKey, newValue, keyChange = false) {
@@ -1186,8 +1190,7 @@ class TemplateScreen extends Component {
                     </div>
                 </div>
                 <div>
-                    {this.updatelistOfUrls()}
-                    <Tinyurlcomp handleEvent={this.onContextChange} attributes={this.state.attributes} listOfUrls={this.listOfUrls} templateName={this.state.templateData.name} templateVersion={this.state.templateData.version} tinyUrlObj={this.state.tinyUrlObj} showAlerts={this.showAlerts}/>
+                    <TinyUrlComponent urlKeyList={this.state.urlKeyList} templateName={this.state.templateData.name} templateVersion={this.state.templateData.version} tinyUrlObj={this.state.tinyUrlObj} showAlerts={this.showAlerts}/>
                 </div>
                 {this.state.editable ? (
                     ''

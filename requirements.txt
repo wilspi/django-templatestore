@@ -1,4 +1,4 @@
-Django==3.2.7
+Django==3.0.7
 black==19.10b0
 <<<<<<< HEAD
 Jinja2==2.11.3
