@@ -247,8 +247,8 @@ class TemplateScreen extends Component {
                                 return err;
                             })
                         );
-                        // tiniedUrl.push([url, this.generateTinyUrl(url, expiry)]);
-                        // var temp=await this.generateTinyUrl(url, expiry);
+                        // tiniedUrl.push([url, this.generate_tiny_url(url, expiry)]);
+                        // var temp=await this.generate_tiny_url(url, expiry);
                         // tiniedUrl.push(temp);
                         // let str = "contextData" + url + "=response.data['tiny_url']";
                         // console.log(ans);
@@ -280,7 +280,7 @@ class TemplateScreen extends Component {
         };
         axios({
             method: 'post',
-            url: "http://localhost:8000/getTinyUrlFromDB",
+            url: "http://localhost:8000/get_tiny_url_from_db",
             data: data
         }).then((response) => {
             console.log(typeof (response.data), response.data);
@@ -296,47 +296,7 @@ class TemplateScreen extends Component {
             this.scan([], JSON.parse(this.state.contextData));
         }
     }
-    // tempfn=async(tiniedUrl) => {
-    //
-    // }
-    // generateTinyUrl=async (url, expiry)=> {
-    //     let attributes = JSON.parse(this.state.attributes);
-    //     if (attributes.lob === "" || attributes.journey === "") {
-    //         alert("Please select attributes first");
-    //         return;
-    //     }
-    //     let contextData = JSON.parse(this.state.contextData); // eslint-disable-line no-unused-vars
-    //     let str = 'contextData' + url;
-    //     let data = {
-    //         original_url: eval(str),
-    //         lob: attributes.lob,
-    //         journey: attributes.journey,
-    //         expiry_time: expiry
-    //     };
-    //     // console.log(typeof (this.state.attributes), this.state.attributes);
-    //     console.log(data);
-    //     var temp;
-    //     axios({
-    //         method: 'post',
-    //         url: "https://tinyurl.internal.ackodev.com/api/v1/create_tiny_url",
-    //         data: data
-    //     }).then((response) => {
-    //         console.log(response.data.tiny_url);
-    //         temp=response.data.tiny_url;
-    //         // tiniedUrl.push(response.data.tiny_url);
-    //         // let str = "contextData" + url + "=response.data['tiny_url']";
-    //         // eval(str);
-    //         // // alert("Saved from frontend");
-    //         // this.setState({
-    //         //     contextData: JSON.stringify(contextData)
-    //         // });
-    //     }).catch((err) => {
-    //         console.log(err);
-    //         alert(err);
-    //         return err;
-    //     });
-    //     return temp;
-    // }
+
     openTemplateVersion(version) {
         window.open(
             backendSettings.TE_BASEPATH +
@@ -1221,7 +1181,8 @@ class TemplateScreen extends Component {
                                             this.state.templateData.name,
                                             this.state.type,
                                             this.state.contextData,
-                                            this.state.attributes
+                                            this.state.attributes,
+                                            this.state.tinyUrlObj
                                         );
                                     }
                                 }}
@@ -1232,12 +1193,6 @@ class TemplateScreen extends Component {
                     )}
                 </div>
                 <br/>
-                <div>
-                    {console.log("rerendered")}
-                    {this.updatelistOfUrls()}
-                    {/* <h1>{JSON.stringify(this.state.tinyUrlObj)}</h1> */}
-                    <Tinyurlcomp handleEvent={this.onContextChange} attributes={this.state.attributes} listOfUrls={this.listOfUrls} templateName={this.state.templateData.name} templateVersion={this.state.templateData.version} setTinyUrlinContextData={this.setTinyUrlinContextData} tinyUrlObj={this.state.tinyUrlObj}/>
-                </div>
                 <div className={styles.teMarginTop20}>
                     <label>Attributes : </label>
                 </div>
@@ -1316,6 +1271,10 @@ class TemplateScreen extends Component {
                             </div>
                         }
                     </div>
+                </div>
+                <div>
+                    {this.updatelistOfUrls()}
+                    <Tinyurlcomp handleEvent={this.onContextChange} attributes={this.state.attributes} listOfUrls={this.listOfUrls} templateName={this.state.templateData.name} templateVersion={this.state.templateData.version} tinyUrlObj={this.state.tinyUrlObj} showAlerts={this.showAlerts}/>
                 </div>
                 {this.state.editable ? (
                     ''

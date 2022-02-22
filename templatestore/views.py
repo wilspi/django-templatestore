@@ -425,23 +425,16 @@ def get_template_versions_view(request, name):
             status=404,
         )
 @csrf_exempt
-def getTinyUrlFromDB(request):
+def get_tiny_url_from_db(request):
     if request.method != "POST":
         return HttpResponseBadRequest("invalid request method: " + request.method)
     print("this is data from request")
     data=json.loads(request.body)
     print(data)
-    # return JsonResponse(json.dumps(data))
-    # return HttpResponse(
-    #     json.dumps(data),
-    #     content_type="application/json",
-    # )
     try:
         templateTable=Template.objects.get(name=data['name'])
-        # print(templateTable)
         try:
             versionTable= TemplateVersion.objects.get(template_id_id=templateTable.id,version=data['version'])
-            # print(versionTable.tiny_url)
             data = json.dumps(versionTable.tiny_url)
             print(data,'data from db')
             return HttpResponse(data)
@@ -459,38 +452,27 @@ def getTinyUrlFromDB(request):
         )
     
 @csrf_exempt
-def generateTinyUrl(request):
+def generate_tiny_url(request):
     print("from generate tiny url")
-    if request.method != "POST":
+    if request.method != "PUT":
         return HttpResponseBadRequest("invalid request method: " + request.method)
     # Get the required template
     try:
-        # print(request.body)
         data=json.loads(request.body)
-        # print("from generate tiny url",data)
         try:
             version=data['templateVersion']
             templateTable=Template.objects.get(name=data['templateName'])
-            # print("here is what should is in table:", data['tinyUrlArray'])
-            # print(version)
             #get template version table
             try:
                 versionTable= TemplateVersion.objects.get(template_id_id=templateTable.id,version=version)
                 versionTable.tiny_url=data['tinyUrlArray']
                 versionTable.save()
-                print("this is from db::::",versionTable.tiny_url)
-                # listOfData=generatePayload(templateTable,versionTable,data['tinyUrlArray'])
-                # for data in listOfData:
-                #     # print(json.dumps(data))
-                #     result = requests.post(api,json.dumps(data),headers={"content-type": "application/json"})
-                #     # print(result.headers['content-type'])
-                #     result=result.json() 
             except Exception as e:
                 logger.exception(e)
                 return HttpResponse(
                     json.dumps({"message": str(e)}),
                     content_type="application/json",
-                    status=500,
+                    status=200,
                 )
         except Exception as e:
             logger.exception(e)
@@ -499,12 +481,6 @@ def generateTinyUrl(request):
                 content_type="application/json",
                 status=200,
             )
-            # raise (
-            #     Exception(
-            #         "Validation: Template with name `" + data["templateName"] + "` does not exist"
-            #     )
-            # )
-        # keyList=data["list"]
         return HttpResponse(
             json.dumps({"message": "Saved successfully"}),
             content_type="application/json",
@@ -552,19 +528,14 @@ def get_render_template_view(request, name, version=None):
             print(tv.tiny_url)
             # versionTable= TemplateVersion.objects.get(template_id_id=templateTable.id,version=version)
             listOfData=generatePayload(t,tv,tv.tiny_url)
-            i=0
+            i=0          
             while i < len(listOfData):
-            # for data in listOfData:
-                # print(json.dumps(data))
                 result = requests.post(api,json.dumps(listOfData[i]),headers={"content-type": "application/json"})
                 result=result.json() 
-                # print("@@@@@@",type(result['tiny_url']))
                 print(tv.tiny_url[i])
-                # for key in tv.tiny_url[i]:
                 temp="data['context_data']"+tv.tiny_url[i]['urlKey']+"='"+ result['tiny_url']+"'"
                 print(temp)
                 exec(temp)
-                # data['context_data'][tv.tiny_url[i]]
                 i=i+1
                 
             

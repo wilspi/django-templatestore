@@ -7,9 +7,8 @@ urlpatterns = [
     path("render_pdf", views.render_pdf),
     path("api/v1/render", views.render_template_view),
     path("api/v1/templates", views.get_templates_view),
-    path("generateTinyUrl", views.generateTinyUrl),
-    path("getTinyUrlFromDB", views.getTinyUrlFromDB),
-    # /t/dummy2/getTinyUrlFromDB
+    path("generate_tiny_url", views.generate_tiny_url),
+    path("get_tiny_url_from_db", views.get_tiny_url_from_db),
     re_path(
         "api/v1/template/(?P<name>[a-zA-Z]+[a-zA-Z0-9_]*)/versions$",
         views.get_template_versions_view,
