@@ -5,11 +5,10 @@ import { backendSettings } from './../utils.js';
 import Dropdowncomp from './Dropdowncomp';
 export default function Tinyurlcomp(props) {
     if (props.contextData === '') return <></>;
-    console.log(props.listOfUrls);
     var tinyUrlObjLocal = props.tinyUrlObj;
     const [items, setItems] = useState([{ urlKey: "", expiry: "" }]);
     const [visited, setVisited] = useState({});
-    useEffect(() => {console.log(props.tinyUrlObj); populateItems(props.tinyUrlObj);}, [props.tinyUrlObj]);
+    useEffect(() => {populateItems(props.tinyUrlObj);}, [props.tinyUrlObj]);
     function populateItems(tinyUrlObj) {
         if (tinyUrlObj.length === 0) return;
         let temp = [...items];
@@ -35,9 +34,7 @@ export default function Tinyurlcomp(props) {
     }
     function removeDropdown(e, givenId) {
         e.preventDefault();
-        console.log(givenId);
         const newItems = items.filter(el => el.urlKey !== givenId);
-        console.log(newItems);
         let tempvisited = { ...visited };
         delete tempvisited[givenId]; // eslint-disable-line
         setVisited(tempvisited);
@@ -45,15 +42,12 @@ export default function Tinyurlcomp(props) {
     }
     function handleChange(e, id) {
         e.persist();
-        console.log("prevValue:", id);
-        console.log("currValue:", e.target.value);
         if (e.target.value === "") {
             props.showAlerts("Choose valid Url and expiry");
             return;
         }
         var newItems = [...items];
         let tempvisited = { ...visited };
-        console.log(e.target.name, e.target.value);
         if (e.target.name === 'urlKey') {
             tempvisited[e.target.value] = 1;
             if (id !== "") {
@@ -75,7 +69,6 @@ export default function Tinyurlcomp(props) {
                 !right.some(rightValue =>
                     compareFunction(leftValue, rightValue)));
         var addedArray, removedArray;
-        console.log(typeof (tinyUrlObjLocal), tinyUrlObjLocal);
         if (tinyUrlObjLocal) {
             removedArray = onlyInLeft(tinyUrlObjLocal, items, isSame);
             addedArray = onlyInLeft(items, tinyUrlObjLocal, isSame);
@@ -83,8 +76,6 @@ export default function Tinyurlcomp(props) {
             removedArray = [];
             addedArray = items;
         }
-        console.log("things removed", removedArray);
-        console.log("things added", addedArray);
         return { thingsRemoved: removedArray,
             thingsAdded: addedArray };
     }
@@ -100,7 +91,6 @@ export default function Tinyurlcomp(props) {
             }
         }
         let changes = arrayChanges();
-        console.log(changes);
         if (changes['thingsAdded'].length === 0 && changes['thingsRemoved'].length === 0) {
             props.showAlerts("Please modify something");
             return;
@@ -114,19 +104,16 @@ export default function Tinyurlcomp(props) {
             if(tinyUrlObjLocal)tinyUrlObjLocal = [...tinyUrlObjLocal, ...changes['thingsAdded']];
             else tinyUrlObjLocal=changes['thingsAdded'];
         }
-        console.log(tinyUrlObjLocal);
         data['tinyUrlArray'] = tinyUrlObjLocal;
         data['templateName'] = props.templateName;
         data['templateVersion'] = props.templateVersion;
-        console.log(data);
         axios({
             method: 'put',
             url: backendSettings.TE_BASEPATH + '/generate_tiny_url',
             data: data
         }).then((response) => {
-            console.log(response.data);
             props.showAlerts(response.data.message);
-        }).catch((err) => {console.log(err);props.showAlerts(err);});
+        }).catch((err) => {props.showAlerts(err);});
     }
     /*eslint-enable */
     return (

@@ -171,22 +171,6 @@ class TemplateScreen extends Component {
         this.settinyUrlObj();
         // if (this.state.contextData) );
     }
-    /* eslint-disable */
-    // componentDidUpdate(prevProps,prevState) {
-    //     console.log("helooowwww");
-    //     //Typical usage, don't forget to compare the props
-    //     if (this.state.contextData.localeCompare(prevState.contextData) !== 0) {
-    //     //   this.fetchData(this.props.userName);
-    //         if (this.state.contextData!="") {
-    //             var temp = [];
-    //             this.scan([], JSON.parse(this.state.contextData), temp);
-    //             this.setState({
-    //                 listOfUrls: temp
-    //             });
-    //         }
-    //     }
-    // }
-    /* eslint-enable */
     scan(parent, obj) {
         var k;
         if (obj instanceof Object) {
@@ -201,77 +185,8 @@ class TemplateScreen extends Component {
         } else if (validateURL(obj)) {
             let name = generateNameOfUrl(parent);
             this.listOfUrls.push(name);
-            // console.log(listOfUrls);
         }
         return;
-    }
-    setTinyUrlinContextData(obj) {
-        // console.log(obj);
-        let attributes = JSON.parse(this.state.attributes);
-        if (attributes.lob === "" || attributes.journey === "") {
-            alert("Please select attributes first");
-            return;
-        }
-        let contextData = JSON.parse(this.state.contextData); // eslint-disable-line no-unused-vars
-
-        // return temp;
-        var tiniedUrl = [];
-        let promises = [];
-        for (const item in obj) {
-            if (item === 'tinyUrlArray') {
-                obj[item].forEach(obj2 => {
-                    for (const url in obj2) {
-                        let [days, months, years] = obj2[url].split(',');
-                        let expiry = generateDate(days, months, years);// eslint-disable-line no-unused-vars
-                        let str = 'contextData' + url;
-                        let data = {
-                            original_url: eval(str),
-                            lob: attributes.lob,
-                            journey: attributes.journey,
-                            expiry_time: expiry
-                        };
-                        // console.log(typeof (this.state.attributes), this.state.attributes);
-                        // console.log(data);
-                        promises.push(
-                            axios({
-                                method: 'post',
-                                url: "https://tinyurl.internal.ackodev.com/api/v1/create_tiny_url",
-                                data: data
-                            }).then((response) => {
-                                console.log(response.data.tiny_url);
-                                // temp=response.data.tiny_url;
-                                tiniedUrl.push([url, response.data.tiny_url]);
-                            }).catch((err) => {
-                                console.log(err);
-                                alert(err);
-                                return err;
-                            })
-                        );
-                        // tiniedUrl.push([url, this.generate_tiny_url(url, expiry)]);
-                        // var temp=await this.generate_tiny_url(url, expiry);
-                        // tiniedUrl.push(temp);
-                        // let str = "contextData" + url + "=response.data['tiny_url']";
-                        // console.log(ans);
-                    }
-                });
-            }
-
-            // console.log(item, obj[item]);
-        }
-        var temp = JSON.parse(this.state.contextData);// eslint-disable-line no-unused-vars
-        Promise.all(promises).then(() => {
-            for (let i = 0; i < tiniedUrl.length; i++) {
-                var s = "temp" + tiniedUrl[i][0] + "='" + tiniedUrl[i][1] + "'";
-                console.log(s);
-                eval(s);
-                // console.log(eval("temp" + tiniedUrl[i][0]));
-            }
-            this.setState({
-                contextData: JSON.stringify(temp)
-            });
-            return true;
-        });
-        return false;
     }
     settinyUrlObj() {
         let data = {
@@ -283,7 +198,6 @@ class TemplateScreen extends Component {
             url: "http://localhost:8000/get_tiny_url_from_db",
             data: data
         }).then((response) => {
-            console.log(typeof (response.data), response.data);
             this.setState({
                 tinyUrlObj: response.data
             });
@@ -291,7 +205,6 @@ class TemplateScreen extends Component {
     }
     updatelistOfUrls() {
         if (this.state.contextData !== "") {
-            console.log("inside meathod");
             this.listOfUrls = [];
             this.scan([], JSON.parse(this.state.contextData));
         }

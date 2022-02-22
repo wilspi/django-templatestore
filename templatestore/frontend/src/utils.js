@@ -57,7 +57,6 @@ export function generateNameOfUrl(parent) {
 }
 export function generateDate(days, months, years) {
     var date = new Date();
-    console.log(date);
     date.setDate(date.getDate() + parseInt(days, 10));
     date.setMonth(date.getMonth() + parseInt(months, 10));
     date.setFullYear(date.getFullYear() + parseInt(years, 10));
