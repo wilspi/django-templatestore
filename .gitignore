@@ -143,5 +143,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-example/secrets.json
