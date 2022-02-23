@@ -198,7 +198,7 @@ class TemplateScreen extends Component {
             data: data
         }).then((response) => {
             this.setState({
-                tinyUrlObj: response.data
+                tinyUrlObj: response.data ? response.data : []
             });
         });
     }
