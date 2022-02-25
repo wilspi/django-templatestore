@@ -1,47 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styles from '../style/templateScreen.less';
 import axios from 'axios';
 import { backendSettings } from './../utils.js';
 import TinyUrlDropdownComponent from './TinyUrlDropdownComponent';
 
 export default function TinyUrlComponent(props) {
-    if (props.contextData === '') return <></>;
-    var tinyUrlObjLocal = props.tinyUrlObj;
-    const [items, setItems] = useState([{ urlKey: "", expiry: "" }]);
-    const [visited, setVisited] = useState({});
-    useEffect(() => {populateItems(props.tinyUrlObj);}, [props.tinyUrlObj]);
-    function populateItems(tinyUrlObj) {
-        if (tinyUrlObj.length === 0) return;
-        let temp = [...items];
-        let tempvisited = { ...visited };
-        tinyUrlObj.forEach(obj => {
-            tempvisited[obj['urlKey']] = 1;
-            temp.splice(temp.length - 1, 0, {
-                urlKey: obj['urlKey'],
-                expiry: obj['expiry'] });
-        });
-        setVisited(tempvisited);
-        setItems(temp);
-    }
+    let tinyUrlObjLocal = props.tinyUrlObj;
 
     function addNewDropdown() {
-        if (items.length) {
-            if (items[items.length - 1]['urlKey'] === "" || items[items.length - 1]['expiry'] === "") {
+        if (props.items.length) {
+            if (props.items[props.items.length - 1].urlKey === "" || props.items[props.items.length - 1].expiry === "") {
                 props.showAlerts("Please select valid values first");
                 return;
             }
         }
-        var newItems = [...items, { urlKey: "", expiry: "" }];
-        setItems(newItems);
+        let newItems = [...props.items, { urlKey: "", expiry: "" }];
+        props.updateItems(newItems);
     }
 
     function removeDropdown(e, givenId) {
         e.preventDefault();
-        const newItems = items.filter(el => el.urlKey !== givenId);
-        let tempvisited = { ...visited };
-        tempvisited[givenId] = 0;
-        setVisited(tempvisited);
-        setItems(newItems);
+        const newItems = props.items.filter(el => el.urlKey !== givenId);
+        let visitedCopy = { ...props.visited };
+        visitedCopy[givenId] = 0;
+        props.updateItems(newItems);
+        props.updateVisited(visitedCopy);
     }
 
     function handleChange(e, id) {
@@ -50,69 +33,69 @@ export default function TinyUrlComponent(props) {
             props.showAlerts("Choose valid Url and expiry");
             return;
         }
-        var newItems = [...items];
-        let tempvisited = { ...visited };
+        let newItems = [...props.items];
+        let visitedCopy = { ...props.visited };
         if (e.target.name === 'urlKey') {
-            tempvisited[e.target.value] = 1;
+            visitedCopy[e.target.value] = 1;
             if (id !== "") {
-                tempvisited[id] = 0;
+                visitedCopy[id] = 0;
             }
-            setVisited(tempvisited);
+            props.updateVisited(visitedCopy);
         }
         let index = newItems.findIndex(item => item.urlKey === id);
         newItems[index][e.target.name] = e.target.value;
-        setItems(newItems);
+        props.updateItems(newItems);
     }
 
     function arrayChanges() {
-        const isSame = (a, b) => a['urlKey'] === b['urlKey'] && a['expiry'] === b['expiry'];
-        // Get items that only occur in the left array,
+        const isSame = (a, b) => a.urlKey === b.urlKey && a.expiry === b.expiry;
+        // Get props.items that only occur in the left array,
         // using the compareFunction to determine equality.
         const onlyInLeft = (left, right, compareFunction) =>
             left.filter(leftValue =>
                 !right.some(rightValue =>
                     compareFunction(leftValue, rightValue)));
-        var addedArray, removedArray;
+        let addedArray, removedArray;
         if (tinyUrlObjLocal) {
-            removedArray = onlyInLeft(tinyUrlObjLocal, items, isSame);
-            addedArray = onlyInLeft(items, tinyUrlObjLocal, isSame);
+            removedArray = onlyInLeft(tinyUrlObjLocal, props.items, isSame);
+            addedArray = onlyInLeft(props.items, tinyUrlObjLocal, isSame);
         } else {
             removedArray = [];
-            addedArray = items;
+            addedArray = props.items;
         }
-        return { thingsRemoved: removedArray,
-            thingsAdded: addedArray };
+        return { itemsRemoved: removedArray,
+            itemsAdded: addedArray };
     }
 
     function valueSelected(e) {
         e.preventDefault();
         let data = {};
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].urlKey === "" || items[i].expiry === "") {
+        for (let i = 0; i < props.items.length; i++) {
+            if (props.items[i].urlKey === "" || props.items[i].expiry === "") {
                 props.showAlerts("Can't leave url or expiry blank");
                 return;
             }
         }
         let changes = arrayChanges();
-        if (changes['thingsAdded'].length === 0 && changes['thingsRemoved'].length === 0) {
+        if (changes.itemsAdded.length === 0 && changes.itemsRemoved.length === 0) {
             props.showAlerts("Please modify something");
             return;
         }
 
-        for (var i = 0; i < changes['thingsRemoved'].length; i++) {
-            const index = tinyUrlObjLocal.findIndex(obj => obj.urlKey === changes['thingsRemoved'][i].urlKey); // eslint-disable-line
+        for (let i = 0; i < changes.itemsRemoved.length; i++) {
+            const index = tinyUrlObjLocal.findIndex(obj => obj.urlKey === changes.itemsRemoved[i].urlKey); // eslint-disable-line
             if (index !== -1)tinyUrlObjLocal.splice(index, 1);
         }
-        if (changes['thingsAdded'].length) {
-            if (tinyUrlObjLocal)tinyUrlObjLocal = [...tinyUrlObjLocal, ...changes['thingsAdded']];
-            else tinyUrlObjLocal = changes['thingsAdded'];
+        if (changes.itemsAdded.length) {
+            if (tinyUrlObjLocal)tinyUrlObjLocal = [...tinyUrlObjLocal, ...changes.itemsAdded];
+            else tinyUrlObjLocal = changes.itemsAdded;
         }
-        data['tinyUrlArray'] = tinyUrlObjLocal;
-        data['templateName'] = props.templateName;
-        data['templateVersion'] = props.templateVersion;
+        data.tinyUrlArray = tinyUrlObjLocal;
+        data.templateName = props.templateName;
+        data.templateVersion = props.templateVersion;
         axios({
             method: 'put',
-            url: backendSettings.TE_BASEPATH + '/save_tiny_url',
+            url: backendSettings.TE_BASEPATH + '/api/v1/tiny_url',
             data: data
         }).then((response) => {
             props.showAlerts(response.data.message);
@@ -159,10 +142,10 @@ export default function TinyUrlComponent(props) {
                         >
                             <div className="card-body">
                                 <div className={styles.teAttributesWrapper}>
-                                    {items.map((item, index) => (
-                                        <TinyUrlDropdownComponent id={item.urlKey} key={item.urlKey} urlKey={item.urlKey} expiry={item.expiry} handleChange={handleChange} removeDropdown={removeDropdown} urlKeyList={props.urlKeyList} visited={visited}/>
+                                    {props.items.map((item, index) => (
+                                        <TinyUrlDropdownComponent id={item.urlKey} key={item.urlKey} urlKey={item.urlKey} expiry={item.expiry} handleChange={handleChange} removeDropdown={removeDropdown} urlKeyList={props.urlKeyList} visited={props.visited}/>
                                     ))}
-                                    {items.length < props.urlKeyList.length ?
+                                    {props.items.length < props.urlKeyList.length ?
                                         <button
                                             className={styles.teAddNewAttributeButton}
                                             onClick={addNewDropdown}
