@@ -17,8 +17,6 @@ PDF_URL = ts_settings.WKPDFGEN_SERVICE_URL
 PDF_ASSET_URL = ts_settings.WKPDFGEN_ASSET_URL
 api="https://tinyurl.internal.ackodev.com/api/v1/create_tiny_url"
 
-
-
 def index(request):
     export_settings = {
         "TE_TEMPLATE_ATTRIBUTES": ts_settings.TE_TEMPLATE_ATTRIBUTES,
@@ -419,27 +417,27 @@ def get_template_versions_view(request, name):
             content_type="application/json",
             status=404,
         )
+
 @csrf_exempt
-def get_tiny_url_from_db(request):
-    if request.method != "POST":
+def get_tiny_url_from_db(request, name, version):
+    if request.method != "GET":
         return HttpResponseBadRequest("invalid request method: " + request.method)
-    data=json.loads(request.body)
     try:
-        templateTable=Template.objects.get(name=data['name'])
+        templateTable=Template.objects.get(name=name)
         try:
-            versionTable= TemplateVersion.objects.get(template_id_id=templateTable.id,version=data['version'])
+            versionTable= TemplateVersion.objects.get(template_id_id=templateTable.id, version=version)
             data = json.dumps(versionTable.tiny_url)
             return HttpResponse(data)
         except Exception:
             raise (
                 Exception(
-                    "Validation: Template Version with version `" + data['version'] + "` does not exist"
+                    "Validation: Template Version with version " + version + " does not exist"
                 )
             )
     except Exception:
         raise (
             Exception(
-                "Validation: Template with name `" + data['name'] + "` does not exist"
+                "Validation: Template with name " + name + " does not exist"
             )
         )
     

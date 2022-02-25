@@ -44,6 +44,8 @@ class TemplateScreen extends Component {
             version_alias: '',
             tinyUrlObj: [],
             urlKeyList: [],
+            items: [{ urlKey: "", expiry: "" }],
+            visited: {},
             editable: this.props.editable
         };
         this.aceconfig = {
@@ -71,7 +73,11 @@ class TemplateScreen extends Component {
         this.updateAttributes = this.updateAttributes.bind(this);
         this.deleteAttribute = this.deleteAttribute.bind(this);
         this.scan = this.scan.bind(this);
-        this.updateurlKeyList = this.updateurlKeyList.bind(this);
+        this.updateUrlKeyList = this.updateUrlKeyList.bind(this);
+        this.populateItems = this.populateItems.bind(this);
+        this.updateItems = this.updateItems.bind(this);
+        this.updateVisited = this.updateVisited.bind(this);
+        this.setTinyUrlObj = this.setTinyUrlObj.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -113,7 +119,7 @@ class TemplateScreen extends Component {
                         type: response.data.type,
                         version_alias: response.data.version_alias
                     });
-                    this.updateurlKeyList();
+                    this.updateUrlKeyList();
                 })
                 .catch(error => {
                     console.log(error);
@@ -161,25 +167,49 @@ class TemplateScreen extends Component {
                         config: response.data
                     });
                 }
-                this.updateurlKeyList();
+                this.updateUrlKeyList();
             })
             .catch(function(error) {
                 console.log(error);
             });
-        this.settinyUrlObj();
+        this.setTinyUrlObj();
+    }
+
+    populateItems(tinyUrlObj) {
+        let itemsCopy = [...this.state.items];
+        let visitedCopy = { ...this.state.visited };
+        tinyUrlObj.forEach(obj => {
+            visitedCopy[obj.urlKey] = 1;
+            itemsCopy.splice(itemsCopy.length - 1, 0, {
+                urlKey: obj.urlKey,
+                expiry: obj.expiry });
+        });
+        this.setState({
+            items: itemsCopy,
+            visited: visitedCopy
+        });
+    }
+
+    updateItems(itemsCopy) {
+        this.setState({
+            items: itemsCopy
+        });
+    }
+
+    updateVisited(visitedCopy) {
+        this.setState({
+            visited: visitedCopy
+        });
     }
 
     scan(parent, obj, result) {
-        var k;
         if (obj instanceof Object) {
-            for (k in obj) {
-                if (obj.hasOwnProperty(k)) {
-                    //recursive call to scan property
-                    parent.push(k);
-                    this.scan(parent, obj[k], result);
-                    parent.pop();
-                }
-            }
+            const keys = Object.keys(obj);
+            keys.forEach((key, index) => {
+                parent.push(key);
+                this.scan(parent, obj[key], result);
+                parent.pop();
+            });
         } else if (validateURL(obj)) {
             let name = generateNameOfUrl(parent);
             result.push(name);
@@ -187,23 +217,24 @@ class TemplateScreen extends Component {
         return;
     }
 
-    settinyUrlObj() {
-        let data = {
-            name: this.state.templateData.name,
-            version: this.state.templateData.version
-        };
-        axios({
-            method: 'post',
-            url: "http://localhost:8000/get_tiny_url_from_db",
-            data: data
-        }).then((response) => {
-            this.setState({
-                tinyUrlObj: response.data ? response.data : []
+    setTinyUrlObj() {
+        let url = backendSettings.TE_BASEPATH +
+        '/api/v1/tiny_url/' +
+        this.state.templateData.name +
+        '/' +
+        this.state.templateData.version;
+        axios
+            .get(
+                url
+            ).then((response) => {
+                this.setState({
+                    tinyUrlObj: response.data ? response.data : []
+                });
+                this.populateItems(this.state.tinyUrlObj);
             });
-        });
     }
 
-    updateurlKeyList() {
+    updateUrlKeyList() {
         if (this.state.contextData !== "") {
             var result = [];
             this.scan([], JSON.parse(this.state.contextData), result);
@@ -437,7 +468,7 @@ class TemplateScreen extends Component {
         this.setState({
             contextData: newValue
         });
-        this.updateurlKeyList();
+        this.updateUrlKeyList();
     }
 
     onAttributesChange(attributeKey, newValue, keyChange = false) {
@@ -1190,7 +1221,7 @@ class TemplateScreen extends Component {
                     </div>
                 </div>
                 <div>
-                    <TinyUrlComponent urlKeyList={this.state.urlKeyList} templateName={this.state.templateData.name} templateVersion={this.state.templateData.version} tinyUrlObj={this.state.tinyUrlObj} showAlerts={this.showAlerts}/>
+                    <TinyUrlComponent items={this.state.items} visited={this.state.visited} updateItems={this.updateItems} updateVisited={this.updateVisited} urlKeyList={this.state.urlKeyList} templateName={this.state.templateData.name} templateVersion={this.state.templateData.version} tinyUrlObj={this.state.tinyUrlObj} showAlerts={this.showAlerts}/>
                 </div>
                 {this.state.editable ? (
                     ''
