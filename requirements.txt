@@ -3,4 +3,3 @@ black==19.10b0
 Jinja2==2.11.1
 psycopg2==2.8.4
 requests==2.25.1
-boto3
