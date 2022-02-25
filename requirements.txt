@@ -7,7 +7,7 @@ requests==2.25.1
 markupsafe==2.0.1
 =======
 Jinja2==2.11.1
-psycopg2==2.9.3
+psycopg2==2.8.4
 requests==2.25.1
 boto3
 >>>>>>> 6a20e8e (Work in progress)
