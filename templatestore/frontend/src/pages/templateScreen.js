@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import "regenerator-runtime/runtime";
 import { withRouter } from 'react-router';
 import { generateNameOfUrl, validateURL } from '../utils.js';
 import {

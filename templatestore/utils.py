@@ -1,7 +1,5 @@
 import base64
 import datetime
-from ensurepip import version
-from urllib import request 
 from dateutil.relativedelta import relativedelta
 import pytz
 
