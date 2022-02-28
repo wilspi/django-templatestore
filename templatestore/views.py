@@ -6,7 +6,6 @@ from datetime import datetime
 import json
 import re
 import logging
-from pkg_resources import register_namespace_handler
 import requests
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
 from templatestore.utils import (
