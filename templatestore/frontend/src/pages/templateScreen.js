@@ -175,6 +175,7 @@ class TemplateScreen extends Component {
     }
 
     populateItems(tinyUrlObj) {
+        if (!tinyUrlObj) return;
         let itemsCopy = [...this.state.items];
         let visitedCopy = { ...this.state.visited };
         tinyUrlObj.forEach(obj => {
@@ -217,6 +218,7 @@ class TemplateScreen extends Component {
     }
 
     setTinyUrlObj() {
+        if (!this.state.templateData.name || !this.state.templateData.version) return;
         let url = backendSettings.TE_BASEPATH +
         '/api/v1/tiny_url/' +
         this.state.templateData.name +
@@ -226,11 +228,11 @@ class TemplateScreen extends Component {
             .get(
                 url
             ).then((response) => {
-                this.setState({
-                    tinyUrlObj: response.data ? response.data : []
-                });
-                this.populateItems(this.state.tinyUrlObj);
-            });
+                    this.setState({
+                        tinyUrlObj: response.data ? response.data : []
+                    });
+                    this.populateItems(this.state.tinyUrlObj);
+            }).catch(err=>{props.showAlerts(err.response.data)});
     }
 
     updateUrlKeyList() {

@@ -91,15 +91,15 @@ export default function TinyUrlComponent(props) {
             else tinyUrlObjLocal = changes.itemsAdded;
         }
         data.tinyUrlArray = tinyUrlObjLocal;
-        data.templateName = props.templateName;
-        data.templateVersion = props.templateVersion;
+        data.templateName = props.templateName ? props.templateName : "";
+        data.templateVersion = props.templateVersion ? props.templateVersion : "";
         axios({
             method: 'put',
             url: backendSettings.TE_BASEPATH + '/api/v1/tiny_url',
             data: data
         }).then((response) => {
             props.showAlerts(response.data.message);
-        }).catch((err) => {props.showAlerts(err);});
+        }).catch((err) => {props.showAlerts(err.response.data);});
     }
 
     return (
