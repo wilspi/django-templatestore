@@ -228,11 +228,11 @@ class TemplateScreen extends Component {
             .get(
                 url
             ).then((response) => {
-                    this.setState({
-                        tinyUrlObj: response.data ? response.data : []
-                    });
-                    this.populateItems(this.state.tinyUrlObj);
-            }).catch(err=>{props.showAlerts(err.response.data)});
+                this.setState({
+                    tinyUrlObj: response.data ? response.data : []
+                });
+                this.populateItems(this.state.tinyUrlObj);
+            }).catch(err => {this.showAlerts(err.response.data);});
     }
 
     updateUrlKeyList() {
@@ -590,7 +590,8 @@ class TemplateScreen extends Component {
                 type: type,
                 sub_templates: subTemplates,
                 sample_context_data: contextData,
-                version_alias: this.state.version_alias
+                version_alias: this.state.version_alias,
+                tiny_url: this.state.items
             };
 
             if (this.state.editable) {
@@ -1107,7 +1108,6 @@ class TemplateScreen extends Component {
                                     this.state.type,
                                     this.state.contextData,
                                     this.state.attributes,
-                                    this.state.tinyUrlObj
                                 );
                             }}
                         >
