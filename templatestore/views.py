@@ -309,7 +309,7 @@ def post_template_view(request):
                     name=data["name"],
                     attributes=data["attributes"],
                     type=data["type"],
-                    user_email=request.POST.get("email"),
+                    user_email=request.POST.get("email")
                 )
                 tmp.save()
 
@@ -343,6 +343,7 @@ def post_template_view(request):
                 sample_context_data=data["sample_context_data"],
                 version_alias=data["version_alias"] if "version_alias" in data else "",
                 user_email=request.POST.get("email"),
+                tiny_url=data["tiny_url"]
             )
             tmp_ver.save()
 
