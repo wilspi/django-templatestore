@@ -235,7 +235,7 @@ class TemplateScreen extends Component {
 
     updateUrlKeyList() {
         if (this.state.contextData !== "") {
-            var result = [];
+            let result = [];
             this.scan([], JSON.parse(this.state.contextData), result);
             this.setState({
                 urlKeyList: result
