@@ -6,15 +6,20 @@ from datetime import datetime
 import json
 import re
 import logging
+from pkg_resources import register_namespace_handler
 import requests
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
-from templatestore.utils import base64decode, base64encode, generateDate, generatePayload
+from templatestore.utils import (
+    base64decode,
+    base64encode,
+    generatePayload,
+)
 from templatestore import app_settings as ts_settings
 
 logger = logging.getLogger(__name__)
 PDF_URL = ts_settings.WKPDFGEN_SERVICE_URL
 PDF_ASSET_URL = ts_settings.WKPDFGEN_ASSET_URL
-TINY_URL= ts_settings.TINY_URL
+TINY_URL = ts_settings.TINY_URL
 
 def index(request):
     export_settings = {
@@ -42,9 +47,12 @@ def render_pdf(request):
         template = data["template"]
         context = data["context"]
         context["base_path"] = PDF_ASSET_URL
-        rendered_html_template = render_via_jinja(template,context)
-        pdf=requests.post(PDF_URL+'/render_pdf/', data=json.dumps({'html': str(base64decode(rendered_html_template))}))
-        return HttpResponse(pdf,content_type='application/pdf')
+        rendered_html_template = render_via_jinja(template, context)
+        pdf = requests.post(
+            PDF_URL + "/render_pdf/",
+            data=json.dumps({"html": str(base64decode(rendered_html_template))}),
+        )
+        return HttpResponse(pdf, content_type="application/pdf")
 
     except Exception as e:
         logger.exception(e)
@@ -418,70 +426,61 @@ def get_template_versions_view(request, name):
         )
 
 @csrf_exempt
-def get_tiny_url_from_db(request, name, version):
+def get_tiny_url(request, name, version):
     if request.method != "GET":
         return HttpResponseBadRequest("invalid request method: " + request.method)
-    try:
-        templateTable=Template.objects.get(name=name)
-        try:
-            versionTable= TemplateVersion.objects.get(template_id_id=templateTable.id, version=version)
-            data = json.dumps(versionTable.tiny_url)
-            return HttpResponse(data)
-        except Exception:
-            raise (
-                Exception(
-                    "Validation: Template Version with version " + version + " does not exist"
-                )
-            )
-    except Exception:
-        raise (
-            Exception(
-                "Validation: Template with name " + name + " does not exist"
-            )
-        )
-    
+
+    templateTable = Template.objects.filter(name=name)
+    if len(templateTable) == 0:
+        return HttpResponseBadRequest("Template Doesnot exists")
+
+    versionTable = TemplateVersion.objects.filter(
+        template_id_id=templateTable[0].id, version=version
+    )
+    if len(versionTable) == 0:
+        return HttpResponseBadRequest("Corresponding version table doesnot exists")
+
+    data = json.dumps(versionTable[0].tiny_url)
+    return HttpResponse(data)
+
+
 @csrf_exempt
 def save_tiny_url(request):
     if request.method != "PUT":
         return HttpResponseBadRequest("invalid request method: " + request.method)
-    # Get the required template
-    try:
-        data=json.loads(request.body)
-        try:
-            version=data['templateVersion']
-            templateTable=Template.objects.get(name=data['templateName'])
-            #get template version table
-            try:
-                versionTable= TemplateVersion.objects.get(template_id_id=templateTable.id,version=version)
-                versionTable.tiny_url=data['tinyUrlArray']
-                versionTable.save()
-            except Exception as e:
-                logger.exception(e)
-                return HttpResponse(
-                    json.dumps({"message": str(e)}),
-                    content_type="application/json",
-                    status=200,
-                )
-        except Exception as e:
-            logger.exception(e)
-            return HttpResponse(
-                json.dumps({"message": "Template doesnot exists"}),
-                content_type="application/json",
-                status=200,
-            )
-        return HttpResponse(
-            json.dumps({"message": "Saved successfully"}),
-            content_type="application/json",
-            status=200
+
+    data = json.loads(request.body)
+    version = data["templateVersion"]
+    name = data["templateName"]
+    templateTable = Template.objects.filter(name=name)
+    if len(templateTable) == 0:
+        return HttpResponseBadRequest("Template Doesnot exists")
+
+    versionTable = TemplateVersion.objects.filter(
+        template_id_id=templateTable[0].id, version=version
+    )
+    if len(versionTable) == 0:
+        return HttpResponseBadRequest(
+            "No corresponding version table exists for :" + name + " table"
         )
-    
+
+    versionTable[0].tiny_url = data["tinyUrlArray"]
+
+    try:
+        versionTable[0].save()
     except Exception as e:
         logger.exception(e)
         return HttpResponse(
-            json.dumps({"message": str(e)}),
+            json.dumps({"message": "Some unknown error occured"}),
             content_type="application/json",
             status=500,
         )
+    return HttpResponse(
+        json.dumps({"message": "Saved successfully"}),
+        content_type="application/json",
+        status=200,
+    )
+
 
 @csrf_exempt
 def get_render_template_view(request, name, version=None):
@@ -513,17 +512,27 @@ def get_render_template_view(request, name, version=None):
                 if version
                 else TemplateVersion.objects.get(id=t.default_version_id)
             )
-            # versionTable= TemplateVersion.objects.get(template_id_id=templateTable.id,version=version)
-            listOfData=generatePayload(t,tv,tv.tiny_url)
-            i=0          
+
+            listOfData = generatePayload(t, tv, tv.tiny_url)
+            i = 0
             while i < len(listOfData):
-                url=TINY_URL+"api/v1/create_tiny_url"
-                result = requests.post(url,json.dumps(listOfData[i]),headers={"content-type": "application/json"})
-                result=result.json() 
-                temp="data['context_data']"+tv.tiny_url[i]['urlKey']+"='"+ result['tiny_url']+"'"
+                url = TINY_URL + "api/v1/create_tiny_url"
+                result = requests.post(
+                    url,
+                    json.dumps(listOfData[i]),
+                    headers={"content-type": "application/json"},
+                )
+                result = result.json()
+                temp = (
+                    "data['context_data']"
+                    + tv.tiny_url[i]["urlKey"]
+                    + "='"
+                    + result["tiny_url"]
+                    + "'"
+                )
                 exec(temp)
-                i=i+1
-                
+                i = i + 1
+
             stpls = SubTemplate.objects.filter(template_version_id=tv.id)
             try:
                 res = {
