@@ -139,3 +139,4 @@ GEOS_LIBRARY_PATH = '/opt/homebrew/opt/geos/lib/libgeos_c.dylib'
 WKPDFGEN_SERVICE_URL="https://wkpdfgen.ackodev.com/"
 WKPDFGEN_ASSET_URL="https://wkpdfgen-uat.ackoassets.com/pdfgen/templates"
 USER_SERVICE_URL="http://entity-service.internal.ackodev.com/api/user/"
+TINY_URL="https://tinyurl.internal.ackodev.com/"

@@ -1104,7 +1104,8 @@ class TemplateScreen extends Component {
                                     document.getElementById('tmp_name').value,
                                     this.state.type,
                                     this.state.contextData,
-                                    this.state.attributes
+                                    this.state.attributes,
+                                    this.state.tinyUrlObj
                                 );
                             }}
                         >

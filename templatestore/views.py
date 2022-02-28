@@ -14,7 +14,7 @@ from templatestore import app_settings as ts_settings
 logger = logging.getLogger(__name__)
 PDF_URL = ts_settings.WKPDFGEN_SERVICE_URL
 PDF_ASSET_URL = ts_settings.WKPDFGEN_ASSET_URL
-api="https://tinyurl.internal.ackodev.com/api/v1/create_tiny_url"
+TINY_URL= ts_settings.TINY_URL
 
 def index(request):
     export_settings = {
@@ -517,7 +517,8 @@ def get_render_template_view(request, name, version=None):
             listOfData=generatePayload(t,tv,tv.tiny_url)
             i=0          
             while i < len(listOfData):
-                result = requests.post(api,json.dumps(listOfData[i]),headers={"content-type": "application/json"})
+                url=TINY_URL+"api/v1/create_tiny_url"
+                result = requests.post(url,json.dumps(listOfData[i]),headers={"content-type": "application/json"})
                 result=result.json() 
                 temp="data['context_data']"+tv.tiny_url[i]['urlKey']+"='"+ result['tiny_url']+"'"
                 exec(temp)
