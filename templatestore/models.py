@@ -61,7 +61,11 @@ class TemplateVersion(models.Model):
     version_alias = models.CharField(blank=True, max_length=100)
     created_by = models.IntegerField(null=True, blank=True)
     user_email = models.CharField(max_length=200, null=True, blank=True)
+<<<<<<< HEAD
     tiny_url = JSONField(default=list, blank=True)
+=======
+    tiny_url = JSONField(null=True,blank=True, default=list)
+>>>>>>> 52f28242f3aa564151166438483dd392940bb04a
 
     class Meta:
         db_table = "templatestore_template_version"

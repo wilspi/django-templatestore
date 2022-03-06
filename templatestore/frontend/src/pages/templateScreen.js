@@ -1103,6 +1103,12 @@ class TemplateScreen extends Component {
                         <button
                             className={styles.teButtons}
                             onClick={() => {
+                                for (let i = 0; i < this.state.items.length; i++) {
+                                    if (this.state.items[i].urlKey === "" || this.state.items[i].expiry === "") {
+                                        this.showAlerts("Can't leave url/expiry of tinyUrl blank. Please select or delete blank fields.");
+                                        return;
+                                    }
+                                }
                                 this.postTemplate(
                                     document.getElementById('tmp_name').value,
                                     this.state.type,
