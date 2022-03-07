@@ -516,7 +516,7 @@ def get_render_template_view(request, name, version=None):
             listOfData = generatePayload(t, tv, tv.tiny_url)
             i = 0
             while i < len(listOfData):
-                url = TINY_URL + "api/v1/create_tiny_url"
+                url = TINY_URL + "/api/v1/create_tiny_url"
                 result = requests.post(
                     url,
                     json.dumps(listOfData[i]),
