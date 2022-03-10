@@ -1,5 +1,6 @@
-Django==3.0.7Django==3.0.7
+Django==3.0.7
 black==19.10b0
 Jinja2==2.11.3
 psycopg2==2.8.4
 requests==2.25.1
+markupsafe==2.0.1
