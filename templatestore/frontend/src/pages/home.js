@@ -67,7 +67,6 @@ class Home extends Component {
     }
 
     getTableRowsJSX() {
-        console.log(this);
         let tableRows = [];
         let filteredTemplates = this.state.templatesData.reduce(
             (result, template) => {

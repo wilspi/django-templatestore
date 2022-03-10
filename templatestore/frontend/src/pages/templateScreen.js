@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { withRouter } from 'react-router';
+import { generateNameOfUrl, validateURL } from '../utils.js';
 import {
     encode,
     decode,
@@ -17,6 +18,7 @@ import 'ace-builds/webpack-resolver';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/theme-github';
+import TinyUrlComponent from '../components/TinyUrlComponent.js';
 const languages = ['html', 'handlebars', 'json'];
 languages.forEach(lang => {
     require(`ace-builds/src-noconflict/mode-${lang}`);
@@ -39,6 +41,10 @@ class TemplateScreen extends Component {
             alertMessage: '',
             attributes: '{}',
             version_alias: '',
+            tinyUrlObj: [],
+            urlKeyList: [],
+            items: [{ urlKey: "", expiry: "" }],
+            visited: {},
             editable: this.props.editable
         };
         this.aceconfig = {
@@ -65,16 +71,22 @@ class TemplateScreen extends Component {
         this.addNewAttribute = this.addNewAttribute.bind(this);
         this.updateAttributes = this.updateAttributes.bind(this);
         this.deleteAttribute = this.deleteAttribute.bind(this);
+        this.scan = this.scan.bind(this);
+        this.updateUrlKeyList = this.updateUrlKeyList.bind(this);
+        this.populateItems = this.populateItems.bind(this);
+        this.updateItems = this.updateItems.bind(this);
+        this.updateVisited = this.updateVisited.bind(this);
+        this.setTinyUrlObj = this.setTinyUrlObj.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
             axios
                 .get(
                     backendSettings.TE_BASEPATH +
-                        '/api/v1/template/' +
-                        this.state.templateData.name +
-                        '/' +
-                        this.state.templateData.version
+                    '/api/v1/template/' +
+                    this.state.templateData.name +
+                    '/' +
+                    this.state.templateData.version
                 )
                 .then(response => {
                     this.setState({
@@ -106,6 +118,7 @@ class TemplateScreen extends Component {
                         type: response.data.type,
                         version_alias: response.data.version_alias
                     });
+                    this.updateUrlKeyList();
                 })
                 .catch(error => {
                     console.log(error);
@@ -118,9 +131,9 @@ class TemplateScreen extends Component {
             axios
                 .get(
                     backendSettings.TE_BASEPATH +
-                        '/api/v1/template/' +
-                        this.state.templateData.name +
-                        '/versions'
+                    '/api/v1/template/' +
+                    this.state.templateData.name +
+                    '/versions'
                 )
                 .then(response => {
                     this.setState({
@@ -153,19 +166,92 @@ class TemplateScreen extends Component {
                         config: response.data
                     });
                 }
+                this.updateUrlKeyList();
             })
             .catch(function(error) {
                 console.log(error);
             });
+        this.setTinyUrlObj();
+    }
+
+    populateItems(tinyUrlObj) {
+        if (!tinyUrlObj) return;
+        let itemsCopy = [...this.state.items];
+        let visitedCopy = { ...this.state.visited };
+        tinyUrlObj.forEach(obj => {
+            visitedCopy[obj.urlKey] = 1;
+            itemsCopy.splice(itemsCopy.length - 1, 0, {
+                urlKey: obj.urlKey,
+                expiry: obj.expiry });
+        });
+        this.setState({
+            items: itemsCopy,
+            visited: visitedCopy
+        });
+    }
+
+    updateItems(itemsCopy) {
+        this.setState({
+            items: itemsCopy
+        });
+    }
+
+    updateVisited(visitedCopy) {
+        this.setState({
+            visited: visitedCopy
+        });
+    }
+
+    scan(parent, obj, result) {
+        if (obj instanceof Object) {
+            const keys = Object.keys(obj);
+            keys.forEach((key, index) => {
+                parent.push(key);
+                this.scan(parent, obj[key], result);
+                parent.pop();
+            });
+        } else if (validateURL(obj)) {
+            let name = generateNameOfUrl(parent);
+            result.push(name);
+        }
+        return;
+    }
+
+    setTinyUrlObj() {
+        if (!this.state.templateData.name || !this.state.templateData.version) return;
+        let url = backendSettings.TE_BASEPATH +
+        '/api/v1/tiny_url/' +
+        this.state.templateData.name +
+        '/' +
+        this.state.templateData.version;
+        axios
+            .get(
+                url
+            ).then((response) => {
+                this.setState({
+                    tinyUrlObj: response.data ? response.data : []
+                });
+                this.populateItems(this.state.tinyUrlObj);
+            }).catch(err => {this.showAlerts(err.response.data);});
+    }
+
+    updateUrlKeyList() {
+        if (this.state.contextData !== "") {
+            let result = [];
+            this.scan([], JSON.parse(this.state.contextData), result);
+            this.setState({
+                urlKeyList: result
+            });
+        }
     }
 
     openTemplateVersion(version) {
         window.open(
             backendSettings.TE_BASEPATH +
-                '/t/' +
-                this.state.templateData.name +
-                '/' +
-                version
+            '/t/' +
+            this.state.templateData.name +
+            '/' +
+            version
         );
     }
 
@@ -173,10 +259,10 @@ class TemplateScreen extends Component {
         axios
             .post(
                 backendSettings.TE_BASEPATH +
-                    '/api/v1/template/' +
-                    this.state.templateData.name +
-                    '/' +
-                    version,
+                '/api/v1/template/' +
+                this.state.templateData.name +
+                '/' +
+                version,
                 {
                     default: true
                 }
@@ -184,10 +270,10 @@ class TemplateScreen extends Component {
             .then(response => {
                 this.props.history.push(
                     backendSettings.TE_BASEPATH +
-                        '/t/' +
-                        response.data.name +
-                        '/' +
-                        response.data.version
+                    '/t/' +
+                    response.data.name +
+                    '/' +
+                    response.data.version
                 );
             })
             .catch(error => {
@@ -290,7 +376,8 @@ class TemplateScreen extends Component {
                 template: encode(templateData),
                 context: contextData,
                 handler: 'jinja2',
-                output: renderMode
+                output: renderMode,
+                tinyUrlArray: this.state.urlKeyList
             };
             axios
                 .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
@@ -382,6 +469,7 @@ class TemplateScreen extends Component {
         this.setState({
             contextData: newValue
         });
+        this.updateUrlKeyList();
     }
 
     onAttributesChange(attributeKey, newValue, keyChange = false) {
@@ -458,10 +546,10 @@ class TemplateScreen extends Component {
             .then(response => {
                 this.props.history.push(
                     backendSettings.TE_BASEPATH +
-                        '/t/' +
-                        response.data.name +
-                        '/' +
-                        response.data.version
+                    '/t/' +
+                    response.data.name +
+                    '/' +
+                    response.data.version
                 );
             })
             .catch(error => {
@@ -502,7 +590,8 @@ class TemplateScreen extends Component {
                 type: type,
                 sub_templates: subTemplates,
                 sample_context_data: contextData,
-                version_alias: this.state.version_alias
+                version_alias: this.state.version_alias,
+                tiny_url: this.state.items
             };
 
             if (this.state.editable) {
@@ -510,9 +599,9 @@ class TemplateScreen extends Component {
                 axios
                     .get(
                         backendSettings.TE_BASEPATH +
-                            '/api/v1/template/' +
-                            name +
-                            '/versions'
+                        '/api/v1/template/' +
+                        name +
+                        '/versions'
                     )
                     .then(response => {
                         this.showAlerts("Template with this name already exists");
@@ -690,7 +779,6 @@ class TemplateScreen extends Component {
             attributes: JSON.stringify(newAttributes)
         });
     }
-
     render() {
         let chooseVersion = this.state.versions.map(versions => {
             return (
@@ -804,7 +892,7 @@ class TemplateScreen extends Component {
                                                         );
                                                     }}
                                                 >
-                                                    Render PDF
+                                                Render PDF
                                                 </button>
                                             ) : (
                                                 <button
@@ -822,7 +910,7 @@ class TemplateScreen extends Component {
                                                         );
                                                     }}
                                                 >
-                                                    Render
+                                                Render
                                                 </button>
                                             )}
                                         {this.state.subTemplatesData[t]
@@ -911,7 +999,7 @@ class TemplateScreen extends Component {
                             )}
                             <label>Default : </label>
                             {!this.state.editable &&
-                            this.state.templateData.default ? (
+                                this.state.templateData.default ? (
                                     <i
                                         className="fa fa-check-circle"
                                         aria-hidden="true"
@@ -1015,11 +1103,17 @@ class TemplateScreen extends Component {
                         <button
                             className={styles.teButtons}
                             onClick={() => {
+                                for (let i = 0; i < this.state.items.length; i++) {
+                                    if (this.state.items[i].urlKey === "" || this.state.items[i].expiry === "") {
+                                        this.showAlerts("Can't leave url/expiry of tinyUrl blank. Please select or delete blank fields.");
+                                        return;
+                                    }
+                                }
                                 this.postTemplate(
                                     document.getElementById('tmp_name').value,
                                     this.state.type,
                                     this.state.contextData,
-                                    this.state.attributes
+                                    this.state.attributes,
                                 );
                             }}
                         >
@@ -1043,16 +1137,18 @@ class TemplateScreen extends Component {
                                             this.state.templateData.name,
                                             this.state.type,
                                             this.state.contextData,
-                                            this.state.attributes
+                                            this.state.attributes,
+                                            this.state.tinyUrlObj
                                         );
                                     }
                                 }}
                             >
-                                    Save
+                                Save
                             </button>
                         </div>
                     )}
                 </div>
+                <br/>
                 <div className={styles.teMarginTop20}>
                     <label>Attributes : </label>
                 </div>
@@ -1118,7 +1214,7 @@ class TemplateScreen extends Component {
                                                             className={styles.teUpdateButton}
                                                             onClick={this.updateAttributes}
                                                         >
-                                                        Update
+                                                            Update
                                                         </button>
                                                     ) : (
                                                         ''
@@ -1131,6 +1227,9 @@ class TemplateScreen extends Component {
                             </div>
                         }
                     </div>
+                </div>
+                <div>
+                    <TinyUrlComponent items={this.state.items} visited={this.state.visited} updateItems={this.updateItems} updateVisited={this.updateVisited} urlKeyList={this.state.urlKeyList} templateName={this.state.templateData.name} templateVersion={this.state.templateData.version} tinyUrlObj={this.state.tinyUrlObj} showAlerts={this.showAlerts}/>
                 </div>
                 {this.state.editable ? (
                     ''
@@ -1174,9 +1273,9 @@ class TemplateScreen extends Component {
                                 style={{ height: '90vh', padding: '0' }}
                             >
                                 {this.state.previewSubType &&
-                                this.state.subTemplatesData.hasOwnProperty(
-                                    this.state.previewSubType
-                                ) ? (
+                                    this.state.subTemplatesData.hasOwnProperty(
+                                        this.state.previewSubType
+                                    ) ? (
                                         <iframe
                                             height="100%"
                                             width="100%"

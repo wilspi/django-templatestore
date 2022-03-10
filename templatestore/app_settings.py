@@ -12,3 +12,4 @@ TE_BASEPATH = "" if TE_BASEPATH == "/" else TE_BASEPATH
 USER_SERVICE_URL = getattr(settings, "USER_SERVICE_URL", "")
 WKPDFGEN_SERVICE_URL = getattr(settings, "WKPDFGEN_SERVICE_URL", "")
 WKPDFGEN_ASSET_URL = getattr(settings, "WKPDFGEN_ASSET_URL", "")
+TINY_URL = getattr(settings, "TINY_URL", "")
