@@ -34,7 +34,7 @@ class Home extends Component {
     }
 
     componentDidMount() {
-        axios.get('./api/v1/templates').then(response => {
+        axios.get('./api/v2/templates').then(response => {
             this.setState({
                 templatesData: response.data.map(t => ({
                     ...{
