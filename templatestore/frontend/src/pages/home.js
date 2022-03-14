@@ -71,6 +71,9 @@ class Home extends Component {
         let tableRows = [];
         let filteredTemplates = this.state.templatesData.reduce(
             (result, template) => {
+                if (!template.journey || template.journey === "" || !template.lob || template.lob === "") {
+                    return result;
+                }
                 if (
                     Object.keys(template).reduce((res, t) => {
                         res =
