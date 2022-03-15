@@ -34,7 +34,7 @@ class Home extends Component {
     }
 
     componentDidMount() {
-        axios.get('./api/v1/templates').then(response => {
+        axios.get('./api/v2/templates').then(response => {
             this.setState({
                 templatesData: response.data.map(t => ({
                     ...{
@@ -70,6 +70,9 @@ class Home extends Component {
         let tableRows = [];
         let filteredTemplates = this.state.templatesData.reduce(
             (result, template) => {
+                if (!template.journey || template.journey === "" || !template.lob || template.lob === "") {
+                    return result;
+                }
                 if (
                     Object.keys(template).reduce((res, t) => {
                         res =

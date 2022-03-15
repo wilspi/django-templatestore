@@ -77,6 +77,7 @@ class TemplateScreen extends Component {
         this.updateItems = this.updateItems.bind(this);
         this.updateVisited = this.updateVisited.bind(this);
         this.setTinyUrlObj = this.setTinyUrlObj.bind(this);
+        this.scanItemsForInvalidEntries = this.scanItemsForInvalidEntries.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -244,7 +245,13 @@ class TemplateScreen extends Component {
             });
         }
     }
-
+    scanItemsForInvalidEntries() {
+        for (let i = 0; i < this.state.items.length; i++) {
+            if (this.state.items[i].urlKey === "" || this.state.items[i].expiry === "") {
+                throw new Error("Can't leave url/expiry of tinyUrl blank. Please select or delete blank fields.");
+            }
+        }
+    }
     openTemplateVersion(version) {
         window.open(
             backendSettings.TE_BASEPATH +
@@ -469,7 +476,6 @@ class TemplateScreen extends Component {
         this.setState({
             contextData: newValue
         });
-        this.updateUrlKeyList();
     }
 
     onAttributesChange(attributeKey, newValue, keyChange = false) {
@@ -584,7 +590,7 @@ class TemplateScreen extends Component {
             } catch (error) {
                 throw new Error("Attributes must be a valid JSON");
             }
-
+            this.scanItemsForInvalidEntries();
             let data = {
                 name: name,
                 type: type,
@@ -1103,12 +1109,6 @@ class TemplateScreen extends Component {
                         <button
                             className={styles.teButtons}
                             onClick={() => {
-                                for (let i = 0; i < this.state.items.length; i++) {
-                                    if (this.state.items[i].urlKey === "" || this.state.items[i].expiry === "") {
-                                        this.showAlerts("Can't leave url/expiry of tinyUrl blank. Please select or delete blank fields.");
-                                        return;
-                                    }
-                                }
                                 this.postTemplate(
                                     document.getElementById('tmp_name').value,
                                     this.state.type,

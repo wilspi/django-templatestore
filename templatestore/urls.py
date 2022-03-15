@@ -7,6 +7,7 @@ urlpatterns = [
     path("render_pdf", views.render_pdf),
     path("api/v1/render", views.render_template_view),
     path("api/v1/templates", views.get_templates_view),
+    path("api/v2/templates", views.get_templates_view_v2),
     path("api/v1/tiny_url", views.save_tiny_url),
     re_path("api/v1/tiny_url/(?P<name>[a-zA-Z]+[a-zA-Z0-9_]*)/(?P<version>\d+\.\d+)$", views.get_tiny_url),
     re_path(
