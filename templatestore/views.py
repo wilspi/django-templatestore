@@ -10,12 +10,12 @@ import requests
 from templatestore.models import Template, TemplateVersion, SubTemplate, TemplateConfig
 from templatestore.utils import base64decode, base64encode
 from templatestore import app_settings as ts_settings
+from django.db import connection
 
 logger = logging.getLogger(__name__)
 PDF_URL = ts_settings.WKPDFGEN_SERVICE_URL
 PDF_ASSET_URL = ts_settings.WKPDFGEN_ASSET_URL
-
-
+QUERY = ts_settings.QUERY
 
 
 def index(request):
@@ -101,6 +101,44 @@ def render_template_view(request):
             json.dumps({"message": str(e)}),
             content_type="application/json",
             status=400,
+        )
+
+
+@csrf_exempt
+def get_templates_view_v2(request):
+    if request.method == "GET":
+        try:
+            cursor = connection.cursor()
+            cursor.execute(QUERY)
+            rows = cursor.fetchall()
+            template_list = []
+            for row in rows:
+                obj = {
+                    "name": row[0],
+                    "version": row[1],
+                    "default": True if row[2] != None else False,
+                    "type": row[3],
+                    "attributes": row[4],
+                    "created_on": row[5],
+                    "modified_on": row[6],
+                    "created_by": row[7],
+                }
+                template_list.append(obj)
+            return JsonResponse(template_list, safe=False)
+
+        except Exception as e:
+            logger.exception(e)
+            return HttpResponse(
+                json.dumps({"message": str(e)}),
+                content_type="application/json",
+                status=400,
+            )
+
+    else:
+        return HttpResponse(
+            json.dumps({"message": "no method found"}),
+            content_type="application/json",
+            status=404,
         )
 
 
