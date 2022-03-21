@@ -5,8 +5,6 @@ import { backendSettings } from './../utils.js';
 import TinyUrlDropdownComponent from './TinyUrlDropdownComponent';
 
 export default function TinyUrlComponent(props) {
-    let tinyUrlObjLocal = props.tinyUrlObj;
-
     function addNewDropdown() {
         if (props.items.length) {
             if (props.items[props.items.length - 1].urlKey === "" || props.items[props.items.length - 1].expiry === "") {
@@ -47,25 +45,6 @@ export default function TinyUrlComponent(props) {
         props.updateItems(newItems);
     }
 
-    function arrayChanges() {
-        const isSame = (a, b) => a.urlKey === b.urlKey && a.expiry === b.expiry;
-        // Get props.items that only occur in the left array,
-        // using the compareFunction to determine equality.
-        const onlyInLeft = (left, right, compareFunction) =>
-            left.filter(leftValue =>
-                !right.some(rightValue =>
-                    compareFunction(leftValue, rightValue)));
-        let addedArray, removedArray;
-        if (tinyUrlObjLocal) {
-            removedArray = onlyInLeft(tinyUrlObjLocal, props.items, isSame);
-            addedArray = onlyInLeft(props.items, tinyUrlObjLocal, isSame);
-        } else {
-            removedArray = [];
-            addedArray = props.items;
-        }
-        return { itemsRemoved: removedArray,
-            itemsAdded: addedArray };
-    }
 
     function valueSelected(e) {
         e.preventDefault();
@@ -76,21 +55,7 @@ export default function TinyUrlComponent(props) {
                 return;
             }
         }
-        let changes = arrayChanges();
-        if (changes.itemsAdded.length === 0 && changes.itemsRemoved.length === 0) {
-            props.showAlerts("Please modify something");
-            return;
-        }
-
-        for (let i = 0; i < changes.itemsRemoved.length; i++) {
-            const index = tinyUrlObjLocal.findIndex(obj => obj.urlKey === changes.itemsRemoved[i].urlKey); // eslint-disable-line
-            if (index !== -1)tinyUrlObjLocal.splice(index, 1);
-        }
-        if (changes.itemsAdded.length) {
-            if (tinyUrlObjLocal)tinyUrlObjLocal = [...tinyUrlObjLocal, ...changes.itemsAdded];
-            else tinyUrlObjLocal = changes.itemsAdded;
-        }
-        data.tinyUrlArray = tinyUrlObjLocal;
+        data.tinyUrlArray = props.items;
         data.templateName = props.templateName ? props.templateName : "";
         data.templateVersion = props.templateVersion ? props.templateVersion : "";
         axios({
