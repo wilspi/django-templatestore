@@ -127,7 +127,7 @@ TE_TEMPLATE_ATTRIBUTES = {
         ],
     },
     "journey": {
-        "allowed_values": ["Policy", "Claim", "IVR", "Purchase", "Pre Inspection", "CX 360", "Reporting"],
+        "allowed_values": ["Policy", "Claim", "IVR", "Purchase", "Pre Inspection", "CX 360", "Reporting", "Payout"],
     },
 }
 
