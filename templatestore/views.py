@@ -554,7 +554,15 @@ def get_render_template_view(request, name, version=None):
                 else TemplateVersion.objects.get(id=t.default_version_id)
             )
 
-            listOfData = generatePayload(t, tv, tv.tiny_url)
+            listOfData = generatePayload(t, tv, data)
+
+            if listOfData is None:
+                return HttpResponse(
+                    json.dumps({"message": "Unexpected keys in Context Data"}),
+                    content_type="application/json",
+                    status=400,
+                )
+
             i = 0
             while i < len(listOfData):
                 url = TINY_URL + "/api/v1/create_tiny_url"
