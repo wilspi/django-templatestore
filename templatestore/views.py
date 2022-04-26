@@ -553,8 +553,16 @@ def get_render_template_view(request, name, version=None):
                 if version
                 else TemplateVersion.objects.get(id=t.default_version_id)
             )
+            try:
+                listOfData = generatePayload(t, tv, data)
+            except Exception as e:
+                logger.exception(e)
+                return HttpResponse(
+                    json.dumps({"message": str(e)}),
+                    content_type="application/json",
+                    status=400,
+                )
 
-            listOfData = generatePayload(t, tv, tv.tiny_url)
             i = 0
             while i < len(listOfData):
                 url = TINY_URL + "/api/v1/create_tiny_url"
