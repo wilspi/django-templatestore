@@ -553,12 +553,12 @@ def get_render_template_view(request, name, version=None):
                 if version
                 else TemplateVersion.objects.get(id=t.default_version_id)
             )
-
-            listOfData = generatePayload(t, tv, data)
-
-            if listOfData is None:
+            try:
+                listOfData = generatePayload(t, tv, data)
+            except Exception as e:
+                logger.exception(e)
                 return HttpResponse(
-                    json.dumps({"message": "Unexpected keys in Context Data"}),
+                    json.dumps({"message": str(e)}),
                     content_type="application/json",
                     status=400,
                 )

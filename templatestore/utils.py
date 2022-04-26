@@ -5,15 +5,12 @@ import pytz
 import re
 
 regex = re.compile(
-    r"^(?:http|ftp)s?://"  # http:// or https://
-    r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"  # domain...
-    r"localhost|"  # localhost...
-    r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
-    r"(?::\d+)?"  # optional port
-    r"(?:/?|[/?]\S+)$",
-    re.IGNORECASE,
-)
-
+        r'^https?://'  # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
+        r'localhost|'  # localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+        r'(?::\d+)?'  # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 def base64decode(template):
     output = base64.b64decode(template.encode("utf-8"))
@@ -35,12 +32,18 @@ def generatePayload(templateTable, versionTable, data):
     i = 0
     while i < len(versionTable.tiny_url):
         original_url = "data" + "['context_data']" + versionTable.tiny_url[i]["urlKey"]
+        
+        try:
+            eval(original_url)
+        except Exception as e:
+            raise Exception("Key not found: "+versionTable.tiny_url[i]["urlKey"])
 
         try:
-            re.match(regex, eval(original_url)) is not None
+            if(re.match(regex, eval(original_url)) is None):
+                raise Exception("Invalid URL "+eval(original_url))
         except Exception as e:
-            return None
-
+            raise e
+        
         lob = templateTable.attributes["lob"]
         journey = templateTable.attributes["journey"]
         days = versionTable.tiny_url[i]["expiry"]
