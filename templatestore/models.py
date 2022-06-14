@@ -85,11 +85,13 @@ class TemplateConfig(models.Model):
     modified_on = models.DateTimeField(auto_now=True)
     deleted_on = models.DateTimeField(null=True, blank=True)
     attributes = JSONField(default=dict, blank=True)
+    optional = models.BooleanField(default=False, blank=False)
 
     class Meta:
         db_table = "templatestore_template_config"
         unique_together = ("type", "sub_type")
-
+    def __unicode__(self):
+        return u'%s' % (self.id)
 
 class SubTemplate(models.Model):
     id = models.AutoField(primary_key=True)

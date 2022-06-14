@@ -46,9 +46,7 @@ class TemplateScreen extends Component {
             urlKeyList: [],
             items: [{ urlKey: '', expiry: '' }],
             visited: {},
-            waMode: '',
             editable: this.props.editable,
-            buttonCnt: 0,
         };
         this.aceconfig = {
             theme: 'monokai',
@@ -80,11 +78,11 @@ class TemplateScreen extends Component {
         this.updateItems = this.updateItems.bind(this);
         this.updateVisited = this.updateVisited.bind(this);
         this.setTinyUrlObj = this.setTinyUrlObj.bind(this);
-        this.setWaMode = this.setWaMode.bind(this);
         this.setButton = this.setButton.bind(this);
         this.scanItemsForInvalidEntries = this.scanItemsForInvalidEntries.bind(
             this
         );
+        this.getRenderedTemplateWA= this.getRenderedTemplateWA.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -436,7 +434,23 @@ class TemplateScreen extends Component {
             this.showAlerts(error.message);
         }
     }
-
+    
+    getRenderedTemplateWA(){
+        Object.keys(this.state.subTemplatesData).map(
+            (t, index) => {
+                this.getRenderedTemplate(
+                    t,
+                    this.state
+                        .subTemplatesData[t]
+                        .data,
+                    this.state.contextData,
+                    this.state
+                        .subTemplatesData[t]
+                        .renderMode
+                )
+            });
+    }
+   
     getRenderedTemplatePdf(subType, templateData, contextData, renderMode) {
         try {
             try {
@@ -577,19 +591,6 @@ class TemplateScreen extends Component {
         this.setMandatoryAttributes(type);
     }
 
-    setWaMode(e) {
-        let buttonCnt;
-        if (e.target.value == 'one_way') {
-            buttonCnt = 2;
-        } else {
-            buttonCnt = 3;
-        }
-        this.setState({
-            waMode: e.target.value,
-            buttonCnt: buttonCnt,
-        });
-    }
-
     setButton(renderMode) {
         console.log(this.state.subTemplatesData);
         let copySubTemplatesData = { ...this.state.subTemplatesData };
@@ -632,6 +633,7 @@ class TemplateScreen extends Component {
 
             let subTemplates = [];
             Object.keys(this.state.subTemplatesData).map(t => {
+                if (Array.isArray(this.state.subTemplatesData[t])) return;
                 let subTemplate = {
                     sub_type: this.state.subTemplatesData[t].subType,
                     render_mode: this.state.subTemplatesData[t].renderMode,
@@ -1066,22 +1068,45 @@ class TemplateScreen extends Component {
                         <div className="card-body">
                             <div className={styles.teSubTemplateBlock}>
                                 <div className={styles.teTemplateEditor}>
-                                    {this.state.waMode != '' ? (
-                                        <WhatsAppEditor
-                                            onTemplateChange={
-                                                this.onTemplateChange
-                                            }
-                                            subTemplatesData={
-                                                this.state.subTemplatesData
-                                            }
-                                            buttonCnt={this.state.buttonCnt}
-                                            setButton={this.setButton}
-                                            availableButtons={
-                                                this.state.waMode == 'one_way'
-                                                    ? ['cta', 'quick_reply']
-                                                    : ['menu', 'quick_reply']
-                                            }
-                                        />
+                                    {JSON.parse(this.state.attributes)
+                                        ?.wa_mode != '' ? (
+                                        <>
+                                            <WhatsAppEditor
+                                                onTemplateChange={
+                                                    this.onTemplateChange
+                                                }
+                                                subTemplatesData={
+                                                    this.state.subTemplatesData
+                                                }
+                                                buttonCnt={
+                                                    JSON.parse(
+                                                        this.state.attributes
+                                                    )?.wa_mode == 'one_way'
+                                                        ? 2
+                                                        : 3
+                                                }
+                                                setButton={this.setButton}
+                                                availableButtons={
+                                                    JSON.parse(
+                                                        this.state.attributes
+                                                    )?.wa_mode == 'one_way'
+                                                        ? ['cta', 'quick_reply']
+                                                        : [
+                                                              'menu',
+                                                              'quick_reply',
+                                                          ]
+                                                }
+                                                editable={this.state.editable}
+                                            />
+                                            <button
+                                                className={styles.teButtons}
+                                                onClick={() => {
+                                                    this.getRenderedTemplateWA()
+                                                }}
+                                            >
+                                                Render
+                                            </button>
+                                        </>
                                     ) : (
                                         <h3>Please Select WA Mode.</h3>
                                     )}
@@ -1179,13 +1204,18 @@ class TemplateScreen extends Component {
                                 {templateTypes}
                             </select>
                             {this.state.type == 'whatsapp' &&
-                                this.state.waMode == '' && (
+                                JSON.parse(this.state.attributes)?.wa_mode ==
+                                    '' && (
                                     <div>
                                         <label> Wa Type : </label>
                                         <select
                                             className={styles.teButtons}
-                                            onChange={e => this.setWaMode(e)}
-                                            value={this.state.waMode}
+                                            onChange={e => this.onAttributesChange('wa_mode', e.target.value)}
+                                            value={
+                                                JSON.parse(
+                                                    this.state.attributes
+                                                )?.wa_mode
+                                            }
                                         >
                                             <option value="" disabled>
                                                 Choose
@@ -1200,7 +1230,9 @@ class TemplateScreen extends Component {
                                     </div>
                                 )}
                             {this.state.type == 'whatsapp' && (
-                                <span>{this.state.waMode}</span>
+                                <span>
+                                    {JSON.parse(this.state.attributes)?.wa_mode}
+                                </span>
                             )}
                         </div>
                     ) : (

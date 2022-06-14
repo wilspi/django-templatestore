@@ -38,6 +38,7 @@ def render_via_jinja(template, context):
 
     return base64encode(Template(base64decode(template)).render(context))
 
+
 @csrf_exempt
 def render_pdf(request):
     # log requests
@@ -64,6 +65,7 @@ def render_pdf(request):
             content_type="application/json",
             status=500,
         )
+
 
 @csrf_exempt
 def render_template_view(request):
@@ -247,14 +249,14 @@ def post_template_view(request):
                 )
 
             cfgs = TemplateConfig.objects.filter(type=data["type"])
-            print(cfgs)
+            #print(cfgs)
             if not len(cfgs):
                 raise (
                     Exception("Validation: `" + data["type"] + "` is not a valid type")
                 )
 
             sub_types = {cfg.sub_type: cfg for cfg in cfgs}
-            print(sub_types)
+            #print(sub_types)
             if len(empty_data) == len(sub_types):
                 raise (
                     Exception(
@@ -263,7 +265,6 @@ def post_template_view(request):
                         + "` must be non empty"
                     )
                 )
-
             invalid_subtypes = set(
                 [s["sub_type"] for s in data["sub_templates"]]
             ).difference(set(sub_types.keys()))
@@ -282,15 +283,20 @@ def post_template_view(request):
                 set([s["sub_type"] for s in data["sub_templates"]])
             )
             if len(diff_keys):
-                raise (
-                    Exception(
-                        "Validation: missing `"
-                        + str(diff_keys)
-                        + "` for type `"
-                        + data["type"]
-                        + "`"
-                    )
-                )
+                for sub_type in diff_keys:
+                    optional_field = TemplateConfig.objects.filter(sub_type=sub_type).values()[0]['optional']
+                    print("@@@@@",optional_field)
+                    # optional = obj.values('optional')
+                    if not optional_field:
+                        raise (
+                            Exception(
+                                "Validation: missing `"
+                                + str(diff_keys)
+                                + "` for type `"
+                                + data["type"]
+                                + "`"
+                            )
+                        )
 
             if not len(data["sample_context_data"]):
                 raise (
@@ -351,7 +357,7 @@ def post_template_view(request):
                     name=data["name"],
                     attributes=data["attributes"],
                     type=data["type"],
-                    user_email=request.POST.get("email")
+                    user_email=request.POST.get("email"),
                 )
                 tmp.save()
 
@@ -385,14 +391,18 @@ def post_template_view(request):
                 sample_context_data=data["sample_context_data"],
                 version_alias=data["version_alias"] if "version_alias" in data else "",
                 user_email=request.POST.get("email"),
-                tiny_url=data["tiny_url"]
+                tiny_url=data["tiny_url"],
             )
             tmp_ver.save()
             for sub_tmp in data["sub_templates"]:
                 print(sub_tmp)
                 st = SubTemplate.objects.create(
                     template_version_id=tmp_ver,
-                    config=TemplateConfig.objects.get(type=data["type"],sub_type=sub_tmp["sub_type"], render_mode=sub_tmp["render_mode"]),
+                    config=TemplateConfig.objects.get(
+                        type=data["type"],
+                        sub_type=sub_tmp["sub_type"],
+                        render_mode=sub_tmp["render_mode"],
+                    ),
                     data=sub_tmp["data"],
                 )
                 print(st)
@@ -467,6 +477,7 @@ def get_template_versions_view(request, name):
             content_type="application/json",
             status=404,
         )
+
 
 @csrf_exempt
 def get_tiny_url(request, name, version):

@@ -1,17 +1,41 @@
 import styles from '../style/WhatsAppEditor.less';
 import { useEffect, useState } from 'react';
+import { uuid } from '../utils';
 function WhatsAppEditor(props) {
-    const [header, setHeader] = useState(props.subTemplatesData.header.data);
+    const [header, setHeader] = useState(
+        typeof props.subTemplatesData.header?.data != 'undefined'
+            ? props.subTemplatesData.header?.data
+            : ''
+    );
     const [body, setBody] = useState(props.subTemplatesData.textpart.data);
-    const [footer, setFooter] = useState(props.subTemplatesData.footer.data);
-    const [buttonList, setButtonList] = useState([]);
-    const [buttonCnt, setButtonCnt] = useState(0);
-    const [buttonId, setButtonId] = useState(0);
-    const [selectedButton, setSelectedButton] = useState('');
+    const [footer, setFooter] = useState(
+        props.subTemplatesData.footer?.data != 'undefined'
+            ? props.subTemplatesData.footer?.data
+            : ''
+    );
+    const [buttonList, setButtonList] = useState(
+        props.editable
+            ? []
+            : typeof props.subTemplatesData.button == 'undefined'
+            ? []
+            : JSON.parse(props.subTemplatesData.button.data)
+    );
+    const [buttonCnt, setButtonCnt] = useState(props.buttonCnt);
+    const [selectedButton, setSelectedButton] = useState(
+        props.editable
+            ? ''
+            : typeof props.subTemplatesData.button == 'undefined'
+            ? ''
+            : props.subTemplatesData.button.renderMode
+    );
+    const [buttonType, setButtonType] = useState('');
     useEffect(() => {
+        setButtonList([]);
+        setSelectedButton('');
         setButtonCnt(props.buttonCnt);
     }, [props.buttonCnt]);
-    function handleChange(e, index = -1) {
+    
+    function handleChange(e, id = -1) {
         let subType;
         if (e.target.name == 'header') {
             subType = 'header';
@@ -24,27 +48,66 @@ function WhatsAppEditor(props) {
             setFooter(e.target.value);
         } else {
             subType = 'button';
-            let buttonListCopy = [...buttonList];
-            buttonListCopy[index].text = e.target.value;
+            let buttonListCopy = buttonList.map((button, index) => {
+                if (button.reply.id == id) {
+                    return {
+                        ...button,
+                        reply: {
+                            id: id,
+                            title: e.target.value,
+                        },
+                    };
+                }
+                return button;
+            });
             setButtonList(buttonListCopy);
+            props.onTemplateChange(subType, JSON.stringify(buttonListCopy));
         }
-        props.onTemplateChange(subType, e.target.value);
+        if (subType != 'button') {
+            props.onTemplateChange(subType, e.target.value);
+        }
     }
-    function setButton(e){
+
+    function setButton(e) {
+        let buttonType;
+        switch (e.target.value) {
+            case 'cta':
+                buttonType = 'unknown';
+                break;
+            case 'quick_reply':
+                buttonType = 'reply';
+                break;
+            case 'menu':
+                buttonType = 'send';
+                break;
+        }
         setSelectedButton(e.target.value);
+        setButtonType(buttonType);
         props.setButton(e.target.value);
     }
+
     function AddButton() {
-        setButtonList([...buttonList, { text: '', id: buttonId }]);
-        setButtonId(prev => prev + 1);
+        setButtonList([
+            ...buttonList,
+            {
+                type: buttonType,
+                reply: {
+                    id: uuid(),
+                    title: '',
+                },
+            },
+        ]);
         setButtonCnt(prev => prev - 1);
     }
-    function DeleteButton(index) {
-        let buttonListCopy = [...buttonList];
-        buttonListCopy.splice(index, 1);
+
+    function DeleteButton(id) {
+        let buttonListCopy = buttonList.filter(button => {
+            return button.reply.id != id;
+        });
         setButtonList(buttonListCopy);
         setButtonCnt(prev => prev + 1);
     }
+
     return (
         <div className={styles.WAeditor}>
             <div className={styles.WAeditor_inputs}>
@@ -59,11 +122,11 @@ function WhatsAppEditor(props) {
                 </div>
                 <div>
                     <div>Body</div>
-                    <input
-                        type="text"
+                    <textarea
                         name="body"
                         value={body}
                         onChange={handleChange}
+                        rows="5"
                     />
                 </div>
                 <div>
@@ -81,27 +144,32 @@ function WhatsAppEditor(props) {
                             <div>
                                 <input
                                     type="text"
-                                    key={button.id}
-                                    value={button.text}
+                                    key={button.reply.id}
+                                    value={button.reply.title}
                                     className="WAinputs"
-                                    onChange={e => handleChange(e, index)}
+                                    onChange={e =>
+                                        handleChange(e, button.reply.id)
+                                    }
                                 />
-                                <button onClick={e => DeleteButton(index)}>
+                                <button
+                                    onClick={e => DeleteButton(button.reply.id)}
+                                >
                                     Delete
                                 </button>
                             </div>
                         );
                     })}
-                {selectedButton == '' && (
+                {typeof props.subTemplatesData.button != 'undefined' && selectedButton == '' && (
                     <div>
                         <label>Button to Add :</label>
                         <select
                             className={styles.teButtons}
                             onChange={setButton}
                             value={selectedButton}
-                            
                         >
-                            <option value='' disabled>Choose</option>
+                            <option value="" disabled>
+                                Choose
+                            </option>
                             {props.availableButtons.map((item, index) => {
                                 return <option value={item}>{item}</option>;
                             })}
@@ -130,7 +198,7 @@ function WhatsAppEditor(props) {
                             className="text-header"
                             style={{ padding: '6px 7px 5px 5px' }}
                         >
-                            {header}
+                            { props.subTemplatesData.header.output}
                         </div>
                         <div
                             class="header"
@@ -141,13 +209,13 @@ function WhatsAppEditor(props) {
                                 style={{ whiteSpace: 'pre-wrap' }}
                                 className={styles.template_content_pre}
                             >
-                                {body}
+                                {props.subTemplatesData.textpart.output}
                             </pre>
                             <div
                                 className={styles.footer}
                                 style={{ padding: '7px 4px 0px 2px' }}
                             >
-                                {footer}
+                                {props.subTemplatesData.footer.output}
                             </div>
                             <div class="metadata">
                                 <span class="time">5:14 PM</span>
@@ -162,7 +230,7 @@ function WhatsAppEditor(props) {
                             {buttonList.map((button, index) => {
                                 return (
                                     <div className={styles.quick_reply_button}>
-                                        {button.text}
+                                        {button.reply.title}
                                     </div>
                                 );
                             })}
