@@ -1,34 +1,49 @@
 import styles from '../style/WhatsAppEditor.less';
-import { useState } from 'react';
-function WhatsAppEditor() {
-    const [header, setHeader] = useState('');
-    const [body, setBody] = useState('');
-    const [footer, setFooter] = useState('');
+import { useEffect, useState } from 'react';
+function WhatsAppEditor(props) {
+    const [header, setHeader] = useState(props.subTemplatesData.header.data);
+    const [body, setBody] = useState(props.subTemplatesData.textpart.data);
+    const [footer, setFooter] = useState(props.subTemplatesData.footer.data);
     const [buttonList, setButtonList] = useState([]);
     const [buttonCnt, setButtonCnt] = useState(0);
-    function handleChange(e) {
+    const [buttonId, setButtonId] = useState(0);
+    const [selectedButton, setSelectedButton] = useState('');
+    useEffect(() => {
+        setButtonCnt(props.buttonCnt);
+    }, [props.buttonCnt]);
+    function handleChange(e, index = -1) {
+        let subType;
         if (e.target.name == 'header') {
+            subType = 'header';
             setHeader(e.target.value);
         } else if (e.target.name == 'body') {
+            subType = 'textpart';
             setBody(e.target.value);
-        } else {
+        } else if (e.target.name == 'footer') {
+            subType = 'footer';
             setFooter(e.target.value);
+        } else {
+            subType = 'button';
+            let buttonListCopy = [...buttonList];
+            buttonListCopy[index].text = e.target.value;
+            setButtonList(buttonListCopy);
         }
+        props.onTemplateChange(subType, e.target.value);
     }
-    function handleButtonChange(e, index) {
-        console.log(e.target.value);
-        let buttonListCopy = [...buttonList];
-        buttonListCopy[index].text = e.target.value;
-        setButtonList(buttonListCopy);
+    function setButton(e){
+        setSelectedButton(e.target.value);
+        props.setButton(e.target.value);
     }
     function AddButton() {
-        setButtonList([...buttonList, { text: '', id: buttonCnt + 1 }]);
-        setButtonCnt(prev => prev + 1);
+        setButtonList([...buttonList, { text: '', id: buttonId }]);
+        setButtonId(prev => prev + 1);
+        setButtonCnt(prev => prev - 1);
     }
     function DeleteButton(index) {
         let buttonListCopy = [...buttonList];
         buttonListCopy.splice(index, 1);
         setButtonList(buttonListCopy);
+        setButtonCnt(prev => prev + 1);
     }
     return (
         <div className={styles.WAeditor}>
@@ -68,7 +83,8 @@ function WhatsAppEditor() {
                                     type="text"
                                     key={button.id}
                                     value={button.text}
-                                    onChange={e => handleButtonChange(e, index)}
+                                    className="WAinputs"
+                                    onChange={e => handleChange(e, index)}
                                 />
                                 <button onClick={e => DeleteButton(index)}>
                                     Delete
@@ -76,7 +92,23 @@ function WhatsAppEditor() {
                             </div>
                         );
                     })}
-                {buttonList.length < 3 && (
+                {selectedButton == '' && (
+                    <div>
+                        <label>Button to Add :</label>
+                        <select
+                            className={styles.teButtons}
+                            onChange={setButton}
+                            value={selectedButton}
+                            
+                        >
+                            <option value='' disabled>Choose</option>
+                            {props.availableButtons.map((item, index) => {
+                                return <option value={item}>{item}</option>;
+                            })}
+                        </select>
+                    </div>
+                )}
+                {selectedButton != '' && buttonCnt != 0 && (
                     <div>
                         <button onClick={AddButton}>Add Button</button>
                     </div>

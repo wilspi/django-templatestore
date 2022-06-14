@@ -6,13 +6,14 @@ import {
     encode,
     decode,
     backendSettings,
-    getDateInSimpleFormat
+    getDateInSimpleFormat,
 } from './../utils.js';
 import PropTypes from 'prop-types';
 import styles from './../style/templateScreen.less';
 import SearchBox from './../components/searchBox/index';
 import Highlight from './../components/highlight.js';
 import AlertModal from './../components/alertModal/alertModal';
+import WhatsAppEditor from './../components/WhatsAppEditor';
 import 'ace-builds';
 import 'ace-builds/webpack-resolver';
 import AceEditor from 'react-ace';
@@ -31,7 +32,7 @@ class TemplateScreen extends Component {
         this.state = {
             templateData: {
                 name: this.props.match.params.name,
-                version: this.props.match.params.version
+                version: this.props.match.params.version,
             },
             searchText: '',
             versions: [{ version: this.props.match.params.version }],
@@ -43,15 +44,17 @@ class TemplateScreen extends Component {
             version_alias: '',
             tinyUrlObj: [],
             urlKeyList: [],
-            items: [{ urlKey: "", expiry: "" }],
+            items: [{ urlKey: '', expiry: '' }],
             visited: {},
-            editable: this.props.editable
+            waMode: '',
+            editable: this.props.editable,
+            buttonCnt: 0,
         };
         this.aceconfig = {
             theme: 'monokai',
             fontSize: 16,
             width: '100%',
-            height: '400px'
+            height: '400px',
         };
         this.getTableRowsJSX = this.getTableRowsJSX.bind(this);
         this.openTemplateVersion = this.openTemplateVersion.bind(this);
@@ -77,17 +80,21 @@ class TemplateScreen extends Component {
         this.updateItems = this.updateItems.bind(this);
         this.updateVisited = this.updateVisited.bind(this);
         this.setTinyUrlObj = this.setTinyUrlObj.bind(this);
-        this.scanItemsForInvalidEntries = this.scanItemsForInvalidEntries.bind(this);
+        this.setWaMode = this.setWaMode.bind(this);
+        this.setButton = this.setButton.bind(this);
+        this.scanItemsForInvalidEntries = this.scanItemsForInvalidEntries.bind(
+            this
+        );
     }
     componentDidMount() {
         if (!this.state.editable) {
             axios
                 .get(
                     backendSettings.TE_BASEPATH +
-                    '/api/v1/template/' +
-                    this.state.templateData.name +
-                    '/' +
-                    this.state.templateData.version
+                        '/api/v1/template/' +
+                        this.state.templateData.name +
+                        '/' +
+                        this.state.templateData.version
                 )
                 .then(response => {
                     this.setState({
@@ -97,7 +104,7 @@ class TemplateScreen extends Component {
                                     data: decode(k.data),
                                     subType: k.sub_type,
                                     renderMode: k.render_mode,
-                                    output: ''
+                                    output: '',
                                 };
                                 return result;
                             },
@@ -106,18 +113,16 @@ class TemplateScreen extends Component {
                         templateData: {
                             name: this.props.match.params.name,
                             version: this.props.match.params.version,
-                            default: response.data.default
+                            default: response.data.default,
                         },
                         contextData: JSON.stringify(
                             response.data.sample_context_data,
                             null,
                             2
                         ),
-                        attributes: JSON.stringify(
-                            response.data.attributes
-                        ),
+                        attributes: JSON.stringify(response.data.attributes),
                         type: response.data.type,
-                        version_alias: response.data.version_alias
+                        version_alias: response.data.version_alias,
                     });
                     this.updateUrlKeyList();
                 })
@@ -132,9 +137,9 @@ class TemplateScreen extends Component {
             axios
                 .get(
                     backendSettings.TE_BASEPATH +
-                    '/api/v1/template/' +
-                    this.state.templateData.name +
-                    '/versions'
+                        '/api/v1/template/' +
+                        this.state.templateData.name +
+                        '/versions'
                 )
                 .then(response => {
                     this.setState({
@@ -142,9 +147,13 @@ class TemplateScreen extends Component {
                             version: t.version,
                             default: t.default,
                             created_on: getDateInSimpleFormat(t.created_on),
-                            version_alias: t.version_alias ? t.version_alias : '-',
-                            created_by: t.created_by ? t.created_by.toString() : '-'
-                        }))
+                            version_alias: t.version_alias
+                                ? t.version_alias
+                                : '-',
+                            created_by: t.created_by
+                                ? t.created_by.toString()
+                                : '-',
+                        })),
                     });
                 })
                 .catch(error => {
@@ -158,13 +167,13 @@ class TemplateScreen extends Component {
                 if (this.state.editable) {
                     this.setState({
                         contextData: JSON.stringify({ name: 'abc' }, null, 2),
-                        config: response.data
+                        config: response.data,
                     });
                     let defaultType = Object.keys(response.data)[0];
                     this.getTypesConfig(response.data, defaultType);
                 } else {
                     this.setState({
-                        config: response.data
+                        config: response.data,
                     });
                 }
                 this.updateUrlKeyList();
@@ -183,23 +192,24 @@ class TemplateScreen extends Component {
             visitedCopy[obj.urlKey] = 1;
             itemsCopy.splice(itemsCopy.length - 1, 0, {
                 urlKey: obj.urlKey,
-                expiry: obj.expiry });
+                expiry: obj.expiry,
+            });
         });
         this.setState({
             items: itemsCopy,
-            visited: visitedCopy
+            visited: visitedCopy,
         });
     }
 
     updateItems(itemsCopy) {
         this.setState({
-            items: itemsCopy
+            items: itemsCopy,
         });
     }
 
     updateVisited(visitedCopy) {
         this.setState({
-            visited: visitedCopy
+            visited: visitedCopy,
         });
     }
 
@@ -219,46 +229,55 @@ class TemplateScreen extends Component {
     }
 
     setTinyUrlObj() {
-        if (!this.state.templateData.name || !this.state.templateData.version) return;
-        let url = backendSettings.TE_BASEPATH +
-        '/api/v1/tiny_url/' +
-        this.state.templateData.name +
-        '/' +
-        this.state.templateData.version;
+        if (!this.state.templateData.name || !this.state.templateData.version)
+            return;
+        let url =
+            backendSettings.TE_BASEPATH +
+            '/api/v1/tiny_url/' +
+            this.state.templateData.name +
+            '/' +
+            this.state.templateData.version;
         axios
-            .get(
-                url
-            ).then((response) => {
+            .get(url)
+            .then(response => {
                 this.setState({
-                    tinyUrlObj: response.data ? response.data : []
+                    tinyUrlObj: response.data ? response.data : [],
                 });
                 this.populateItems(this.state.tinyUrlObj);
-            }).catch(err => {this.showAlerts(err.response.data);});
+            })
+            .catch(err => {
+                this.showAlerts(err.response.data);
+            });
     }
 
     updateUrlKeyList() {
-        if (this.state.contextData !== "") {
+        if (this.state.contextData !== '') {
             let result = [];
             this.scan([], JSON.parse(this.state.contextData), result);
             this.setState({
-                urlKeyList: result
+                urlKeyList: result,
             });
         }
     }
     scanItemsForInvalidEntries() {
         for (let i = 0; i < this.state.items.length; i++) {
-            if (this.state.items[i].urlKey === "" || this.state.items[i].expiry === "") {
-                throw new Error("Can't leave url/expiry of tinyUrl blank. Please select or delete blank fields.");
+            if (
+                this.state.items[i].urlKey === '' ||
+                this.state.items[i].expiry === ''
+            ) {
+                throw new Error(
+                    "Can't leave url/expiry of tinyUrl blank. Please select or delete blank fields."
+                );
             }
         }
     }
     openTemplateVersion(version) {
         window.open(
             backendSettings.TE_BASEPATH +
-            '/t/' +
-            this.state.templateData.name +
-            '/' +
-            version
+                '/t/' +
+                this.state.templateData.name +
+                '/' +
+                version
         );
     }
 
@@ -266,21 +285,21 @@ class TemplateScreen extends Component {
         axios
             .post(
                 backendSettings.TE_BASEPATH +
-                '/api/v1/template/' +
-                this.state.templateData.name +
-                '/' +
-                version,
+                    '/api/v1/template/' +
+                    this.state.templateData.name +
+                    '/' +
+                    version,
                 {
-                    default: true
+                    default: true,
                 }
             )
             .then(response => {
                 this.props.history.push(
                     backendSettings.TE_BASEPATH +
-                    '/t/' +
-                    response.data.name +
-                    '/' +
-                    response.data.version
+                        '/t/' +
+                        response.data.name +
+                        '/' +
+                        response.data.version
                 );
             })
             .catch(error => {
@@ -290,7 +309,7 @@ class TemplateScreen extends Component {
 
     onSearchTextChange(searchValue) {
         this.setState({
-            searchText: searchValue
+            searchText: searchValue,
         });
     }
 
@@ -304,7 +323,9 @@ class TemplateScreen extends Component {
                             version[t]
                                 .toString()
                                 .toLowerCase()
-                                .indexOf(this.state.searchText.toLowerCase()) !== -1;
+                                .indexOf(
+                                    this.state.searchText.toLowerCase()
+                                ) !== -1;
                         return res;
                     }, false)
                 ) {
@@ -377,14 +398,14 @@ class TemplateScreen extends Component {
             try {
                 contextData = JSON.parse(contextData);
             } catch (error) {
-                throw new Error("sample_context_data must be a valid JSON");
+                throw new Error('sample_context_data must be a valid JSON');
             }
             let data = {
                 template: encode(templateData),
                 context: contextData,
                 handler: 'jinja2',
                 output: renderMode,
-                tinyUrlArray: this.state.urlKeyList
+                tinyUrlArray: this.state.urlKeyList,
             };
             axios
                 .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
@@ -395,11 +416,11 @@ class TemplateScreen extends Component {
                         ).reduce((result, k) => {
                             result[k] = this.state.subTemplatesData[k];
                             result[k].output =
-                                k === subType ?
-                                    decode(response.data.rendered_template) :
-                                    this.state.subTemplatesData[k].output;
+                                k === subType
+                                    ? decode(response.data.rendered_template)
+                                    : this.state.subTemplatesData[k].output;
                             return result;
-                        }, {})
+                        }, {}),
                     });
                 })
                 .catch(function(error) {
@@ -408,7 +429,7 @@ class TemplateScreen extends Component {
                 });
             if (renderMode === 'html') {
                 this.setState({
-                    previewSubType: subType
+                    previewSubType: subType,
                 });
             }
         } catch (error) {
@@ -421,21 +442,23 @@ class TemplateScreen extends Component {
             try {
                 contextData = JSON.parse(contextData);
             } catch (error) {
-                throw new Error("sample_context_data must be a valid JSON");
+                throw new Error('sample_context_data must be a valid JSON');
             }
             let data = {
                 template: encode(templateData),
                 context: contextData,
                 handler: 'jinja2',
-                output: renderMode
+                output: renderMode,
             };
             axios
                 .post(backendSettings.TE_BASEPATH + '/render_pdf', data, {
-                    responseType: "blob"
+                    responseType: 'blob',
                 })
-                .then((response) => {
+                .then(response => {
                     //Create a Blob from the PDF Stream
-                    const file = new Blob([response.data], { type: "application/pdf" });
+                    const file = new Blob([response.data], {
+                        type: 'application/pdf',
+                    });
                     //Build a URL from the file
                     const fileURL = URL.createObjectURL(file);
                     //Open the URL on new Window
@@ -448,7 +471,7 @@ class TemplateScreen extends Component {
                 });
             if (renderMode === 'html') {
                 this.setState({
-                    previewSubType: subType
+                    previewSubType: subType,
                 });
             }
         } catch (error) {
@@ -457,24 +480,25 @@ class TemplateScreen extends Component {
     }
 
     onTemplateChange(subType, templateData) {
+        console.log(subType, templateData);
         this.setState({
             subTemplatesData: Object.keys(this.state.subTemplatesData).reduce(
                 (result, k) => {
                     result[k] = this.state.subTemplatesData[k];
                     result[k].data =
-                        k === subType ?
-                            templateData :
-                            this.state.subTemplatesData[k].data;
+                        k === subType
+                            ? templateData
+                            : this.state.subTemplatesData[k].data;
                     return result;
                 },
                 {}
-            )
+            ),
         });
     }
 
     onContextChange(newValue, event) {
         this.setState({
-            contextData: newValue
+            contextData: newValue,
         });
     }
 
@@ -497,20 +521,20 @@ class TemplateScreen extends Component {
             newAttributes = { ...currentAttributes, [attributeKey]: newValue };
         }
         this.setState({
-            attributes: JSON.stringify(newAttributes)
+            attributes: JSON.stringify(newAttributes),
         });
     }
 
     onVersionAliasChange(newValue, event) {
         this.setState({
-            version_alias: newValue
+            version_alias: newValue,
         });
     }
 
     setMandatoryAttributes(type) {
         let mandatoryAttributes = {
             ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
-            ...this.state.config[type]["attributes"]
+            ...this.state.config[type]['attributes'],
         };
         let newAttributes = Object.keys(mandatoryAttributes).reduce(
             (result, attribute) => {
@@ -520,42 +544,76 @@ class TemplateScreen extends Component {
             {}
         );
         this.setState({
-            attributes: JSON.stringify(newAttributes)
+            attributes: JSON.stringify(newAttributes),
         });
     }
 
     getTypesConfig(config, type) {
         this.setState({
-            subTemplatesData: config[type].sub_type.reduce(
-                (result, k) => {
+            subTemplatesData: config[type].sub_type.reduce((result, k) => {
+                if (k.type in result) {
+                    if (!Array.isArray(result[k.type])) {
+                        let tempObj = result[k.type];
+                        result[k.type] = [];
+                        result[k.type].push(tempObj);
+                    }
+                    result[k.type].push({
+                        subType: k.type,
+                        renderMode: k.render_mode,
+                        data: '',
+                        output: '',
+                    });
+                } else
                     result[k.type] = {
                         subType: k.type,
                         renderMode: k.render_mode,
                         data: '',
-                        output: ''
+                        output: '',
                     };
-                    return result;
-                },
-                {}
-            ),
-            type: type
+                return result;
+            }, {}),
+            type: type,
         });
         this.setMandatoryAttributes(type);
     }
 
+    setWaMode(e) {
+        let buttonCnt;
+        if (e.target.value == 'one_way') {
+            buttonCnt = 2;
+        } else {
+            buttonCnt = 3;
+        }
+        this.setState({
+            waMode: e.target.value,
+            buttonCnt: buttonCnt,
+        });
+    }
+
+    setButton(renderMode) {
+        console.log(this.state.subTemplatesData);
+        let copySubTemplatesData = { ...this.state.subTemplatesData };
+        this.state.subTemplatesData.button.forEach(item => {
+            if (item.renderMode == renderMode) {
+                copySubTemplatesData.button = item;
+            }
+        });
+        this.setState({
+            subTemplatesData: copySubTemplatesData,
+        });
+    }
+
     saveTemplate(data) {
+        console.log(data);
         axios
-            .post(
-                backendSettings.TE_BASEPATH + '/api/v1/template',
-                data
-            )
+            .post(backendSettings.TE_BASEPATH + '/api/v1/template', data)
             .then(response => {
                 this.props.history.push(
                     backendSettings.TE_BASEPATH +
-                    '/t/' +
-                    response.data.name +
-                    '/' +
-                    response.data.version
+                        '/t/' +
+                        response.data.name +
+                        '/' +
+                        response.data.version
                 );
             })
             .catch(error => {
@@ -565,16 +623,19 @@ class TemplateScreen extends Component {
 
     postTemplate(name, type, contextData, attributes) {
         try {
-            var re = new RegExp("^[a-zA-Z]+[a-zA-Z0-9_]*$");
+            var re = new RegExp('^[a-zA-Z]+[a-zA-Z0-9_]*$');
             if (!re.test(name)) {
-                throw new Error("Validation: `" + name + "` is not a valid template name");
+                throw new Error(
+                    'Validation: `' + name + '` is not a valid template name'
+                );
             }
 
             let subTemplates = [];
             Object.keys(this.state.subTemplatesData).map(t => {
                 let subTemplate = {
                     sub_type: this.state.subTemplatesData[t].subType,
-                    data: encode(this.state.subTemplatesData[t].data)
+                    render_mode: this.state.subTemplatesData[t].renderMode,
+                    data: encode(this.state.subTemplatesData[t].data),
                 };
                 subTemplates.push(subTemplate);
             });
@@ -582,13 +643,13 @@ class TemplateScreen extends Component {
             try {
                 contextData = JSON.parse(contextData);
             } catch (error) {
-                throw new Error("sample_context_data must be a valid JSON");
+                throw new Error('sample_context_data must be a valid JSON');
             }
 
             try {
                 attributes = JSON.parse(attributes);
             } catch (error) {
-                throw new Error("Attributes must be a valid JSON");
+                throw new Error('Attributes must be a valid JSON');
             }
             this.scanItemsForInvalidEntries();
             let data = {
@@ -597,20 +658,22 @@ class TemplateScreen extends Component {
                 sub_templates: subTemplates,
                 sample_context_data: contextData,
                 version_alias: this.state.version_alias,
-                tiny_url: this.state.items
+                tiny_url: this.state.items,
             };
 
             if (this.state.editable) {
-                data["attributes"] = attributes;
+                data['attributes'] = attributes;
                 axios
                     .get(
                         backendSettings.TE_BASEPATH +
-                        '/api/v1/template/' +
-                        name +
-                        '/versions'
+                            '/api/v1/template/' +
+                            name +
+                            '/versions'
                     )
                     .then(response => {
-                        this.showAlerts("Template with this name already exists");
+                        this.showAlerts(
+                            'Template with this name already exists'
+                        );
                     })
                     .catch(error => {
                         this.saveTemplate(data);
@@ -625,17 +688,22 @@ class TemplateScreen extends Component {
 
     showAlerts(errorMessage = '') {
         this.setState({
-            alertMessage: errorMessage
+            alertMessage: errorMessage,
         });
     }
 
     getAttributeOptions(allowedValues) {
         var options = [];
-        options.push(<option value="" disabled selected> Choose Here </option>);
+        options.push(
+            <option value="" disabled selected>
+                {' '}
+                Choose Here{' '}
+            </option>
+        );
 
         options.push(
             allowedValues.map(t => {
-                return (<option value={t}>{t}</option>);
+                return <option value={t}>{t}</option>;
             })
         );
         return options;
@@ -648,73 +716,74 @@ class TemplateScreen extends Component {
         if (this.state.type && Object.keys(this.state.config).length) {
             mandatoryAttributes = {
                 ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
-                ...this.state.config[this.state.type]["attributes"]
+                ...this.state.config[this.state.type]['attributes'],
             };
         }
 
         let allAttributes = JSON.parse(JSON.stringify(mandatoryAttributes));
 
         Object.keys(JSON.parse(this.state.attributes)).map(t => {
-            allAttributes[t] = allAttributes[t] || JSON.parse(this.state.attributes)[t];
+            allAttributes[t] =
+                allAttributes[t] || JSON.parse(this.state.attributes)[t];
         });
 
         Object.keys(allAttributes).map((t, index) => {
             attributes.push(
                 <div className={styles.teAttributesRow}>
                     <div className={styles.teAttributesCell}>
-                        {
-                            mandatoryAttributes.hasOwnProperty(t) ? (
-                                <div className={styles.teLabel}>
-                                    {t}
-                                </div>
-                            ) : (
-                                <input
-                                    value={t}
-                                    onChange={e =>
-                                        this.onAttributesChange(t, e.target.value, true)
-                                    }
-                                />
-                            )
-                        }
+                        {mandatoryAttributes.hasOwnProperty(t) ? (
+                            <div className={styles.teLabel}>{t}</div>
+                        ) : (
+                            <input
+                                value={t}
+                                onChange={e =>
+                                    this.onAttributesChange(
+                                        t,
+                                        e.target.value,
+                                        true
+                                    )
+                                }
+                            />
+                        )}
                     </div>
                     <div className={styles.teAttributesCell}>
-                        {
-                            allAttributes[t].hasOwnProperty("allowed_values") ? (
-                                <select
-                                    value={
-                                        JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
-                                    }
-                                    onChange={e =>
-                                        this.onAttributesChange(t, e.target.value)
-                                    }
-                                >
-                                    {
-                                        this.getAttributeOptions(allAttributes[t]["allowed_values"])
-                                    }
-                                </select>
-                            ) : (
-                                <input
-                                    value={
-                                        JSON.parse(this.state.attributes)[t] ? JSON.parse(this.state.attributes)[t] : ""
-                                    }
-                                    onChange={
-                                        e => this.onAttributesChange(t, e.target.value)
-                                    }
-                                />
-                            )
-                        }
-                        {
-                            mandatoryAttributes.hasOwnProperty(t) ? (
-                                ''
-                            ) : (
-                                <span
-                                    className={styles.teDeleteAttribute}
-                                    onClick={() => this.deleteAttribute(t)}
-                                >
-                                    &times;
-                                </span>
-                            )
-                        }
+                        {allAttributes[t].hasOwnProperty('allowed_values') ? (
+                            <select
+                                value={
+                                    JSON.parse(this.state.attributes)[t]
+                                        ? JSON.parse(this.state.attributes)[t]
+                                        : ''
+                                }
+                                onChange={e =>
+                                    this.onAttributesChange(t, e.target.value)
+                                }
+                            >
+                                {this.getAttributeOptions(
+                                    allAttributes[t]['allowed_values']
+                                )}
+                            </select>
+                        ) : (
+                            <input
+                                value={
+                                    JSON.parse(this.state.attributes)[t]
+                                        ? JSON.parse(this.state.attributes)[t]
+                                        : ''
+                                }
+                                onChange={e =>
+                                    this.onAttributesChange(t, e.target.value)
+                                }
+                            />
+                        )}
+                        {mandatoryAttributes.hasOwnProperty(t) ? (
+                            ''
+                        ) : (
+                            <span
+                                className={styles.teDeleteAttribute}
+                                onClick={() => this.deleteAttribute(t)}
+                            >
+                                &times;
+                            </span>
+                        )}
                     </div>
                 </div>
             );
@@ -724,24 +793,27 @@ class TemplateScreen extends Component {
 
     addNewAttribute() {
         try {
-            let key = document.getElementById("newAttributeKey").value;
-            let value = document.getElementById("newAttributeValue").value;
+            let key = document.getElementById('newAttributeKey').value;
+            let value = document.getElementById('newAttributeValue').value;
 
             if (!key) {
-                throw new Error("Please enter a non empty attribute key");
+                throw new Error('Please enter a non empty attribute key');
             }
 
             if (JSON.parse(this.state.attributes).hasOwnProperty(key)) {
-                throw new Error("Attribute `" + key + "` already exists");
+                throw new Error('Attribute `' + key + '` already exists');
             }
 
-            document.getElementById("newAttributeKey").value = "";
-            document.getElementById("newAttributeValue").value = "";
+            document.getElementById('newAttributeKey').value = '';
+            document.getElementById('newAttributeValue').value = '';
 
-            let newAttributes = { ...JSON.parse(this.state.attributes), [key]: value };
+            let newAttributes = {
+                ...JSON.parse(this.state.attributes),
+                [key]: value,
+            };
 
             this.setState({
-                attributes: JSON.stringify(newAttributes)
+                attributes: JSON.stringify(newAttributes),
             });
         } catch (error) {
             this.showAlerts(error.message);
@@ -750,21 +822,24 @@ class TemplateScreen extends Component {
 
     updateAttributes() {
         try {
-            if (JSON.parse(this.state.attributes).hasOwnProperty("")) {
-                throw new Error("Attributes can not have empty key");
+            if (JSON.parse(this.state.attributes).hasOwnProperty('')) {
+                throw new Error('Attributes can not have empty key');
             }
 
             let data = {
-                attributes: JSON.parse(this.state.attributes)
+                attributes: JSON.parse(this.state.attributes),
             };
 
             axios
                 .patch(
-                    backendSettings.TE_BASEPATH + '/api/v1/template/' + this.state.templateData.name + '/attributes',
+                    backendSettings.TE_BASEPATH +
+                        '/api/v1/template/' +
+                        this.state.templateData.name +
+                        '/attributes',
                     data
                 )
                 .then(response => {
-                    this.showAlerts("Attributes updated successfully !");
+                    this.showAlerts('Attributes updated successfully !');
                 })
                 .catch(error => {
                     this.showAlerts(error.response.data.message);
@@ -775,20 +850,25 @@ class TemplateScreen extends Component {
     }
 
     deleteAttribute(attributeKey) {
-        let newAttributes = Object.keys(JSON.parse(this.state.attributes)).reduce((object, key) => {
+        let newAttributes = Object.keys(
+            JSON.parse(this.state.attributes)
+        ).reduce((object, key) => {
             if (key !== attributeKey) {
                 object[key] = JSON.parse(this.state.attributes)[key];
             }
             return object;
         }, {});
         this.setState({
-            attributes: JSON.stringify(newAttributes)
+            attributes: JSON.stringify(newAttributes),
         });
     }
     render() {
         let chooseVersion = this.state.versions.map(versions => {
             return (
-                <option value={versions.version} key={versions.version}> {versions.version} </option>
+                <option value={versions.version} key={versions.version}>
+                    {' '}
+                    {versions.version}{' '}
+                </option>
             );
         });
 
@@ -796,9 +876,14 @@ class TemplateScreen extends Component {
         // let tableHeaders = ['version', 'created_on', ' - ', ' - ', 'comment'].map(k => (
         //     <th>{k}</th>
         // ));
-        let tableHeaders = ['version', 'created_on', 'version_alias', 'created_by', ' - ', ' - '].map((k, index) => (
-            <th key={index}>{k}</th>
-        ));
+        let tableHeaders = [
+            'version',
+            'created_on',
+            'version_alias',
+            'created_by',
+            ' - ',
+            ' - ',
+        ].map((k, index) => <th key={index}>{k}</th>);
 
         let editors = Object.keys(this.state.subTemplatesData).map(
             (t, index) => {
@@ -883,68 +968,68 @@ class TemplateScreen extends Component {
                                     <div className={styles.teVersionWrapper}>
                                         {this.state.subTemplatesData[t]
                                             .renderMode === 'html' ? (
-                                                <button
-                                                    className={styles.teButtons}
-                                                    onClick={() => {
-                                                        this.getRenderedTemplatePdf(
-                                                            t,
-                                                            this.state.subTemplatesData[
-                                                                t
-                                                            ].data,
-                                                            this.state.contextData,
-                                                            this.state.subTemplatesData[
-                                                                t
-                                                            ].renderMode
-                                                        );
-                                                    }}
-                                                >
+                                            <button
+                                                className={styles.teButtons}
+                                                onClick={() => {
+                                                    this.getRenderedTemplatePdf(
+                                                        t,
+                                                        this.state
+                                                            .subTemplatesData[t]
+                                                            .data,
+                                                        this.state.contextData,
+                                                        this.state
+                                                            .subTemplatesData[t]
+                                                            .renderMode
+                                                    );
+                                                }}
+                                            >
                                                 Render PDF
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    className={styles.teButtons}
-                                                    onClick={() => {
-                                                        this.getRenderedTemplate(
-                                                            t,
-                                                            this.state.subTemplatesData[
-                                                                t
-                                                            ].data,
-                                                            this.state.contextData,
-                                                            this.state.subTemplatesData[
-                                                                t
-                                                            ].renderMode
-                                                        );
-                                                    }}
-                                                >
+                                            </button>
+                                        ) : (
+                                            <button
+                                                className={styles.teButtons}
+                                                onClick={() => {
+                                                    this.getRenderedTemplate(
+                                                        t,
+                                                        this.state
+                                                            .subTemplatesData[t]
+                                                            .data,
+                                                        this.state.contextData,
+                                                        this.state
+                                                            .subTemplatesData[t]
+                                                            .renderMode
+                                                    );
+                                                }}
+                                            >
                                                 Render
-                                                </button>
-                                            )}
+                                            </button>
+                                        )}
                                         {this.state.subTemplatesData[t]
                                             .renderMode === 'html' ? (
-                                                <button
-                                                    className={
-                                                        styles.tePreviewButton
-                                                    }
-                                                    data-toggle="modal"
-                                                    data-target="#myModal"
-                                                    onClick={() => {
-                                                        this.getRenderedTemplate(
-                                                            t,
-                                                            this.state
-                                                                .subTemplatesData[t]
-                                                                .data,
-                                                            this.state.contextData,
-                                                            this.state
-                                                                .subTemplatesData[t]
-                                                                .renderMode
-                                                        );
-                                                    }}
-                                                >
+                                            <button
+                                                className={
+                                                    styles.tePreviewButton
+                                                }
+                                                data-toggle="modal"
+                                                data-target="#myModal"
+                                                onClick={() => {
+                                                    this.getRenderedTemplate(
+                                                        t,
+                                                        this.state
+                                                            .subTemplatesData[t]
+                                                            .data,
+                                                        this.state.contextData,
+                                                        this.state
+                                                            .subTemplatesData[t]
+                                                            .renderMode
+                                                    );
+                                                }}
+                                            >
                                                 Preview HTML
-                                                </button>
-                                            ) : (
-                                                ''
-                                            )}
+                                            </button>
+                                        ) : (
+                                            ''
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -954,8 +1039,67 @@ class TemplateScreen extends Component {
             }
         );
 
+        let editorWA = (
+            <div className={styles.teRowBlock} key={0}>
+                <div className={styles.teCard + ' card'}>
+                    <div className="card-header" role="tab" id={`Heading0`}>
+                        <a
+                            data-toggle="collapse"
+                            data-parent="#accordionEx"
+                            href={`#collapse0`}
+                            aria-expanded="true"
+                            aria-controls={`collapse0`}
+                        >
+                            <h5 className="mb-0">
+                                {'Template'}{' '}
+                                <i className="fas fa-angle-down rotate-icon" />
+                            </h5>
+                        </a>
+                    </div>
+                    <div
+                        id={`collapse0`}
+                        className="collapse"
+                        role="tabpanel"
+                        aria-labelledby={`Heading0`}
+                        data-parent="#accordionEx"
+                    >
+                        <div className="card-body">
+                            <div className={styles.teSubTemplateBlock}>
+                                <div className={styles.teTemplateEditor}>
+                                    {this.state.waMode != '' ? (
+                                        <WhatsAppEditor
+                                            onTemplateChange={
+                                                this.onTemplateChange
+                                            }
+                                            subTemplatesData={
+                                                this.state.subTemplatesData
+                                            }
+                                            buttonCnt={this.state.buttonCnt}
+                                            setButton={this.setButton}
+                                            availableButtons={
+                                                this.state.waMode == 'one_way'
+                                                    ? ['cta', 'quick_reply']
+                                                    : ['menu', 'quick_reply']
+                                            }
+                                        />
+                                    ) : (
+                                        <h3>Please Select WA Mode.</h3>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
         let templateTypes = Object.keys(this.state.config).map(t => {
-            return <option value={t} key={t}> {t} </option>;
+            return (
+                <option value={t} key={t}>
+                    {' '}
+                    {t}{' '}
+                </option>
+            );
         });
 
         return (
@@ -963,9 +1107,9 @@ class TemplateScreen extends Component {
                 <div className={styles.teDetailPage}>
                     <div className={styles.teTemplateHeader}>
                         <h1>
-                            {this.state.editable ?
-                                'Create New Template' :
-                                this.state.templateData.name}
+                            {this.state.editable
+                                ? 'Create New Template'
+                                : this.state.templateData.name}
                         </h1>
                     </div>
                     <div>
@@ -1005,17 +1149,17 @@ class TemplateScreen extends Component {
                             )}
                             <label>Default : </label>
                             {!this.state.editable &&
-                                this.state.templateData.default ? (
-                                    <i
-                                        className="fa fa-check-circle"
-                                        aria-hidden="true"
-                                    />
-                                ) : (
-                                    <i
-                                        className="fa fa-times-circle"
-                                        aria-hidden="true"
-                                    />
-                                )}
+                            this.state.templateData.default ? (
+                                <i
+                                    className="fa fa-check-circle"
+                                    aria-hidden="true"
+                                />
+                            ) : (
+                                <i
+                                    className="fa fa-times-circle"
+                                    aria-hidden="true"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -1026,11 +1170,38 @@ class TemplateScreen extends Component {
                             <select
                                 className={styles.teButtons}
                                 onChange={e =>
-                                    this.getTypesConfig(this.state.config, e.target.value)
+                                    this.getTypesConfig(
+                                        this.state.config,
+                                        e.target.value
+                                    )
                                 }
                             >
                                 {templateTypes}
                             </select>
+                            {this.state.type == 'whatsapp' &&
+                                this.state.waMode == '' && (
+                                    <div>
+                                        <label> Wa Type : </label>
+                                        <select
+                                            className={styles.teButtons}
+                                            onChange={e => this.setWaMode(e)}
+                                            value={this.state.waMode}
+                                        >
+                                            <option value="" disabled>
+                                                Choose
+                                            </option>
+                                            <option value="one_way">
+                                                One Way
+                                            </option>
+                                            <option value="two_way">
+                                                Two Way
+                                            </option>
+                                        </select>
+                                    </div>
+                                )}
+                            {this.state.type == 'whatsapp' && (
+                                <span>{this.state.waMode}</span>
+                            )}
                         </div>
                     ) : (
                         ''
@@ -1045,7 +1216,9 @@ class TemplateScreen extends Component {
                     role="tablist"
                     aria-multiselectable="true"
                 >
-                    <div className={styles.teScreenTable}>{editors}</div>
+                    <div className={styles.teScreenTable}>
+                        {this.state.type == 'whatsapp' ? editorWA : editors}
+                    </div>
                 </div>
                 <div className={styles.teMarginTop20}>
                     <label>Sample Context Data : </label>
@@ -1113,7 +1286,7 @@ class TemplateScreen extends Component {
                                     document.getElementById('tmp_name').value,
                                     this.state.type,
                                     this.state.contextData,
-                                    this.state.attributes,
+                                    this.state.attributes
                                 );
                             }}
                         >
@@ -1127,12 +1300,15 @@ class TemplateScreen extends Component {
                                 className={styles.teVersionAlias}
                                 value={this.state.version_alias}
                                 placeholder="version_alias"
-                                onChange={e => this.onVersionAliasChange(e.target.value)}
+                                onChange={e =>
+                                    this.onVersionAliasChange(e.target.value)
+                                }
                             />
                             <button
                                 className={styles.teButtons}
                                 onClick={() => {
-                                    if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
+                                    if (window.confirm('Are you sure ?')) {
+                                        // eslint-disable-line no-alert
                                         this.postTemplate(
                                             this.state.templateData.name,
                                             this.state.type,
@@ -1148,7 +1324,7 @@ class TemplateScreen extends Component {
                         </div>
                     )}
                 </div>
-                <br/>
+                <br />
                 <div className={styles.teMarginTop20}>
                     <label>Attributes : </label>
                 </div>
@@ -1187,39 +1363,58 @@ class TemplateScreen extends Component {
                                     data-parent="#accordionEx"
                                 >
                                     <div className="card-body">
-                                        <div className={styles.teAttributesWrapper}>
+                                        <div
+                                            className={
+                                                styles.teAttributesWrapper
+                                            }
+                                        >
                                             {this.getAttributes()}
-                                            <div className={styles.teAddNewAttributes}>
+                                            <div
+                                                className={
+                                                    styles.teAddNewAttributes
+                                                }
+                                            >
                                                 <input
-                                                    className={styles.teNewAttributeInput}
+                                                    className={
+                                                        styles.teNewAttributeInput
+                                                    }
                                                     id="newAttributeKey"
                                                     placeholder="New Attribute Key"
                                                 />
                                                 <input
-                                                    className={styles.teNewAttributeInput}
+                                                    className={
+                                                        styles.teNewAttributeInput
+                                                    }
                                                     id="newAttributeValue"
                                                     placeholder="New Attribute Value"
                                                 />
                                             </div>
                                             <div>
                                                 <button
-                                                    className={styles.teAddNewAttributeButton}
-                                                    onClick={this.addNewAttribute}
+                                                    className={
+                                                        styles.teAddNewAttributeButton
+                                                    }
+                                                    onClick={
+                                                        this.addNewAttribute
+                                                    }
                                                 >
                                                     +
                                                 </button>
-                                                {
-                                                    !this.state.editable ? (
-                                                        <button
-                                                            className={styles.teUpdateButton}
-                                                            onClick={this.updateAttributes}
-                                                        >
-                                                            Update
-                                                        </button>
-                                                    ) : (
-                                                        ''
-                                                    )
-                                                }
+                                                {!this.state.editable ? (
+                                                    <button
+                                                        className={
+                                                            styles.teUpdateButton
+                                                        }
+                                                        onClick={
+                                                            this
+                                                                .updateAttributes
+                                                        }
+                                                    >
+                                                        Update
+                                                    </button>
+                                                ) : (
+                                                    ''
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -1229,7 +1424,18 @@ class TemplateScreen extends Component {
                     </div>
                 </div>
                 <div>
-                    <TinyUrlComponent items={this.state.items} visited={this.state.visited} updateItems={this.updateItems} updateVisited={this.updateVisited} urlKeyList={this.state.urlKeyList} templateName={this.state.templateData.name} templateVersion={this.state.templateData.version} tinyUrlObj={this.state.tinyUrlObj} showAlerts={this.showAlerts}/>
+                    {console.log(this.state.subTemplatesData)}
+                    <TinyUrlComponent
+                        items={this.state.items}
+                        visited={this.state.visited}
+                        updateItems={this.updateItems}
+                        updateVisited={this.updateVisited}
+                        urlKeyList={this.state.urlKeyList}
+                        templateName={this.state.templateData.name}
+                        templateVersion={this.state.templateData.version}
+                        tinyUrlObj={this.state.tinyUrlObj}
+                        showAlerts={this.showAlerts}
+                    />
                 </div>
                 {this.state.editable ? (
                     ''
@@ -1273,30 +1479,28 @@ class TemplateScreen extends Component {
                                 style={{ height: '90vh', padding: '0' }}
                             >
                                 {this.state.previewSubType &&
-                                    this.state.subTemplatesData.hasOwnProperty(
-                                        this.state.previewSubType
-                                    ) ? (
-                                        <iframe
-                                            height="100%"
-                                            width="100%"
-                                            srcDoc={
-                                                this.state.subTemplatesData[
-                                                    this.state.previewSubType
-                                                ].output
-                                            }
-                                        />
-                                    ) : (
-                                        ''
-                                    )}
+                                this.state.subTemplatesData.hasOwnProperty(
+                                    this.state.previewSubType
+                                ) ? (
+                                    <iframe
+                                        height="100%"
+                                        width="100%"
+                                        srcDoc={
+                                            this.state.subTemplatesData[
+                                                this.state.previewSubType
+                                            ].output
+                                        }
+                                    />
+                                ) : (
+                                    ''
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
                 <AlertModal
                     errorMessage={this.state.alertMessage}
-                    onClose={(e) =>
-                        this.showAlerts()
-                    }
+                    onClose={e => this.showAlerts()}
                 />
             </div>
         );
@@ -1307,13 +1511,13 @@ TemplateScreen.propTypes = {
     match: PropTypes.shape({
         params: PropTypes.shape({
             name: PropTypes.string,
-            version: PropTypes.string
-        })
+            version: PropTypes.string,
+        }),
     }),
     history: PropTypes.shape({
-        push: PropTypes.func
+        push: PropTypes.func,
     }),
-    editable: PropTypes.bool
+    editable: PropTypes.bool,
 };
 
 export default withRouter(TemplateScreen);

@@ -247,13 +247,14 @@ def post_template_view(request):
                 )
 
             cfgs = TemplateConfig.objects.filter(type=data["type"])
+            print(cfgs)
             if not len(cfgs):
                 raise (
                     Exception("Validation: `" + data["type"] + "` is not a valid type")
                 )
 
             sub_types = {cfg.sub_type: cfg for cfg in cfgs}
-
+            print(sub_types)
             if len(empty_data) == len(sub_types):
                 raise (
                     Exception(
@@ -387,13 +388,14 @@ def post_template_view(request):
                 tiny_url=data["tiny_url"]
             )
             tmp_ver.save()
-
             for sub_tmp in data["sub_templates"]:
+                print(sub_tmp)
                 st = SubTemplate.objects.create(
                     template_version_id=tmp_ver,
-                    config=sub_types[sub_tmp["sub_type"]],
+                    config=TemplateConfig.objects.get(type=data["type"],sub_type=sub_tmp["sub_type"], render_mode=sub_tmp["render_mode"]),
                     data=sub_tmp["data"],
                 )
+                print(st)
                 st.save()
 
             template_data = {
