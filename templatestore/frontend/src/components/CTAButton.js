@@ -7,7 +7,7 @@ export default function CTAButton({
     changeCTAButtonType
 }) {
     const [ctaType, setCtaTypa] = useState(button.type);
-    if (ctaType === 'phone_number') {
+    if (ctaType == 'phone_number') {
         return (
             <div
                 className={`ui segment url_button ${styles.ctab_container}`}

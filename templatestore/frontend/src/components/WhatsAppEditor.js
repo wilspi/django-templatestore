@@ -1,10 +1,10 @@
 import styles from '../style/WhatsAppEditor.less';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { uuid } from '../utils';
 import CTAButton from './CTAButton';
 import QuickReplyButton from './QuickReplyButton';
-import { IoMdCall } from "react-icons/io";
-import { BsGlobe } from "react-icons/bs";
+import { IoMdCall } from 'react-icons/io';
+import { BsGlobe } from 'react-icons/bs';
 function WhatsAppEditor(props) {
     const [header, setHeader] = useState(
         props.subTemplatesData.header?.data != null ?
@@ -24,15 +24,21 @@ function WhatsAppEditor(props) {
                 [] :
                 JSON.parse(props.subTemplatesData.button.data)
     );
-    const [buttonCnt, setButtonCnt] = useState(2);
-    const [selectedButton, setSelectedButton] = useState(
+    const [buttonCnt, setButtonCnt] = useState(0);
+    const [buttonType, setButtonType] = useState(
         props.editable ?
             '' :
             props.subTemplatesData.button == null ?
                 '' :
                 props.subTemplatesData.button.renderMode
     );
-    const [buttonType, setButtonType] = useState('');
+    useEffect(() => {
+        if (buttonType == 'cta') {
+            setButtonCnt(2);
+        } else {
+            setButtonCnt(3);
+        }
+    }, [buttonType]);
     function handleChange(e) {
         let subType;
         if (e.target.name == 'header') {
@@ -86,37 +92,40 @@ function WhatsAppEditor(props) {
             buttonType = 'cta';
             break;
         case 'quick_reply':
-            buttonType = 'reply';
+            buttonType = 'quick_reply';
             break;
         }
-        setSelectedButton(e.target.value);
+        // setSelectedButton(e.target.value);
         setButtonType(buttonType);
         setButtonCnt(buttonType == 'cta' ? 2 : 3);
-        props.setButton(e.target.value);
-        props.onAttributesChange('button_type', e.target.value);
+        props.setButton(buttonType);
+        props.onAttributesChange('button_type', buttonType);
     }
 
     function AddQuickReplyButton() {
-        setButtonList([
-            ...buttonList,
-            {
-                type: buttonType,
-                reply: {
-                    id: uuid(),
-                    title: ''
-                }
+        let buttonListCopy = [...buttonList, {
+            type: 'reply',
+            reply: {
+                id: uuid(),
+                title: ''
             }
-        ]);
+        }];
+        setButtonList(buttonListCopy);
+        props.onTemplateChange('button', JSON.stringify(buttonListCopy));
     }
 
     function AddCtaButton() {
-        let newButton = {
-            id: uuid(),
-            type: 'phone_number',
-            text: '',
-            phone_number: ''
-        };
-        setButtonList([...buttonList, newButton]);
+        let buttonListCopy = [
+            ...buttonList,
+            {
+                id: uuid(),
+                type: 'phone_number',
+                text: '',
+                phone_number: ''
+            }
+        ];
+        setButtonList(buttonListCopy);
+        props.onTemplateChange('button', JSON.stringify(buttonListCopy));
     }
 
     function deleteQuickReplyButton(id) {
@@ -157,24 +166,35 @@ function WhatsAppEditor(props) {
             }
             return button;
         });
-
         setButtonList(buttonListCopy);
+        props.onTemplateChange('button', JSON.stringify(buttonListCopy));
     }
 
     return (
         <div className={styles.WAeditor}>
             <div className={styles.WAeditor_inputs}>
-                {props.subTemplatesData.header != null && <div>
-                    <div>Header <span className={`${styles.optional} ${styles.label}`}>Optional</span></div>
-                    <input
-                        type="text"
-                        name="header"
-                        value={header}
-                        onChange={handleChange}
-                        style={{ marginBottom: "0px" }}
-                    />
-                    <p style={{ fontSize: "12px" }}>Header donot supports variables.</p>
-                </div>}
+                {props.subTemplatesData.header != null && (
+                    <div>
+                        <div>
+                            Header{' '}
+                            <span
+                                className={`${styles.optional} ${styles.label}`}
+                            >
+                                Optional
+                            </span>
+                        </div>
+                        <input
+                            type="text"
+                            name="header"
+                            value={header}
+                            onChange={handleChange}
+                            style={{ marginBottom: '0px' }}
+                        />
+                        <p style={{ fontSize: '12px' }}>
+                            Header donot supports variables.
+                        </p>
+                    </div>
+                )}
                 <div>
                     <div>Body</div>
                     <textarea
@@ -184,20 +204,40 @@ function WhatsAppEditor(props) {
                         rows="5"
                     />
                 </div>
-                {props.subTemplatesData.footer != null && <div>
-                    <div>Footer <span className={`${styles.optional} ${styles.label}`}>Optional</span></div>
-                    <input
-                        type="text"
-                        name="footer"
-                        value={footer}
-                        onChange={handleChange}
-                        style={{ marginBottom: "0px" }}
-                    />
-                    <p style={{ fontSize: "12px" }}>Footer donot supports variables.</p>
-                </div>}
+                {props.subTemplatesData.footer != null && (
+                    <div>
+                        <div>
+                            Footer{' '}
+                            <span
+                                className={`${styles.optional} ${styles.label}`}
+                            >
+                                Optional
+                            </span>
+                        </div>
+                        <input
+                            type="text"
+                            name="footer"
+                            value={footer}
+                            onChange={handleChange}
+                            style={{ marginBottom: '0px' }}
+                        />
+                        <p style={{ fontSize: '12px' }}>
+                            Footer donot supports variables.
+                        </p>
+                    </div>
+                )}
                 {buttonList.length != 0 &&
                     buttonList.map((button, index) => {
-                        if (button.type != 'reply') {
+                        if (button.type == 'reply') {
+                            return (
+                                <QuickReplyButton
+                                    key={button.reply.id}
+                                    button={button}
+                                    handleChange={handleQuickReplyButtonChange}
+                                    deleteButton={deleteQuickReplyButton}
+                                />
+                            );
+                        } else {
                             return (
                                 <CTAButton
                                     key={button.id}
@@ -207,35 +247,28 @@ function WhatsAppEditor(props) {
                                     changeCTAButtonType={changeCTAButtonType}
                                 />
                             );
-                        } else {
-                            return (
-                                <QuickReplyButton
-                                    key={button.reply.id}
-                                    button={button}
-                                    handleChange={handleQuickReplyButtonChange}
-                                    deleteButton={deleteQuickReplyButton}
-                                />
-                            );
                         }
                     })}
-                {props.subTemplatesData.button != null && selectedButton == '' && (
+                {props.subTemplatesData.button != null && buttonType == '' && (
                     <div>
                         <div>Button to Add :</div>
                         <select
                             className={styles.teButtons}
                             onChange={setButton}
-                            value={selectedButton}
+                            value={buttonType}
                         >
                             <option value="" disabled>
                                 Choose
                             </option>
                             {props.availableButtons.map((item, index) => {
-                                if (item != 'menu') {return <option value={item}>{item}</option>;}
+                                if (item != 'menu') {
+                                    return <option value={item}>{item}</option>;
+                                }
                             })}
                         </select>
                     </div>
                 )}
-                {selectedButton != '' && buttonCnt - buttonList.length != 0 && (
+                {buttonType != '' && buttonCnt - buttonList.length > 0 && (
                     <div>
                         <button
                             className={styles.waButton}
@@ -315,7 +348,15 @@ function WhatsAppEditor(props) {
                                             unicodeBidi: 'normal'
                                         }}
                                     >
-                                        {button.type == 'phone_number' ? <i className={styles.icon}><IoMdCall/></i> : <i className={styles.icon}><BsGlobe/></i>}
+                                        {button.type == 'phone_number' ? (
+                                            <i className={styles.icon}>
+                                                <IoMdCall />
+                                            </i>
+                                        ) : (
+                                            <i className={styles.icon}>
+                                                <BsGlobe />
+                                            </i>
+                                        )}
                                         {button.text}
                                     </div>
                                 </div>

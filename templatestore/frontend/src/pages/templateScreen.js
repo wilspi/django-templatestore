@@ -1091,7 +1091,6 @@ class TemplateScreen extends Component {
                                                     )?.wa_mode == 'one_way' ?
                                                         ['cta', 'quick_reply'] :
                                                         [
-                                                            'menu',
                                                             'quick_reply'
                                                         ]
                                                     }
