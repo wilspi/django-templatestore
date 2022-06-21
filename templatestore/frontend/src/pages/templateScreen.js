@@ -532,6 +532,12 @@ class TemplateScreen extends Component {
                 {}
             );
         } else {
+            if(attributeKey=='wa_mode'){
+                if(currentAttributes.wa_mode!=''){
+                    this.showAlerts("Changing WA Mode is not allowed.");
+                    return;
+                }
+            }
             newAttributes = { ...currentAttributes, [attributeKey]: newValue };
         }
         this.setState({
@@ -1078,13 +1084,6 @@ class TemplateScreen extends Component {
                                                 subTemplatesData={
                                                     this.state.subTemplatesData
                                                 }
-                                                buttonCnt={
-                                                    JSON.parse(
-                                                        this.state.attributes
-                                                    )?.wa_mode == 'one_way'
-                                                        ? 2
-                                                        : 3
-                                                }
                                                 setButton={this.setButton}
                                                 availableButtons={
                                                     JSON.parse(
@@ -1097,9 +1096,10 @@ class TemplateScreen extends Component {
                                                           ]
                                                 }
                                                 editable={this.state.editable}
+                                                onAttributesChange={this.onAttributesChange}
                                             />
                                             <button
-                                                className={styles.teButtons}
+                                                className={styles.waRender}
                                                 onClick={() => {
                                                     this.getRenderedTemplateWA()
                                                 }}
