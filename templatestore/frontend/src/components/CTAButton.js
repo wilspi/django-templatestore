@@ -274,7 +274,6 @@ export default function CTAButton({
                                         }
                                     >
                                         <option value="STATIC">Static</option>
-                                        <option value="DYNAMIC">Dynamic</option>
                                     </select>
                                 </td>
                             </tr>

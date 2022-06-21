@@ -1096,6 +1096,7 @@ class TemplateScreen extends Component {
                                                     }
                                                     editable={this.state.editable}
                                                     onAttributesChange={this.onAttributesChange}
+                                                    waMode={JSON.parse(this.state.attributes).wa_mode}
                                                 />
                                                 <button
                                                     className={styles.waRender}

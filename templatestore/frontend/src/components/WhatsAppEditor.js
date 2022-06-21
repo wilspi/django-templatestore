@@ -97,7 +97,6 @@ function WhatsAppEditor(props) {
             buttonType = 'quick_reply';
             break;
         }
-        // setSelectedButton(e.target.value);
         setButtonType(buttonType);
         setButtonCnt(buttonType == 'cta' ? 2 : 3);
         props.setButton(buttonType);
@@ -105,13 +104,6 @@ function WhatsAppEditor(props) {
     }
 
     function AddQuickReplyButton() {
-        // let buttonListCopy = [...buttonList, {
-        //     type: 'reply',
-        //     reply: {
-        //         id: uuid(),
-        //         title: ''
-        //     }
-        // }];
         let buttonListCopy = {
             buttons: [
                 ...buttonList.buttons,
@@ -129,15 +121,6 @@ function WhatsAppEditor(props) {
     }
 
     function AddCtaButton() {
-        // let buttonListCopy = [
-        //     ...buttonList,
-        //     {
-        //         id: uuid(),
-        //         type: 'phone_number',
-        //         text: '',
-        //         phone_number: '',
-        //     },
-        // ];
         let buttonListCopy = {
             buttons: [
                 ...buttonList.buttons,
@@ -218,9 +201,9 @@ function WhatsAppEditor(props) {
                             onChange={handleChange}
                             style={{ marginBottom: '0px' }}
                         />
-                        <p style={{ fontSize: '12px' }}>
-                            Header donot supports variables.
-                        </p>
+                        {props.waMode == 'one_way' && <p style={{ fontSize: '12px' }}>
+                            Header doesn't support variables in one-way mode.
+                        </p>}
                     </div>
                 )}
                 <div>
@@ -249,9 +232,9 @@ function WhatsAppEditor(props) {
                             onChange={handleChange}
                             style={{ marginBottom: '0px' }}
                         />
-                        <p style={{ fontSize: '12px' }}>
-                            Footer donot supports variables.
-                        </p>
+                        {props.waMode == 'one_way' && <p style={{ fontSize: '12px' }}>
+                            Footer doesn't supports variables in one-way mode.
+                        </p>}
                     </div>
                 )}
                 {buttonList.buttons.length != 0 &&
@@ -388,9 +371,6 @@ function WhatsAppEditor(props) {
                                         {button.text}
                                     </div>
                                 </div>
-                                // <div className={styles.call_to_action_button}>
-                                //     {button.text}
-                                // </div>
                             );
                         }
                     })}
