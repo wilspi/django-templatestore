@@ -89,7 +89,6 @@ class TemplateConfig(models.Model):
 
     class Meta:
         db_table = "templatestore_template_config"
-        unique_together = ("type", "sub_type")
     def __unicode__(self):
         return u'%s' % (self.id)
 
