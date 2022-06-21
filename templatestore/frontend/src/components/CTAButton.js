@@ -4,20 +4,19 @@ export default function CTAButton({
     button,
     handleChange,
     deleteButton,
-    changeCTAButtonType,
+    changeCTAButtonType
 }) {
     const [ctaType, setCtaTypa] = useState(button.type);
-    if (ctaType == 'phone_number')
+    if (ctaType === 'phone_number') {
         return (
             <div
                 className={`ui segment url_button ${styles.ctab_container}`}
                 style={{
-                    border: '1px solid black',
                     padding: '.5rem',
                     boxShadow: 'none',
                     backgroundColor: '#f8fafb',
                     border: '1px solid #dadde1',
-                    borderRadius: '10px !important',
+                    borderRadius: '10px !important'
                 }}
             >
                 <span
@@ -34,7 +33,7 @@ export default function CTAButton({
                         className="ui celled padded table"
                         style={{
                             fontFamily: 'Roboto, sans-serif',
-                            border: 'none',
+                            border: 'none'
                         }}
                     >
                         <tbody>
@@ -43,7 +42,7 @@ export default function CTAButton({
                                     style={{
                                         paddingBottom: '.5rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
                                 >
                                     Type Of Action
@@ -52,7 +51,7 @@ export default function CTAButton({
                                     style={{
                                         padding: '0 0 1rem 1rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
                                 >
                                     <select
@@ -80,7 +79,7 @@ export default function CTAButton({
                                     style={{
                                         paddingBottom: '.5rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
                                 >
                                     Button Text
@@ -89,22 +88,22 @@ export default function CTAButton({
                                     style={{
                                         padding: '0 1rem 1rem 1rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
                                 >
-                                        <input
-                                            type="text"
-                                            maxlength="25"
-                                            className="phone_number_button_text call_to_action_button_text"
-                                            value={button.text}
-                                            onChange={e =>
-                                                handleChange(
-                                                    button.id,
-                                                    'text',
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
+                                    <input
+                                        type="text"
+                                        maxLength="25"
+                                        className="phone_number_button_text call_to_action_button_text"
+                                        value={button.text}
+                                        onChange={e =>
+                                            handleChange(
+                                                button.id,
+                                                'text',
+                                                e.target.value
+                                            )
+                                        }
+                                    />
                                 </td>
                             </tr>
                             <tr>
@@ -112,7 +111,7 @@ export default function CTAButton({
                                     style={{
                                         paddingBottom: '.5rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
                                 >
                                     Phone Number
@@ -121,16 +120,16 @@ export default function CTAButton({
                                     style={{
                                         padding: '0 1rem 1rem 1rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
-                                    colspan="4"
+                                    colSpan="4"
                                 >
                                     <input
                                         type="text"
                                         placeholder="With Country Code"
                                         className="phone_number_textbox"
                                         value={button.phone_number}
-                                        maxlength="13"
+                                        maxLength="13"
                                         onChange={e =>
                                             handleChange(
                                                 button.id,
@@ -146,17 +145,16 @@ export default function CTAButton({
                 </div>
             </div>
         );
-    else
+    } else {
         return (
             <div
                 className={`ui segment url_button ${styles.ctab_container}`}
                 style={{
-                    border: '1px solid black',
                     padding: '.5rem',
                     boxShadow: 'none',
                     backgroundColor: '#f8fafb',
                     border: '1px solid #dadde1',
-                    borderRadius: '10px !important',
+                    borderRadius: '10px !important'
                 }}
             >
                 <span
@@ -173,7 +171,7 @@ export default function CTAButton({
                         className="ui celled padded table"
                         style={{
                             fontFamily: 'Roboto, sans-serif',
-                            border: 'none',
+                            border: 'none'
                         }}
                     >
                         <tbody>
@@ -182,7 +180,7 @@ export default function CTAButton({
                                     style={{
                                         paddingBottom: '.5rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
                                 >
                                     Type Of Action
@@ -191,7 +189,7 @@ export default function CTAButton({
                                     style={{
                                         padding: '0 1rem 1rem 1rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
                                 >
                                     <select
@@ -219,7 +217,7 @@ export default function CTAButton({
                                     style={{
                                         paddingBottom: '.5rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
                                 >
                                     Button Text
@@ -228,12 +226,12 @@ export default function CTAButton({
                                     style={{
                                         padding: '0 1rem 1rem 1rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
                                 >
                                     <input
                                         type="text"
-                                        maxlength="25"
+                                        maxLength="25"
                                         className="url_button_text call_to_action_button_text"
                                         value={button.text}
                                         onChange={e =>
@@ -251,7 +249,7 @@ export default function CTAButton({
                                     style={{
                                         paddingBottom: '.5rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
                                 >
                                     URL Type
@@ -260,7 +258,7 @@ export default function CTAButton({
                                     style={{
                                         padding: '0 1rem 1rem 1rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
                                 >
                                     <select
@@ -285,26 +283,26 @@ export default function CTAButton({
                                     style={{
                                         paddingBottom: '.5rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
                                 >
                                     Website URL
                                     <i
                                         style={{
                                             color: '#444950',
-                                            float: 'right',
+                                            float: 'right'
                                         }}
                                         className="info circle icon"
                                         data-content="Adding a variable creates a personalized link for the customer to view their info. Only one variable will be added to the end of a URL. {{1}} will be added automatically to the url, no need to explicitly define it here."
-                                    ></i>
+                                    />
                                 </td>
                                 <td
                                     style={{
                                         padding: '0 1rem 1rem 1rem',
                                         backgroundColor: '#f8fafb',
-                                        border: 'none',
+                                        border: 'none'
                                     }}
-                                    colspan="3"
+                                    colSpan="3"
                                 >
                                     <input
                                         id="website_url"
@@ -325,4 +323,5 @@ export default function CTAButton({
                 </div>
             </div>
         );
+    }
 }

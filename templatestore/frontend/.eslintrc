@@ -15,6 +15,9 @@
    },
    "rules": {
       "indent": ["error", 4],
-      "space-before-function-paren": ["error", "never"]
+      "space-before-function-paren": ["error", "never"],
+      "eqeqeq": "off",
+      "no-nested-ternary":"off",
+      "camelcase":"off"
    }
 }

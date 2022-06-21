@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from '../style/WhatsAppEditor.less';
-export default function QuickReplyButton({button, handleChange,deleteButton }) {
+export default function QuickReplyButton({ button, handleChange, deleteButton }) {
     return (
         <div>
             <input

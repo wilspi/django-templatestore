@@ -6,7 +6,7 @@ import {
     encode,
     decode,
     backendSettings,
-    getDateInSimpleFormat,
+    getDateInSimpleFormat
 } from './../utils.js';
 import PropTypes from 'prop-types';
 import styles from './../style/templateScreen.less';
@@ -32,7 +32,7 @@ class TemplateScreen extends Component {
         this.state = {
             templateData: {
                 name: this.props.match.params.name,
-                version: this.props.match.params.version,
+                version: this.props.match.params.version
             },
             searchText: '',
             versions: [{ version: this.props.match.params.version }],
@@ -46,13 +46,13 @@ class TemplateScreen extends Component {
             urlKeyList: [],
             items: [{ urlKey: '', expiry: '' }],
             visited: {},
-            editable: this.props.editable,
+            editable: this.props.editable
         };
         this.aceconfig = {
             theme: 'monokai',
             fontSize: 16,
             width: '100%',
-            height: '400px',
+            height: '400px'
         };
         this.getTableRowsJSX = this.getTableRowsJSX.bind(this);
         this.openTemplateVersion = this.openTemplateVersion.bind(this);
@@ -82,7 +82,7 @@ class TemplateScreen extends Component {
         this.scanItemsForInvalidEntries = this.scanItemsForInvalidEntries.bind(
             this
         );
-        this.getRenderedTemplateWA= this.getRenderedTemplateWA.bind(this);
+        this.getRenderedTemplateWA = this.getRenderedTemplateWA.bind(this);
     }
     componentDidMount() {
         if (!this.state.editable) {
@@ -102,7 +102,7 @@ class TemplateScreen extends Component {
                                     data: decode(k.data),
                                     subType: k.sub_type,
                                     renderMode: k.render_mode,
-                                    output: '',
+                                    output: ''
                                 };
                                 return result;
                             },
@@ -111,7 +111,7 @@ class TemplateScreen extends Component {
                         templateData: {
                             name: this.props.match.params.name,
                             version: this.props.match.params.version,
-                            default: response.data.default,
+                            default: response.data.default
                         },
                         contextData: JSON.stringify(
                             response.data.sample_context_data,
@@ -120,7 +120,7 @@ class TemplateScreen extends Component {
                         ),
                         attributes: JSON.stringify(response.data.attributes),
                         type: response.data.type,
-                        version_alias: response.data.version_alias,
+                        version_alias: response.data.version_alias
                     });
                     this.updateUrlKeyList();
                 })
@@ -145,13 +145,13 @@ class TemplateScreen extends Component {
                             version: t.version,
                             default: t.default,
                             created_on: getDateInSimpleFormat(t.created_on),
-                            version_alias: t.version_alias
-                                ? t.version_alias
-                                : '-',
-                            created_by: t.created_by
-                                ? t.created_by.toString()
-                                : '-',
-                        })),
+                            version_alias: t.version_alias ?
+                                t.version_alias :
+                                '-',
+                            created_by: t.created_by ?
+                                t.created_by.toString() :
+                                '-'
+                        }))
                     });
                 })
                 .catch(error => {
@@ -165,13 +165,13 @@ class TemplateScreen extends Component {
                 if (this.state.editable) {
                     this.setState({
                         contextData: JSON.stringify({ name: 'abc' }, null, 2),
-                        config: response.data,
+                        config: response.data
                     });
                     let defaultType = Object.keys(response.data)[0];
                     this.getTypesConfig(response.data, defaultType);
                 } else {
                     this.setState({
-                        config: response.data,
+                        config: response.data
                     });
                 }
                 this.updateUrlKeyList();
@@ -190,24 +190,24 @@ class TemplateScreen extends Component {
             visitedCopy[obj.urlKey] = 1;
             itemsCopy.splice(itemsCopy.length - 1, 0, {
                 urlKey: obj.urlKey,
-                expiry: obj.expiry,
+                expiry: obj.expiry
             });
         });
         this.setState({
             items: itemsCopy,
-            visited: visitedCopy,
+            visited: visitedCopy
         });
     }
 
     updateItems(itemsCopy) {
         this.setState({
-            items: itemsCopy,
+            items: itemsCopy
         });
     }
 
     updateVisited(visitedCopy) {
         this.setState({
-            visited: visitedCopy,
+            visited: visitedCopy
         });
     }
 
@@ -227,8 +227,7 @@ class TemplateScreen extends Component {
     }
 
     setTinyUrlObj() {
-        if (!this.state.templateData.name || !this.state.templateData.version)
-            return;
+        if (!this.state.templateData.name || !this.state.templateData.version) {return;}
         let url =
             backendSettings.TE_BASEPATH +
             '/api/v1/tiny_url/' +
@@ -239,7 +238,7 @@ class TemplateScreen extends Component {
             .get(url)
             .then(response => {
                 this.setState({
-                    tinyUrlObj: response.data ? response.data : [],
+                    tinyUrlObj: response.data ? response.data : []
                 });
                 this.populateItems(this.state.tinyUrlObj);
             })
@@ -253,7 +252,7 @@ class TemplateScreen extends Component {
             let result = [];
             this.scan([], JSON.parse(this.state.contextData), result);
             this.setState({
-                urlKeyList: result,
+                urlKeyList: result
             });
         }
     }
@@ -288,7 +287,7 @@ class TemplateScreen extends Component {
                     '/' +
                     version,
                 {
-                    default: true,
+                    default: true
                 }
             )
             .then(response => {
@@ -307,7 +306,7 @@ class TemplateScreen extends Component {
 
     onSearchTextChange(searchValue) {
         this.setState({
-            searchText: searchValue,
+            searchText: searchValue
         });
     }
 
@@ -403,7 +402,7 @@ class TemplateScreen extends Component {
                 context: contextData,
                 handler: 'jinja2',
                 output: renderMode,
-                tinyUrlArray: this.state.urlKeyList,
+                tinyUrlArray: this.state.urlKeyList
             };
             axios
                 .post(backendSettings.TE_BASEPATH + '/api/v1/render', data)
@@ -414,11 +413,11 @@ class TemplateScreen extends Component {
                         ).reduce((result, k) => {
                             result[k] = this.state.subTemplatesData[k];
                             result[k].output =
-                                k === subType
-                                    ? decode(response.data.rendered_template)
-                                    : this.state.subTemplatesData[k].output;
+                                k === subType ?
+                                    decode(response.data.rendered_template) :
+                                    this.state.subTemplatesData[k].output;
                             return result;
-                        }, {}),
+                        }, {})
                     });
                 })
                 .catch(function(error) {
@@ -427,15 +426,15 @@ class TemplateScreen extends Component {
                 });
             if (renderMode === 'html') {
                 this.setState({
-                    previewSubType: subType,
+                    previewSubType: subType
                 });
             }
         } catch (error) {
             this.showAlerts(error.message);
         }
     }
-    
-    getRenderedTemplateWA(){
+
+    getRenderedTemplateWA() {
         Object.keys(this.state.subTemplatesData).map(
             (t, index) => {
                 this.getRenderedTemplate(
@@ -447,10 +446,10 @@ class TemplateScreen extends Component {
                     this.state
                         .subTemplatesData[t]
                         .renderMode
-                )
+                );
             });
     }
-   
+
     getRenderedTemplatePdf(subType, templateData, contextData, renderMode) {
         try {
             try {
@@ -462,16 +461,16 @@ class TemplateScreen extends Component {
                 template: encode(templateData),
                 context: contextData,
                 handler: 'jinja2',
-                output: renderMode,
+                output: renderMode
             };
             axios
                 .post(backendSettings.TE_BASEPATH + '/render_pdf', data, {
-                    responseType: 'blob',
+                    responseType: 'blob'
                 })
                 .then(response => {
                     //Create a Blob from the PDF Stream
                     const file = new Blob([response.data], {
-                        type: 'application/pdf',
+                        type: 'application/pdf'
                     });
                     //Build a URL from the file
                     const fileURL = URL.createObjectURL(file);
@@ -485,7 +484,7 @@ class TemplateScreen extends Component {
                 });
             if (renderMode === 'html') {
                 this.setState({
-                    previewSubType: subType,
+                    previewSubType: subType
                 });
             }
         } catch (error) {
@@ -500,19 +499,19 @@ class TemplateScreen extends Component {
                 (result, k) => {
                     result[k] = this.state.subTemplatesData[k];
                     result[k].data =
-                        k === subType
-                            ? templateData
-                            : this.state.subTemplatesData[k].data;
+                        k === subType ?
+                            templateData :
+                            this.state.subTemplatesData[k].data;
                     return result;
                 },
                 {}
-            ),
+            )
         });
     }
 
     onContextChange(newValue, event) {
         this.setState({
-            contextData: newValue,
+            contextData: newValue
         });
     }
 
@@ -532,8 +531,8 @@ class TemplateScreen extends Component {
                 {}
             );
         } else {
-            if(attributeKey=='wa_mode'){
-                if(currentAttributes.wa_mode!=''){
+            if (attributeKey == 'wa_mode') {
+                if (currentAttributes.wa_mode != '') {
                     this.showAlerts("Changing WA Mode is not allowed.");
                     return;
                 }
@@ -541,20 +540,20 @@ class TemplateScreen extends Component {
             newAttributes = { ...currentAttributes, [attributeKey]: newValue };
         }
         this.setState({
-            attributes: JSON.stringify(newAttributes),
+            attributes: JSON.stringify(newAttributes)
         });
     }
 
     onVersionAliasChange(newValue, event) {
         this.setState({
-            version_alias: newValue,
+            version_alias: newValue
         });
     }
 
     setMandatoryAttributes(type) {
         let mandatoryAttributes = {
             ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
-            ...this.state.config[type]['attributes'],
+            ...this.state.config[type]['attributes']
         };
         let newAttributes = Object.keys(mandatoryAttributes).reduce(
             (result, attribute) => {
@@ -564,7 +563,7 @@ class TemplateScreen extends Component {
             {}
         );
         this.setState({
-            attributes: JSON.stringify(newAttributes),
+            attributes: JSON.stringify(newAttributes)
         });
     }
 
@@ -581,18 +580,19 @@ class TemplateScreen extends Component {
                         subType: k.type,
                         renderMode: k.render_mode,
                         data: '',
-                        output: '',
+                        output: ''
                     });
-                } else
+                } else {
                     result[k.type] = {
                         subType: k.type,
                         renderMode: k.render_mode,
                         data: '',
-                        output: '',
+                        output: ''
                     };
+                }
                 return result;
             }, {}),
-            type: type,
+            type: type
         });
         this.setMandatoryAttributes(type);
     }
@@ -606,7 +606,7 @@ class TemplateScreen extends Component {
             }
         });
         this.setState({
-            subTemplatesData: copySubTemplatesData,
+            subTemplatesData: copySubTemplatesData
         });
     }
 
@@ -643,7 +643,7 @@ class TemplateScreen extends Component {
                 let subTemplate = {
                     sub_type: this.state.subTemplatesData[t].subType,
                     render_mode: this.state.subTemplatesData[t].renderMode,
-                    data: encode(this.state.subTemplatesData[t].data),
+                    data: encode(this.state.subTemplatesData[t].data)
                 };
                 subTemplates.push(subTemplate);
             });
@@ -666,7 +666,7 @@ class TemplateScreen extends Component {
                 sub_templates: subTemplates,
                 sample_context_data: contextData,
                 version_alias: this.state.version_alias,
-                tiny_url: this.state.items,
+                tiny_url: this.state.items
             };
 
             if (this.state.editable) {
@@ -696,7 +696,7 @@ class TemplateScreen extends Component {
 
     showAlerts(errorMessage = '') {
         this.setState({
-            alertMessage: errorMessage,
+            alertMessage: errorMessage
         });
     }
 
@@ -724,7 +724,7 @@ class TemplateScreen extends Component {
         if (this.state.type && Object.keys(this.state.config).length) {
             mandatoryAttributes = {
                 ...backendSettings.TE_TEMPLATE_ATTRIBUTES,
-                ...this.state.config[this.state.type]['attributes'],
+                ...this.state.config[this.state.type]['attributes']
             };
         }
 
@@ -758,9 +758,9 @@ class TemplateScreen extends Component {
                         {allAttributes[t].hasOwnProperty('allowed_values') ? (
                             <select
                                 value={
-                                    JSON.parse(this.state.attributes)[t]
-                                        ? JSON.parse(this.state.attributes)[t]
-                                        : ''
+                                    JSON.parse(this.state.attributes)[t] ?
+                                        JSON.parse(this.state.attributes)[t] :
+                                        ''
                                 }
                                 onChange={e =>
                                     this.onAttributesChange(t, e.target.value)
@@ -773,9 +773,9 @@ class TemplateScreen extends Component {
                         ) : (
                             <input
                                 value={
-                                    JSON.parse(this.state.attributes)[t]
-                                        ? JSON.parse(this.state.attributes)[t]
-                                        : ''
+                                    JSON.parse(this.state.attributes)[t] ?
+                                        JSON.parse(this.state.attributes)[t] :
+                                        ''
                                 }
                                 onChange={e =>
                                     this.onAttributesChange(t, e.target.value)
@@ -817,11 +817,11 @@ class TemplateScreen extends Component {
 
             let newAttributes = {
                 ...JSON.parse(this.state.attributes),
-                [key]: value,
+                [key]: value
             };
 
             this.setState({
-                attributes: JSON.stringify(newAttributes),
+                attributes: JSON.stringify(newAttributes)
             });
         } catch (error) {
             this.showAlerts(error.message);
@@ -835,7 +835,7 @@ class TemplateScreen extends Component {
             }
 
             let data = {
-                attributes: JSON.parse(this.state.attributes),
+                attributes: JSON.parse(this.state.attributes)
             };
 
             axios
@@ -867,7 +867,7 @@ class TemplateScreen extends Component {
             return object;
         }, {});
         this.setState({
-            attributes: JSON.stringify(newAttributes),
+            attributes: JSON.stringify(newAttributes)
         });
     }
     render() {
@@ -890,7 +890,7 @@ class TemplateScreen extends Component {
             'version_alias',
             'created_by',
             ' - ',
-            ' - ',
+            ' - '
         ].map((k, index) => <th key={index}>{k}</th>);
 
         let editors = Object.keys(this.state.subTemplatesData).map(
@@ -976,68 +976,68 @@ class TemplateScreen extends Component {
                                     <div className={styles.teVersionWrapper}>
                                         {this.state.subTemplatesData[t]
                                             .renderMode === 'html' ? (
-                                            <button
-                                                className={styles.teButtons}
-                                                onClick={() => {
-                                                    this.getRenderedTemplatePdf(
-                                                        t,
-                                                        this.state
-                                                            .subTemplatesData[t]
-                                                            .data,
-                                                        this.state.contextData,
-                                                        this.state
-                                                            .subTemplatesData[t]
-                                                            .renderMode
-                                                    );
-                                                }}
-                                            >
+                                                <button
+                                                    className={styles.teButtons}
+                                                    onClick={() => {
+                                                        this.getRenderedTemplatePdf(
+                                                            t,
+                                                            this.state
+                                                                .subTemplatesData[t]
+                                                                .data,
+                                                            this.state.contextData,
+                                                            this.state
+                                                                .subTemplatesData[t]
+                                                                .renderMode
+                                                        );
+                                                    }}
+                                                >
                                                 Render PDF
-                                            </button>
-                                        ) : (
-                                            <button
-                                                className={styles.teButtons}
-                                                onClick={() => {
-                                                    this.getRenderedTemplate(
-                                                        t,
-                                                        this.state
-                                                            .subTemplatesData[t]
-                                                            .data,
-                                                        this.state.contextData,
-                                                        this.state
-                                                            .subTemplatesData[t]
-                                                            .renderMode
-                                                    );
-                                                }}
-                                            >
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className={styles.teButtons}
+                                                    onClick={() => {
+                                                        this.getRenderedTemplate(
+                                                            t,
+                                                            this.state
+                                                                .subTemplatesData[t]
+                                                                .data,
+                                                            this.state.contextData,
+                                                            this.state
+                                                                .subTemplatesData[t]
+                                                                .renderMode
+                                                        );
+                                                    }}
+                                                >
                                                 Render
-                                            </button>
-                                        )}
+                                                </button>
+                                            )}
                                         {this.state.subTemplatesData[t]
                                             .renderMode === 'html' ? (
-                                            <button
-                                                className={
-                                                    styles.tePreviewButton
-                                                }
-                                                data-toggle="modal"
-                                                data-target="#myModal"
-                                                onClick={() => {
-                                                    this.getRenderedTemplate(
-                                                        t,
-                                                        this.state
-                                                            .subTemplatesData[t]
-                                                            .data,
-                                                        this.state.contextData,
-                                                        this.state
-                                                            .subTemplatesData[t]
-                                                            .renderMode
-                                                    );
-                                                }}
-                                            >
+                                                <button
+                                                    className={
+                                                        styles.tePreviewButton
+                                                    }
+                                                    data-toggle="modal"
+                                                    data-target="#myModal"
+                                                    onClick={() => {
+                                                        this.getRenderedTemplate(
+                                                            t,
+                                                            this.state
+                                                                .subTemplatesData[t]
+                                                                .data,
+                                                            this.state.contextData,
+                                                            this.state
+                                                                .subTemplatesData[t]
+                                                                .renderMode
+                                                        );
+                                                    }}
+                                                >
                                                 Preview HTML
-                                            </button>
-                                        ) : (
-                                            ''
-                                        )}
+                                                </button>
+                                            ) : (
+                                                ''
+                                            )}
                                     </div>
                                 </div>
                             </div>
@@ -1076,40 +1076,40 @@ class TemplateScreen extends Component {
                                 <div className={styles.teTemplateEditor}>
                                     {JSON.parse(this.state.attributes)
                                         ?.wa_mode != '' ? (
-                                        <>
-                                            <WhatsAppEditor
-                                                onTemplateChange={
-                                                    this.onTemplateChange
-                                                }
-                                                subTemplatesData={
-                                                    this.state.subTemplatesData
-                                                }
-                                                setButton={this.setButton}
-                                                availableButtons={
+                                            <>
+                                                <WhatsAppEditor
+                                                    onTemplateChange={
+                                                        this.onTemplateChange
+                                                    }
+                                                    subTemplatesData={
+                                                        this.state.subTemplatesData
+                                                    }
+                                                    setButton={this.setButton}
+                                                    availableButtons={
                                                     JSON.parse(
                                                         this.state.attributes
-                                                    )?.wa_mode == 'one_way'
-                                                        ? ['cta', 'quick_reply']
-                                                        : [
-                                                              'menu',
-                                                              'quick_reply',
-                                                          ]
-                                                }
-                                                editable={this.state.editable}
-                                                onAttributesChange={this.onAttributesChange}
-                                            />
-                                            <button
-                                                className={styles.waRender}
-                                                onClick={() => {
-                                                    this.getRenderedTemplateWA()
-                                                }}
-                                            >
+                                                    )?.wa_mode == 'one_way' ?
+                                                        ['cta', 'quick_reply'] :
+                                                        [
+                                                            'menu',
+                                                            'quick_reply'
+                                                        ]
+                                                    }
+                                                    editable={this.state.editable}
+                                                    onAttributesChange={this.onAttributesChange}
+                                                />
+                                                <button
+                                                    className={styles.waRender}
+                                                    onClick={() => {
+                                                        this.getRenderedTemplateWA();
+                                                    }}
+                                                >
                                                 Render
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <h3>Please Select WA Mode.</h3>
-                                    )}
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <h3>Please Select WA Mode.</h3>
+                                        )}
                                 </div>
                             </div>
                         </div>
@@ -1132,9 +1132,9 @@ class TemplateScreen extends Component {
                 <div className={styles.teDetailPage}>
                     <div className={styles.teTemplateHeader}>
                         <h1>
-                            {this.state.editable
-                                ? 'Create New Template'
-                                : this.state.templateData.name}
+                            {this.state.editable ?
+                                'Create New Template' :
+                                this.state.templateData.name}
                         </h1>
                     </div>
                     <div>
@@ -1175,16 +1175,16 @@ class TemplateScreen extends Component {
                             <label>Default : </label>
                             {!this.state.editable &&
                             this.state.templateData.default ? (
-                                <i
-                                    className="fa fa-check-circle"
-                                    aria-hidden="true"
-                                />
-                            ) : (
-                                <i
-                                    className="fa fa-times-circle"
-                                    aria-hidden="true"
-                                />
-                            )}
+                                    <i
+                                        className="fa fa-check-circle"
+                                        aria-hidden="true"
+                                    />
+                                ) : (
+                                    <i
+                                        className="fa fa-times-circle"
+                                        aria-hidden="true"
+                                    />
+                                )}
                         </div>
                     </div>
                 </div>
@@ -1206,29 +1206,29 @@ class TemplateScreen extends Component {
                             {this.state.type == 'whatsapp' &&
                                 JSON.parse(this.state.attributes)?.wa_mode ==
                                     '' && (
-                                    <div>
-                                        <label> Wa Type : </label>
-                                        <select
-                                            className={styles.teButtons}
-                                            onChange={e => this.onAttributesChange('wa_mode', e.target.value)}
-                                            value={
+                                <div>
+                                    <label> Wa Type : </label>
+                                    <select
+                                        className={styles.teButtons}
+                                        onChange={e => this.onAttributesChange('wa_mode', e.target.value)}
+                                        value={
                                                 JSON.parse(
                                                     this.state.attributes
                                                 )?.wa_mode
-                                            }
-                                        >
-                                            <option value="" disabled>
+                                        }
+                                    >
+                                        <option value="" disabled>
                                                 Choose
-                                            </option>
-                                            <option value="one_way">
+                                        </option>
+                                        <option value="one_way">
                                                 One Way
-                                            </option>
-                                            <option value="two_way">
+                                        </option>
+                                        <option value="two_way">
                                                 Two Way
-                                            </option>
-                                        </select>
-                                    </div>
-                                )}
+                                        </option>
+                                    </select>
+                                </div>
+                            )}
                             {this.state.type == 'whatsapp' && (
                                 <span>
                                     {JSON.parse(this.state.attributes)?.wa_mode}
@@ -1339,8 +1339,7 @@ class TemplateScreen extends Component {
                             <button
                                 className={styles.teButtons}
                                 onClick={() => {
-                                    if (window.confirm('Are you sure ?')) {
-                                        // eslint-disable-line no-alert
+                                    if (window.confirm('Are you sure ?')) { // eslint-disable-line no-alert
                                         this.postTemplate(
                                             this.state.templateData.name,
                                             this.state.type,
@@ -1514,18 +1513,18 @@ class TemplateScreen extends Component {
                                 this.state.subTemplatesData.hasOwnProperty(
                                     this.state.previewSubType
                                 ) ? (
-                                    <iframe
-                                        height="100%"
-                                        width="100%"
-                                        srcDoc={
-                                            this.state.subTemplatesData[
-                                                this.state.previewSubType
-                                            ].output
-                                        }
-                                    />
-                                ) : (
-                                    ''
-                                )}
+                                        <iframe
+                                            height="100%"
+                                            width="100%"
+                                            srcDoc={
+                                                this.state.subTemplatesData[
+                                                    this.state.previewSubType
+                                                ].output
+                                            }
+                                        />
+                                    ) : (
+                                        ''
+                                    )}
                             </div>
                         </div>
                     </div>
@@ -1543,13 +1542,13 @@ TemplateScreen.propTypes = {
     match: PropTypes.shape({
         params: PropTypes.shape({
             name: PropTypes.string,
-            version: PropTypes.string,
-        }),
+            version: PropTypes.string
+        })
     }),
     history: PropTypes.shape({
-        push: PropTypes.func,
+        push: PropTypes.func
     }),
-    editable: PropTypes.bool,
+    editable: PropTypes.bool
 };
 
 export default withRouter(TemplateScreen);
