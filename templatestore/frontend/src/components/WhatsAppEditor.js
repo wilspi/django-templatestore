@@ -19,9 +19,9 @@ function WhatsAppEditor(props) {
     );
     const [buttonList, setButtonList] = useState(
         props.editable ?
-            [] :
+            { buttons: [] } :
             props.subTemplatesData.button == null ?
-                [] :
+                { buttons: [] } :
                 JSON.parse(props.subTemplatesData.button.data)
     );
     const [buttonCnt, setButtonCnt] = useState(0);
@@ -55,7 +55,8 @@ function WhatsAppEditor(props) {
     }
 
     function handleQuickReplyButtonChange(e, id) {
-        let buttonListCopy = buttonList.map((button, index) => {
+        let buttonListCopy = { ...buttonList };
+        buttonListCopy.buttons = buttonList.buttons.map((button, index) => {
             if (button.reply.id == id) {
                 return {
                     ...button,
@@ -72,7 +73,8 @@ function WhatsAppEditor(props) {
     }
 
     function handleCTAButtonChange(id, field, value) {
-        let buttonListCopy = buttonList.map((button, index) => {
+        let buttonListCopy = { ...buttonList };
+        buttonListCopy.buttons = buttonList.buttons.map((button, index) => {
             if (button.id == id) {
                 return {
                     ...button,
@@ -103,33 +105,57 @@ function WhatsAppEditor(props) {
     }
 
     function AddQuickReplyButton() {
-        let buttonListCopy = [...buttonList, {
-            type: 'reply',
-            reply: {
-                id: uuid(),
-                title: ''
-            }
-        }];
+        // let buttonListCopy = [...buttonList, {
+        //     type: 'reply',
+        //     reply: {
+        //         id: uuid(),
+        //         title: ''
+        //     }
+        // }];
+        let buttonListCopy = {
+            buttons: [
+                ...buttonList.buttons,
+                {
+                    type: 'reply',
+                    reply: {
+                        id: uuid(),
+                        title: ''
+                    }
+                }
+            ]
+        };
         setButtonList(buttonListCopy);
         props.onTemplateChange('button', JSON.stringify(buttonListCopy));
     }
 
     function AddCtaButton() {
-        let buttonListCopy = [
-            ...buttonList,
-            {
-                id: uuid(),
-                type: 'phone_number',
-                text: '',
-                phone_number: ''
-            }
-        ];
+        // let buttonListCopy = [
+        //     ...buttonList,
+        //     {
+        //         id: uuid(),
+        //         type: 'phone_number',
+        //         text: '',
+        //         phone_number: '',
+        //     },
+        // ];
+        let buttonListCopy = {
+            buttons: [
+                ...buttonList.buttons,
+                {
+                    id: uuid(),
+                    type: 'phone_number',
+                    text: '',
+                    phone_number: ''
+                }
+            ]
+        };
         setButtonList(buttonListCopy);
         props.onTemplateChange('button', JSON.stringify(buttonListCopy));
     }
 
     function deleteQuickReplyButton(id) {
-        let buttonListCopy = buttonList.filter(button => {
+        let buttonListCopy = { ...buttonList };
+        buttonListCopy.buttons = buttonList.buttons.filter(button => {
             return button.reply.id != id;
         });
         setButtonList(buttonListCopy);
@@ -137,7 +163,8 @@ function WhatsAppEditor(props) {
     }
 
     function deleteCTAButton(id) {
-        let buttonListCopy = buttonList.filter(button => {
+        let buttonListCopy = { ...buttonList };
+        buttonListCopy.buttons = buttonListCopy.buttons.filter(button => {
             return button.id != id;
         });
         setButtonList(buttonListCopy);
@@ -145,7 +172,8 @@ function WhatsAppEditor(props) {
     }
 
     function changeCTAButtonType(id, oldCTAType) {
-        let buttonListCopy = buttonList.map((button, index) => {
+        let buttonListCopy = { ...buttonList };
+        buttonListCopy.buttons = buttonList.buttons.map((button, index) => {
             if (button.id == id) {
                 if (oldCTAType == 'phone_number') {
                     return {
@@ -226,8 +254,8 @@ function WhatsAppEditor(props) {
                         </p>
                     </div>
                 )}
-                {buttonList.length != 0 &&
-                    buttonList.map((button, index) => {
+                {buttonList.buttons.length != 0 &&
+                    buttonList.buttons.map((button, index) => {
                         if (button.type == 'reply') {
                             return (
                                 <QuickReplyButton
@@ -268,7 +296,7 @@ function WhatsAppEditor(props) {
                         </select>
                     </div>
                 )}
-                {buttonType != '' && buttonCnt - buttonList.length > 0 && (
+                {buttonType != '' && buttonCnt - buttonList.buttons.length > 0 && (
                     <div>
                         <button
                             className={styles.waButton}
@@ -326,7 +354,7 @@ function WhatsAppEditor(props) {
                         </div>
                     </div>
 
-                    {buttonList.map((button, index) => {
+                    {buttonList.buttons.map((button, index) => {
                         if (button.type == 'reply') {
                             return (
                                 <div
