@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styles from '../style/WhatsAppEditor.less';
 export default function CTAButton({
     button,
+    ctaTypeDropdownOptions,
     handleChange,
     deleteButton,
     changeCTAButtonType
@@ -65,12 +66,9 @@ export default function CTAButton({
                                             );
                                         }}
                                     >
-                                        <option value="phone_number">
-                                            Call Phone Number
-                                        </option>
-                                        <option value="url">
-                                            Visit Website
-                                        </option>
+                                        {ctaTypeDropdownOptions.map((item, i) => {
+                                            return <option value={item.value} disabled={item.disabled} index={i}> {item.text}</option>;
+                                        })}
                                     </select>
                                 </td>
                             </tr>
@@ -203,12 +201,9 @@ export default function CTAButton({
                                             );
                                         }}
                                     >
-                                        <option value="phone_number">
-                                            Call Phone Number
-                                        </option>
-                                        <option value="url">
-                                            Visit Website
-                                        </option>
+                                        {ctaTypeDropdownOptions.map((item, i) => {
+                                            return <option value={item.value} disabled={item.disabled} index={i}> {item.text}</option>;
+                                        })}
                                     </select>
                                 </td>
                             </tr>

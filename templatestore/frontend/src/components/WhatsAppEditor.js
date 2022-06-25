@@ -32,6 +32,7 @@ function WhatsAppEditor(props) {
                 '' :
                 props.subTemplatesData.button.renderMode
     );
+    const [ctaTypeDropdownOptions, setCtaTypeDropdownOptions] = useState([{ text: "Call Phone Number", value: "phone_number", disabled: false }, { text: "Visit Website", value: "url", disabled: false }]);
     useEffect(() => {
         if (buttonType == 'cta') {
             setButtonCnt(2);
@@ -39,6 +40,21 @@ function WhatsAppEditor(props) {
             setButtonCnt(3);
         }
     }, [buttonType]);
+    useEffect(() => {
+        buttonList.buttons.forEach(button => {
+            if (button.type == 'phone_number') {
+                setCtaTypeDropdownOptions((prev) => {
+                    prev[0].disabled = true;
+                    return prev;
+                });
+            } else if (button.type == 'url') {
+                setCtaTypeDropdownOptions((prev) => {
+                    prev[1].disabled = true;
+                    return prev;
+                });
+            }
+        });
+    }, [buttonList]);
     function handleChange(e) {
         let subType;
         if (e.target.name == 'header') {
@@ -121,15 +137,35 @@ function WhatsAppEditor(props) {
     }
 
     function AddCtaButton() {
+        let newButton;
+        if (ctaTypeDropdownOptions[0].disabled == false) {
+            newButton = {
+                id: uuid(),
+                type: 'phone_number',
+                text: '',
+                phone_number: ''
+            };
+            setCtaTypeDropdownOptions(prev => {
+                prev[0].disabled = true;
+                return prev;
+            });
+        } else {
+            newButton = {
+                id: uuid(),
+                type: 'url',
+                text: '',
+                urlType: 'STATIC',
+                url: ''
+            };
+            setCtaTypeDropdownOptions(prev => {
+                prev[1].disabled = true;
+                return prev;
+            });
+        }
         let buttonListCopy = {
             buttons: [
                 ...buttonList.buttons,
-                {
-                    id: uuid(),
-                    type: 'phone_number',
-                    text: '',
-                    phone_number: ''
-                }
+                newButton
             ]
         };
         setButtonList(buttonListCopy);
@@ -148,7 +184,15 @@ function WhatsAppEditor(props) {
     function deleteCTAButton(id) {
         let buttonListCopy = { ...buttonList };
         buttonListCopy.buttons = buttonListCopy.buttons.filter(button => {
-            return button.id != id;
+            if (button.id == id) {
+                setCtaTypeDropdownOptions(prev => {
+                    let index = button.type == 'phone_number' ? 0 : 1;
+                    prev[index].disabled = false;
+                    return prev;
+                });
+                return false;
+            }
+            return true;
         });
         setButtonList(buttonListCopy);
         props.onTemplateChange('button', JSON.stringify(buttonListCopy));
@@ -159,6 +203,11 @@ function WhatsAppEditor(props) {
         buttonListCopy.buttons = buttonList.buttons.map((button, index) => {
             if (button.id == id) {
                 if (oldCTAType == 'phone_number') {
+                    setCtaTypeDropdownOptions(prev => {
+                        prev[0].disabled = false;
+                        prev[1].disabled = true;
+                        return prev;
+                    });
                     return {
                         id: id,
                         type: 'url',
@@ -167,6 +216,11 @@ function WhatsAppEditor(props) {
                         url: ''
                     };
                 } else {
+                    setCtaTypeDropdownOptions(prev => {
+                        prev[0].disabled = true;
+                        prev[1].disabled = false;
+                        return prev;
+                    });
                     return {
                         id: id,
                         type: 'phone_number',
@@ -253,6 +307,7 @@ function WhatsAppEditor(props) {
                                 <CTAButton
                                     key={button.id}
                                     button={button}
+                                    ctaTypeDropdownOptions={ctaTypeDropdownOptions}
                                     handleChange={handleCTAButtonChange}
                                     deleteButton={deleteCTAButton}
                                     changeCTAButtonType={changeCTAButtonType}
