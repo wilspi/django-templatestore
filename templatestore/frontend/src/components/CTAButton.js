@@ -57,7 +57,7 @@ export default function CTAButton({
                                 >
                                     <select
                                         value={ctaType}
-                                        className="ui dropdown call_to_action_type_dropdown"
+                                        className={`${styles.teButtons} ui dropdown call_to_action_type_dropdown ${styles.WAselect}`}
                                         onChange={e => {
                                             setCtaTypa(e.target.value);
                                             changeCTAButtonType(
@@ -92,7 +92,7 @@ export default function CTAButton({
                                     <input
                                         type="text"
                                         maxLength="25"
-                                        className="phone_number_button_text call_to_action_button_text"
+                                        className={`${styles.WAinput} phone_number_button_text call_to_action_button_text`}
                                         value={button.text}
                                         onChange={e =>
                                             handleChange(
@@ -125,7 +125,7 @@ export default function CTAButton({
                                     <input
                                         type="text"
                                         placeholder="With Country Code"
-                                        className="phone_number_textbox"
+                                        className={`${styles.WAinput} phone_number_textbox`}
                                         value={button.phone_number}
                                         maxLength="13"
                                         onChange={e =>
@@ -192,7 +192,7 @@ export default function CTAButton({
                                 >
                                     <select
                                         value={ctaType}
-                                        className="ui dropdown call_to_action_type_dropdown"
+                                        className={`${styles.teButtons} ui dropdown call_to_action_type_dropdown ${styles.WAselect}`}
                                         onChange={e => {
                                             setCtaTypa(e.target.value);
                                             changeCTAButtonType(
@@ -227,7 +227,7 @@ export default function CTAButton({
                                     <input
                                         type="text"
                                         maxLength="25"
-                                        className="url_button_text call_to_action_button_text"
+                                        className={`${styles.WAinput} url_button_text call_to_action_button_text`}
                                         value={button.text}
                                         onChange={e =>
                                             handleChange(
@@ -258,7 +258,7 @@ export default function CTAButton({
                                 >
                                     <select
                                         id="url_type_dropdown"
-                                        className="ui dropdown"
+                                        className={`${styles.teButtons} ui dropdown ${styles.WAselect}`}
                                         value={button.urlType}
                                         onChange={e =>
                                             handleChange(
@@ -309,6 +309,7 @@ export default function CTAButton({
                                                 e.target.value
                                             )
                                         }
+                                        className={`${styles.WAinput}`}
                                     />
                                 </td>
                             </tr>

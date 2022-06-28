@@ -254,6 +254,7 @@ function WhatsAppEditor(props) {
                             value={header}
                             onChange={handleChange}
                             style={{ marginBottom: '0px' }}
+                            className={styles.WAinput}
                         />
                         {props.waMode == 'one_way' && <p style={{ fontSize: '12px' }}>
                             Header doesn't support variables in one-way mode.
@@ -285,6 +286,7 @@ function WhatsAppEditor(props) {
                             value={footer}
                             onChange={handleChange}
                             style={{ marginBottom: '0px' }}
+                            className={styles.WAinput}
                         />
                         {props.waMode == 'one_way' && <p style={{ fontSize: '12px' }}>
                             Footer doesn't supports variables in one-way mode.
@@ -319,7 +321,7 @@ function WhatsAppEditor(props) {
                     <div>
                         <div>Button to Add :</div>
                         <select
-                            className={styles.teButtons}
+                            className={`${styles.teButtons} ${styles.WAselect}`}
                             onChange={setButton}
                             value={buttonType}
                         >

@@ -6,7 +6,7 @@ export default function QuickReplyButton({ button, handleChange, deleteButton })
             <input
                 type="text"
                 value={button.reply.title}
-                className="WAinputs"
+                className={`${styles.WAinput} WAinputs`}
                 onChange={e => handleChange(e, button.reply.id)}
             />
             <span
