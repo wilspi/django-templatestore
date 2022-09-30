@@ -53,13 +53,11 @@ class Home extends Component {
     }
 
     openTemplateScreenPage(name, version) {
-        this.props.history.push(
-            backendSettings.TE_BASEPATH +
-                '/t/' +
-                name +
-                '/' +
-                (version === '-' ? '0.1' : version)
-        );
+        window.open(backendSettings.TE_BASEPATH +
+            '/t/' +
+            name +
+            '/' +
+            (version === '-' ? '0.1' : version), "_blank");
     }
 
     openNewTemplatePage() {
