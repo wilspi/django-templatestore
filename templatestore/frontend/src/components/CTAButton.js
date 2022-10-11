@@ -269,6 +269,7 @@ export default function CTAButton({
                                         }
                                     >
                                         <option value="STATIC">Static</option>
+                                        <option value="DYNAMIC">Dynamic</option>
                                     </select>
                                 </td>
                             </tr>
@@ -313,6 +314,49 @@ export default function CTAButton({
                                     />
                                 </td>
                             </tr>
+                            {button.urlType == "DYNAMIC" && (
+                                <tr>
+                                    <td
+                                        style={{
+                                            paddingBottom: '.5rem',
+                                            backgroundColor: '#f8fafb',
+                                            border: 'none'
+                                        }}
+                                    >
+                                        Dynamic URL Parameter
+                                        <i
+                                            style={{
+                                                color: '#444950',
+                                                float: 'right'
+                                            }}
+                                            className="info circle icon"
+                                            data-content="Adding a variable creates a personalized link for the customer to view their info. Only one variable will be added to the end of a URL. {{1}} will be added automatically to the url, no need to explicitly define it here."
+                                        />
+                                    </td>
+                                    <td
+                                        style={{
+                                            padding: '0 1rem 1rem 1rem',
+                                            backgroundColor: '#f8fafb',
+                                            border: 'none'
+                                        }}
+                                        colSpan="3"
+                                    >
+                                        <input
+                                            id="website_url_dynamic"
+                                            type="text"
+                                            value={button.dynamicUrlParam}
+                                            onChange={e =>
+                                                handleChange(
+                                                    button.id,
+                                                    'dynamicUrlParam',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className={`${styles.WAinput}`}
+                                        />
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
