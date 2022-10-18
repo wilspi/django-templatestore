@@ -354,6 +354,13 @@ export default function CTAButton({
                                             }
                                             className={`${styles.WAinput}`}
                                         />
+                                        <p style={{ fontSize: '12px' }}>
+                                            Dynamic URL Parameter will be appended to the Website URL.
+                                            <br />
+                                            Eg:- input: 'url':'www.ackodev.com/' and 'dynamicUrlParam':'hello'
+                                            <br />
+                                            result: 'url':'www.ackodev.com/hello'
+                                        </p>
                                     </td>
                                 </tr>
                             )}
